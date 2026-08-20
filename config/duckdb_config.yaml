@@ -1,0 +1,7 @@
+snapshot_pointer: 'D:/duckdb_data/xc_tushare_data.snapshots/current.json'
+start: '20200102'
+end: '20251231'
+max_stocks: 60
+liquidity_lookback: 60
+min_observations: 60
+output_dir: outputs/duckdb_demo

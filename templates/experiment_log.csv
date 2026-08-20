@@ -1,0 +1,3 @@
+experiment_id,date,hypothesis,only_change,fixed_items,data_version,label_version,feature_version,model,seed,mean_rank_ic,top_group_return,sharpe,max_drawdown,turnover,conclusion,failure_reason,next_step
+EXP-001,YYYY-MM-DD,示例：增加流动性过滤可提高稳定性,min_observations 800->1000,其余配置固定,snapshot_id,label_rank_5d_v1,basic_v1,lightgbm,42,,,,,,,待填写,待填写
+
