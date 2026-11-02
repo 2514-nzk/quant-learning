@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ef">
+  <meta name="description" content="从传统因子到机器学习选股的中文量化研究自学教材。">
+  <title>量化入门 · 在线阅读</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="书籍目录">
+      <a class="brand" href="./" aria-label="量化入门首页">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+        <span><strong>读书计划</strong><small>QUANT STUDY NOTES</small></span>
+      </a>
+
+      <div class="library-label"><span>你的书架</span><span class="shelf-count" id="item-count">—</span></div>
+      <label class="search-box" for="search-input">
+        <span class="search-icon" aria-hidden="true">⌕</span>
+        <input id="search-input" type="search" placeholder="搜索章节与内容" autocomplete="off">
+        <kbd>⌘ K</kbd>
+      </label>
+      <div class="search-status" id="search-status" aria-live="polite"></div>
+      <nav class="chapter-nav" id="chapter-nav"></nav>
+
+      <div class="sidebar-bottom">
+        <div class="overall-progress">
+          <div class="progress-heading"><span>学习进度</span><span id="overall-progress-label">0%</span></div>
+          <div class="progress-track"><span id="overall-progress-bar"></span></div>
+          <small id="overall-progress-copy">开始阅读，记录会保存在这台设备上</small>
+        </div>
+        <a class="repository-link" href="https://github.com/2514-nzk/quant-learning" target="_blank" rel="noreferrer">
+          <span>查看 GitHub 项目</span><span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </aside>
+
+    <div class="mobile-backdrop" id="mobile-backdrop"></div>
+    <div class="main-column">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-button menu-button" id="menu-button" aria-label="打开目录" title="打开目录">☰</button>
+          <div class="breadcrumb"><span>书架</span><span class="crumb-slash">/</span><strong id="breadcrumb-title">量化入门</strong></div>
+        </div>
+        <div class="topbar-tools">
+          <span class="chapter-progress" id="chapter-progress"></span>
+          <span class="tool-divider"></span>
+          <button class="icon-button" id="font-down" aria-label="缩小字号" title="缩小字号">A−</button>
+          <button class="icon-button font-up" id="font-up" aria-label="放大字号" title="放大字号">A+</button>
+          <button class="icon-button theme-button" id="theme-button" aria-label="切换明暗主题" title="切换明暗主题">◐</button>
+        </div>
+      </header>
+
+      <main class="reader-scroll" id="reader-scroll" tabindex="-1">
+        <section class="home-view" id="home-view" hidden>
+          <div class="home-intro">
+            <div class="eyebrow"><span class="eyebrow-line"></span>一份可以慢慢读的自学教材</div>
+            <h1>从因子开始，<br><em>读懂量化研究。</em></h1>
+            <p class="home-lede">把复杂的研究过程拆成清楚的章节。先建立数据与因子的直觉，再学习组合、回测与机器学习。</p>
+            <div class="home-actions">
+              <button class="primary-button" id="resume-button">从上次位置继续 <span aria-hidden="true">→</span></button>
+              <button class="text-button" id="start-button">从头开始阅读 <span aria-hidden="true">↗</span></button>
+            </div>
+          </div>
+          <div class="home-aside">
+            <div class="book-cover">
+              <div class="cover-top"><span>QUANTITATIVE RESEARCH</span><span>自学教材 · 中文</span></div>
+              <div class="cover-chart" aria-hidden="true">
+                <div class="chart-grid"></div>
+                <svg viewBox="0 0 280 156" role="presentation"><path class="chart-area" d="M0 135 C24 126 36 112 52 117 S80 98 99 106 S131 72 151 85 S177 61 195 68 S223 32 241 47 S263 18 280 24 V156 H0Z"/><path class="chart-line" d="M0 135 C24 126 36 112 52 117 S80 98 99 106 S131 72 151 85 S177 61 195 68 S223 32 241 47 S263 18 280 24"/></svg>
+                <span class="chart-note">研究 · 验证 · 复现</span>
+              </div>
+              <div class="cover-title"><span>QUANT 01 / 02</span><strong>量化研究<br>入门手册</strong><small>从传统因子到机器学习选股</small></div>
+              <div class="cover-foot"><span>一章一章读，随时接着学</span><span>↗</span></div>
+            </div>
+            <div class="cover-caption"><span class="caption-dot"></span>你的阅读进度会保存在当前浏览器</div>
+          </div>
+          <div class="home-meta">
+            <div><strong id="home-chapter-count">—</strong><span>篇讲义与参考材料</span></div>
+            <div><strong>2</strong><span>个学习阶段</span></div>
+            <div><strong id="home-reading-time">—</strong><span>分钟预计阅读</span></div>
+          </div>
+          <div class="home-paths">
+            <div class="section-heading"><div><span class="eyebrow-small">A SUGGESTED ROUTE</span><h2>循序渐进的学习路线</h2></div><span>按推荐顺序阅读即可</span></div>
+            <div class="path-grid" id="path-grid"></div>
+          </div>
+          <footer class="home-footer"><span>内容来自本地教材与研究模板</span><a href="https://github.com/2514-nzk/quant-learning" target="_blank" rel="noreferrer">项目源码 ↗</a></footer>
+        </section>
+
+        <section class="chapter-view" id="chapter-view" hidden>
+          <div class="chapter-shell">
+            <div class="chapter-kicker"><span id="chapter-group"></span><span class="kicker-dot">·</span><span id="chapter-reading-time"></span><span class="chapter-actions">
+              <button class="small-action" id="bookmark-button" title="加入书签"><span aria-hidden="true">☆</span><span>书签</span></button>
+              <button class="small-action" id="complete-button" title="标记已读"><span aria-hidden="true">✓</span><span>标记已读</span></button>
+            </span></div>
+            <div class="section-index" id="section-index" hidden></div>
+            <article class="markdown-body" id="markdown-body"></article>
+            <div class="chapter-endnote"><span class="endnote-mark">✳</span><span>读完一章，记下一个问题。研究从好问题开始。</span></div>
+            <nav class="chapter-pager" aria-label="章节导航">
+              <button id="previous-button" class="pager-link previous-link"><span>← 上一篇</span><strong></strong></button>
+              <button id="next-button" class="pager-link next-link"><span>下一篇 →</span><strong></strong></button>
+            </nav>
+            <footer class="chapter-footer"><a href="https://github.com/2514-nzk/quant-learning" target="_blank" rel="noreferrer">在 GitHub 查看原文 ↗</a><span>阅读进度仅保存在本地设备</span></footer>
+          </div>
+        </section>
+        <div class="loading-state" id="loading-state"><span class="loading-mark"></span><span>正在整理你的书架…</span></div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
