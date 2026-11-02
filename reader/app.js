@@ -63,6 +63,10 @@
     return String(index + 1).padStart(2, "0");
   }
 
+  function navigationTitle(title) {
+    return String(title).replace(/^回读\s*/i, "").replace(/^\d{2}[a-z]?\s*/i, "").trim();
+  }
+
   function renderOverallProgress() {
     const completed = state.completed.filter((path) => byPath.has(path)).length;
     const percent = documents.length ? Math.round(completed / documents.length * 100) : 0;
@@ -73,13 +77,12 @@
       : "开始阅读，记录会保存在这台设备上";
   }
 
-  function chapterButton(doc, index) {
+  function chapterButton(doc) {
     const isActive = current?.path === doc.path;
     const isBookmarked = state.bookmarks.includes(doc.path);
     const isComplete = state.completed.includes(doc.path);
     return `<button class="chapter-link${isActive ? " is-active" : ""}" data-path="${escapeHTML(doc.path)}" aria-current="${isActive ? "page" : "false"}">
-      <span class="chapter-number">${displayNumber(index)}</span>
-      <span class="chapter-label">${escapeHTML(doc.title)}</span>
+      <span class="chapter-label">${escapeHTML(navigationTitle(doc.title))}</span>
       <span class="chapter-state" aria-label="${isComplete ? "已读" : isBookmarked ? "已加入书签" : ""}">${isComplete ? "✓" : isBookmarked ? "☆" : ""}</span>
     </button>`;
   }
@@ -92,13 +95,12 @@
         || doc.content.toLocaleLowerCase().includes(query)
         || doc.group.toLocaleLowerCase().includes(query);
     });
-    const indexByPath = new Map(documents.map((doc, index) => [doc.path, index]));
     let html = "";
 
     if (!query && state.bookmarks.length) {
       const saved = state.bookmarks.map((path) => byPath.get(path)).filter(Boolean);
       if (saved.length) {
-        html += `<div class="nav-group bookmark-group"><div class="nav-heading"><span>我的书签</span><span class="nav-count">${saved.length}</span></div>${saved.map((doc) => chapterButton(doc, indexByPath.get(doc.path))).join("")}</div>`;
+        html += `<div class="nav-group bookmark-group"><div class="nav-heading"><span>我的书签</span><span class="nav-count">${saved.length}</span></div>${saved.map((doc) => chapterButton(doc)).join("")}</div>`;
       }
     }
 
@@ -106,7 +108,7 @@
     for (const group of groups) {
       const items = matches.filter((doc) => doc.group === group);
       if (!items.length) continue;
-      html += `<div class="nav-group"><div class="nav-heading"><span>${escapeHTML(group)}</span><span class="nav-count">${items.length}</span></div>${items.map((doc) => chapterButton(doc, indexByPath.get(doc.path))).join("")}</div>`;
+      html += `<div class="nav-group"><div class="nav-heading"><span>${escapeHTML(group)}</span><span class="nav-count">${items.length}</span></div>${items.map((doc) => chapterButton(doc)).join("")}</div>`;
     }
 
     els.nav.innerHTML = html || `<div class="empty-search"><span>⌕</span><strong>没有找到匹配内容</strong><small>试试更短的关键词</small></div>`;
