@@ -186,6 +186,43 @@
     } catch { /* Keep unparseable links as supplied. */ }
   }
 
+  function highlightCodeBlocks(container) {
+    const aliases = { py: "python", ps: "powershell", ps1: "powershell", pwsh: "powershell", yml: "yaml", sh: "bash", txt: "plaintext", text: "plaintext" };
+    const labels = { python: "Python", powershell: "PowerShell", sql: "SQL", yaml: "YAML", json: "JSON", bash: "Bash", plaintext: "纯文本" };
+    container.querySelectorAll("pre").forEach((pre) => {
+      const code = pre.querySelector("code");
+      if (!code) return;
+      const languageClass = [...code.classList].find((name) => name.startsWith("language-"));
+      let language = languageClass ? languageClass.slice("language-".length).toLowerCase() : "";
+      language = aliases[language] || language;
+      if (window.hljs) {
+        if (language && language !== "plaintext" && window.hljs.getLanguage(language)) {
+          code.className = `language-${language}`;
+          window.hljs.highlightElement(code);
+        } else if (!language) {
+          const result = window.hljs.highlightAuto(code.textContent || "");
+          if (result.relevance >= 4) {
+            language = result.language || "";
+            code.innerHTML = result.value;
+            code.className = language ? `language-${language} hljs` : "hljs";
+          } else {
+            language = "plaintext";
+            code.className = "language-plaintext";
+          }
+        } else {
+          code.className = "language-plaintext";
+        }
+      }
+      language ||= "plaintext";
+      pre.classList.add("code-block");
+      pre.dataset.language = language;
+      const toolbar = document.createElement("div");
+      toolbar.className = "code-toolbar";
+      toolbar.innerHTML = `<span class="code-language">${escapeHTML(labels[language] || language)}</span><button class="code-copy" type="button" aria-label="复制代码">复制代码</button>`;
+      pre.prepend(toolbar);
+    });
+  }
+
   function renderArticle(doc) {
     if (!window.marked || !window.DOMPurify) {
       els.article.innerHTML = `<p class="reader-error">正文解析组件没有加载成功。请刷新页面，或检查当前网络是否可以访问 jsDelivr。</p><pre>${escapeHTML(doc.content)}</pre>`;
@@ -206,6 +243,7 @@
       }
       image.loading = "lazy";
     });
+    highlightCodeBlocks(wrapper);
 
     const headings = [...wrapper.querySelectorAll("h2, h3")];
     const slugCounts = new Map();
@@ -397,6 +435,21 @@
   els.mobileBackdrop.addEventListener("click", closeMobileMenu);
   els.reader.addEventListener("scroll", updateReadingProgress, { passive: true });
   els.article.addEventListener("click", (event) => {
+    const copyButton = event.target.closest(".code-copy");
+    if (copyButton) {
+      const code = copyButton.closest("pre")?.querySelector("code");
+      if (!code) return;
+      if (!navigator.clipboard?.writeText) {
+        copyButton.textContent = "无法复制";
+        return;
+      }
+      const originalLabel = "复制代码";
+      navigator.clipboard.writeText(code.innerText).then(() => {
+        copyButton.textContent = "已复制";
+        setTimeout(() => { if (copyButton.isConnected) copyButton.textContent = originalLabel; }, 1400);
+      }).catch(() => { copyButton.textContent = "复制失败"; });
+      return;
+    }
     const anchor = event.target.closest("a.reader-internal-link");
     if (!anchor) return;
     const targetURL = new URL(anchor.href, location.href);
