@@ -1,5 +1,7 @@
 # 前置知识A：Python 数据分析基础（pandas 与 NumPy）
 
+**程序员学习入口：** 先完成 [00d 量化 Python 实战](00d_量化Python实战.md) 的完整数据流程，再按需要查本章语法；统计直觉配合 [00e 量化数学与统计](00e_量化数学与统计.md)。本章部分短例子用 `date`，完整课程统一用 `trade_date`，接入时应明确重命名。
+
 本章假设你已经会 Python 基本语法（变量、循环、函数），专注于量化研究中最常用的 pandas 与 NumPy 操作。后面的“扩展模块”补充时间序列、分组窗口、缺失值和调试方法，并把示例对齐到本教程 `src/` 的当前实现。
 
 > 当前项目字段口径：教学代码使用 `trade_date`、`code`、`open`、`high`、`low`、`close`、`volume`、`amount`、`market_cap`；特征列包括 `mom_5`、`mom_20`、`reversal_3`、`vol_20`、`range_1d`、`amount_chg_5`、`log_mkt_cap`。标签为 T 日信号后 T+1 开盘到 T+5 收盘的 `fwd_return`，并在 T 日可用股票池内计算 `label_rank`。真实数据里的 `ts_code`、`adj_open` 等字段由 `src/duckdb_data.py` 转成上述统一字段。
@@ -59,17 +61,17 @@ recent_data = df[mask]
 
 ```python
 # 计算每只股票的收益率（当前价格/前一日价格 - 1）
-df['return'] = df.groupby('code')['close'].pct_change()
+df['return'] = df.groupby('code')['close'].pct_change(fill_method=None)
 
 # 计算每只股票的5日移动平均
 df['ma5'] = df.groupby('code')['close'].transform(
     lambda x: x.rolling(window=5, min_periods=1).mean()
 )
 
-# 向前移动（shift）：获取前一日的值
+# 正向 shift：获取同一股票前一行的值；市场交易日语义需要完整日历
 df['prev_close'] = df.groupby('code')['close'].shift(1)
 
-# 向后移动（shift负数）：获取未来值（用于标签，注意泄漏！）
+# 负向 shift：示范获取未来第 5 行；严格 T+5 标签应按市场日历连接
 df['next_5d_close'] = df.groupby('code')['close'].shift(-5)
 
 print(df)
@@ -77,7 +79,7 @@ print(df)
 
 **关键概念：**
 - `groupby('code')` 确保每只股票独立计算
-- `shift(1)` 是"昨天的值"，`shift(-5)` 是"5天后的值"
+- `shift(1)` 取前一行，`shift(-5)` 取后五行；只有股票已对齐完整市场日历时才能对应交易日期，不能将稀疏行号当作天数
 - `transform` 保持原DataFrame形状，`apply` 可能改变形状
 
 ## 4. 横截面操作：每天对比所有股票
@@ -245,13 +247,13 @@ grouped = grouped.reset_index(drop=True)  # 重置索引
 
 ## 10. 下一步
 
-完成以下练习后再进入机器学习章节：
+完成以下练习后进入研究问题、数据时点与单因子章节：
 
 1. 读取一份CSV股票数据，计算5日、10日、20日收益率
 2. 计算每只股票的20日滚动波动率（收益率标准差）
 3. 每天对所有股票按市值排名，标记市值最大的前100只
 4. 合并两张表：日线价格表 + 每日指标表
-5. 处理缺失值：删除连续停牌超过5天的样本
+5. 标记连续缺失行情，核对停牌或数据源原因，并报告标签覆盖；不能把已有持仓直接删除
 
 **检验标准：** 能够写出"每天选出过去20日收益率前10%且成交额>1亿的股票"这类筛选逻辑。
 
@@ -1050,4 +1052,4 @@ print(sample[features].isna().mean().sort_values(ascending=False))
 - [ ] 能写出形状、重复键、日期范围、数值范围和缺失率检查。
 - [ ] 清楚当前 `fwd_return` 是 T+1 开盘到 T+5 收盘，`label_rank` 是 T 日可用股票池内的直接收益百分位排名。
 
-完成这些练习后再进入机器学习基础章节。下一步仍然是先确认时间切分、标签对齐和样本外评价，而不是先追求更复杂的模型。
+完成这些练习后，进入研究问题、数据时点、时间切分与单因子研究；推荐顺序见 [教材目录](README.md)。机器学习基础在完成传统因子阶段后再学。
