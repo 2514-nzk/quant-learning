@@ -12,6 +12,15 @@
   --green-dark: #385a32;
   --green-pale: #e9eee5;
   --orange: #bb7854;
+  --code-comment: #687568;
+  --code-keyword: #7651a3;
+  --code-string: #2c7650;
+  --code-attribute: #93620d;
+  --code-number: #90601a;
+  --code-function: #335fa8;
+  --code-type: #167482;
+  --code-red: #b84250;
+  --code-foreground: #4d554a;
   --sidebar-width: 286px;
   --reader-scale: 1;
   font-synthesis: none;
@@ -34,6 +43,15 @@
   --green-dark: #c8dfbb;
   --green-pale: #28352a;
   --orange: #d19470;
+  --code-comment: #82909e;
+  --code-keyword: #c792ea;
+  --code-string: #a5d6a7;
+  --code-attribute: #e5c07b;
+  --code-number: #e5a86b;
+  --code-function: #82aaff;
+  --code-type: #56b6c2;
+  --code-red: #e06c75;
+  --code-foreground: #c6ccd5;
 }
 
 * { box-sizing: border-box; }
@@ -217,42 +235,20 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .markdown-body pre.code-block { position: relative; padding: 43px 17px 17px; }
 .code-toolbar { position: absolute; top: 9px; right: 12px; left: 15px; display: flex; align-items: center; justify-content: space-between; min-height: 21px; }
 .code-language { color: var(--ink-faint); font-family: "DM Mono", monospace; font-size: 8px; font-weight: 500; letter-spacing: .09em; text-transform: uppercase; }
-.code-copy { padding: 3px 7px; color: var(--ink-soft); background: var(--paper); border: 1px solid var(--line); border-radius: 3px; cursor: pointer; font-family: "DM Sans", "Noto Sans SC", sans-serif; font-size: 9px; transition: border-color .15s ease, color .15s ease; }
-.code-copy:hover { color: var(--green-dark); border-color: var(--green); }
+.code-copy { padding: 3px 7px; color: var(--ink-soft); background: var(--paper); border: 1px solid var(--line); border-radius: 3px; cursor: pointer; font-family: "DM Sans", "Noto Sans SC", sans-serif; font-size: 9px; transition: border-color .15s ease, color .15s ease, background .15s ease; }
+.code-copy:hover { color: var(--green-dark); background: var(--green-pale); border-color: var(--green); }
 .markdown-body pre code { padding: 0; color: var(--ink-soft); background: transparent; font-size: .78em; }
 .markdown-body pre code.hljs { display: block; padding: 0; overflow-x: visible; background: transparent; }
-.markdown-body .hljs-comment, .markdown-body .hljs-quote, .markdown-body .hljs-meta { color: #687568; font-style: italic; }
-.markdown-body .hljs-keyword, .markdown-body .hljs-selector-tag, .markdown-body .hljs-doctag, .markdown-body .hljs-name { color: #70409a; font-weight: 600; }
-.markdown-body .hljs-string, .markdown-body .hljs-attr, .markdown-body .hljs-template-variable, .markdown-body .hljs-regexp { color: #a24f2e; }
-.markdown-body .hljs-number, .markdown-body .hljs-literal, .markdown-body .hljs-symbol, .markdown-body .hljs-bullet { color: #8d5b12; }
-.markdown-body .hljs-title, .markdown-body .hljs-title.function_, .markdown-body .hljs-title.class_, .markdown-body .hljs-function .hljs-title { color: #245b88; }
-.markdown-body .hljs-built_in, .markdown-body .hljs-type, .markdown-body .hljs-variable.language_, .markdown-body .hljs-params { color: #28745d; }
-.markdown-body .hljs-section, .markdown-body .hljs-attribute { color: #765325; }
-:root[data-theme="dark"] .markdown-body .hljs-comment,
-:root[data-theme="dark"] .markdown-body .hljs-quote,
-:root[data-theme="dark"] .markdown-body .hljs-meta { color: #a0ae9f; }
-:root[data-theme="dark"] .markdown-body .hljs-keyword,
-:root[data-theme="dark"] .markdown-body .hljs-selector-tag,
-:root[data-theme="dark"] .markdown-body .hljs-doctag,
-:root[data-theme="dark"] .markdown-body .hljs-name { color: #d2b2ff; }
-:root[data-theme="dark"] .markdown-body .hljs-string,
-:root[data-theme="dark"] .markdown-body .hljs-attr,
-:root[data-theme="dark"] .markdown-body .hljs-template-variable,
-:root[data-theme="dark"] .markdown-body .hljs-regexp { color: #f0b38f; }
-:root[data-theme="dark"] .markdown-body .hljs-number,
-:root[data-theme="dark"] .markdown-body .hljs-literal,
-:root[data-theme="dark"] .markdown-body .hljs-symbol,
-:root[data-theme="dark"] .markdown-body .hljs-bullet { color: #e8d384; }
-:root[data-theme="dark"] .markdown-body .hljs-title,
-:root[data-theme="dark"] .markdown-body .hljs-title.function_,
-:root[data-theme="dark"] .markdown-body .hljs-title.class_,
-:root[data-theme="dark"] .markdown-body .hljs-function .hljs-title { color: #99caff; }
-:root[data-theme="dark"] .markdown-body .hljs-built_in,
-:root[data-theme="dark"] .markdown-body .hljs-type,
-:root[data-theme="dark"] .markdown-body .hljs-variable.language_,
-:root[data-theme="dark"] .markdown-body .hljs-params { color: #91d8bb; }
-:root[data-theme="dark"] .markdown-body .hljs-section,
-:root[data-theme="dark"] .markdown-body .hljs-attribute { color: #e9bf83; }
+.markdown-body .hljs-comment, .markdown-body .hljs-quote, .markdown-body .hljs-meta { color: var(--code-comment); font-style: italic; }
+.markdown-body .hljs-keyword, .markdown-body .hljs-selector-tag, .markdown-body .hljs-doctag { color: var(--code-keyword); font-weight: 600; }
+.markdown-body .hljs-name, .markdown-body .hljs-tag, .markdown-body .hljs-regexp { color: var(--code-red); }
+.markdown-body .hljs-string, .markdown-body .hljs-template-variable { color: var(--code-string); }
+.markdown-body .hljs-attr, .markdown-body .hljs-attribute { color: var(--code-attribute); }
+.markdown-body .hljs-number, .markdown-body .hljs-literal, .markdown-body .hljs-symbol, .markdown-body .hljs-bullet { color: var(--code-number); }
+.markdown-body .hljs-title, .markdown-body .hljs-title.function_, .markdown-body .hljs-function .hljs-title { color: var(--code-function); }
+.markdown-body .hljs-title.class_, .markdown-body .hljs-type, .markdown-body .hljs-built_in { color: var(--code-type); }
+.markdown-body .hljs-variable, .markdown-body .hljs-variable.language_ { color: var(--code-attribute); }
+.markdown-body .hljs-params, .markdown-body .hljs-operator, .markdown-body .hljs-punctuation { color: var(--code-foreground); }
 .markdown-body table { width: 100%; margin: 1.6em 0; border-collapse: collapse; font-size: .9em; line-height: 1.78; }
 .markdown-body th, .markdown-body td { padding: 10px 11px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
 .markdown-body th { color: var(--ink); background: var(--paper-deep); font-family: "DM Sans", "Noto Sans SC", sans-serif; font-size: .9em; font-weight: 600; }
