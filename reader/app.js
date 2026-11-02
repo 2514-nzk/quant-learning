@@ -35,6 +35,7 @@
   let current = null;
   let saveTimer = 0;
   let searchTerm = "";
+  let mainChapterCount = 0;
 
   function freshState() {
     return { lastPath: "", bookmarks: [], completed: [], positions: {}, theme: "light", font: 1 };
@@ -59,14 +60,6 @@
     return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
   }
 
-  function displayNumber(index) {
-    return String(index + 1).padStart(2, "0");
-  }
-
-  function navigationTitle(title) {
-    return String(title).replace(/^回读\s*/i, "").replace(/^\d{2}[a-z]?\s*/i, "").trim();
-  }
-
   function renderOverallProgress() {
     const completed = state.completed.filter((path) => byPath.has(path)).length;
     const percent = documents.length ? Math.round(completed / documents.length * 100) : 0;
@@ -82,7 +75,7 @@
     const isBookmarked = state.bookmarks.includes(doc.path);
     const isComplete = state.completed.includes(doc.path);
     return `<button class="chapter-link${isActive ? " is-active" : ""}" data-path="${escapeHTML(doc.path)}" aria-current="${isActive ? "page" : "false"}">
-      <span class="chapter-label">${escapeHTML(navigationTitle(doc.title))}</span>
+      <span class="chapter-label">${escapeHTML(doc.title)}</span>
       <span class="chapter-state" aria-label="${isComplete ? "已读" : isBookmarked ? "已加入书签" : ""}">${isComplete ? "✓" : isBookmarked ? "☆" : ""}</span>
     </button>`;
   }
@@ -120,10 +113,13 @@
   function renderHome() {
     const groups = [...new Set(documents.map((doc) => doc.group))];
     const summaries = {
-      "起步导览": "补上量化 Python 与数学统计，先把研究语言读顺。",
-      "第一阶段 · 传统量化研究": "从研究假设、数据和因子，走到单因子评价与组合。",
-      "第二阶段 · 机器学习": "以传统因子为参照，扩展到模型、验证与研究复现。",
-      "附录与研究模板": "随读随用的研究卡片、审计清单与规则说明。",
+      "阅读导览": "先了解全书主线，再用 Python 和统计练习补齐研究工具。",
+      "第一编 · 研究问题与证据设计": "定义假设、数据时点和样本外验证边界。",
+      "第二编 · 构造并检验因子": "从基础特征走到单因子证据与稳定性检查。",
+      "第三编 · 从信号到组合": "把因子分数转成组合，并完成多因子手算。",
+      "第四编 · 模型比较": "沿用相同研究口径，判断更复杂模型是否增加信息。",
+      "第五编 · 复现与完整实训": "保存完整研究证据，并核对一次端到端实验。",
+      "参考资料与模板": "按需查阅术语、市场规则、模板和数据字段说明。",
     };
     els.pathGrid.innerHTML = groups.map((group, index) => {
       const items = documents.filter((doc) => doc.group === group);
@@ -295,10 +291,12 @@
 
   function updateReadingProgress() {
     if (!current) return;
-    const index = documents.findIndex((doc) => doc.path === current.path);
     const maximum = Math.max(0, els.reader.scrollHeight - els.reader.clientHeight);
     const percent = maximum ? Math.min(100, Math.round(els.reader.scrollTop / maximum * 100)) : 0;
-    els.chapterProgress.textContent = `${displayNumber(index)} / ${String(documents.length).padStart(2, "0")}　·　${percent}%`;
+    const chapter = current.content.match(/^#\s*第\s*(\d+)\s*章/m);
+    let position = current.group === "阅读导览" ? "导读与准备" : "参考资料";
+    if (chapter) position = `第 ${chapter[1]} / ${mainChapterCount} 章`;
+    els.chapterProgress.textContent = `${position}　·　${percent}%`;
     state.positions[current.path] = els.reader.scrollTop;
     if (maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
       state.completed.push(current.path);
@@ -392,6 +390,7 @@
       const payload = await response.json();
       documents = payload.documents || [];
       byPath = new Map(documents.map((doc) => [doc.path, doc]));
+      mainChapterCount = documents.filter((doc) => /^#\s*第\s*\d+\s*章/m.test(doc.content)).length;
       state.bookmarks = state.bookmarks.filter((path) => byPath.has(path));
       state.completed = state.completed.filter((path) => byPath.has(path));
       $("#home-chapter-count").textContent = documents.length;

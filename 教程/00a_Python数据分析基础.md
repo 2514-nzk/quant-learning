@@ -1,4 +1,4 @@
-# 前置知识A：Python 数据分析基础（pandas 与 NumPy）
+# 参考手册｜Python 数据分析基础（pandas 与 NumPy）
 
 **程序员学习入口：** 先完成 [00d 量化 Python 实战](00d_量化Python实战.md) 的完整数据流程，再按需要查本章语法；统计直觉配合 [00e 量化数学与统计](00e_量化数学与统计.md)。本章部分短例子用 `date`，完整课程统一用 `trade_date`，接入时应明确重命名。
 
@@ -1052,4 +1052,4 @@ print(sample[features].isna().mean().sort_values(ascending=False))
 - [ ] 能写出形状、重复键、日期范围、数值范围和缺失率检查。
 - [ ] 清楚当前 `fwd_return` 是 T+1 开盘到 T+5 收盘，`label_rank` 是 T 日可用股票池内的直接收益百分位排名。
 
-完成这些练习后，进入研究问题、数据时点、时间切分与单因子研究；推荐顺序见 [教材目录](README.md)。机器学习基础在完成传统因子阶段后再学。
+本章供遇到 pandas 和 NumPy 语法问题时查阅。正式阅读请从[阅读指南](00_学习路线.md)开始，五编主线和完整顺序见[教材目录](README.md)。

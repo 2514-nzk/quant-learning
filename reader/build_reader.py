@@ -14,10 +14,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "教程" / "README.md"
 GROUPS = {
-    "先修与总路线": "起步导览",
-    "第一阶段：传统量化研究基础": "第一阶段 · 传统量化研究",
-    "第二阶段：机器学习选股扩展": "第二阶段 · 机器学习",
-    "附录与模板": "附录与研究模板",
+    "阅读导览": "阅读导览",
+    "第一编：研究问题与证据设计": "第一编 · 研究问题与证据设计",
+    "第二编：构造并检验因子": "第二编 · 构造并检验因子",
+    "第三编：从信号到组合": "第三编 · 从信号到组合",
+    "第四编：检验模型是否增加信息": "第四编 · 模型比较",
+    "第五编：复现与完整实训": "第五编 · 复现与完整实训",
+    "参考资料与模板": "参考资料与模板",
 }
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+\.md)(?:#[^)]*)?\)")
 
@@ -34,7 +37,7 @@ def estimate_minutes(markdown: str) -> int:
 def collect_documents() -> list[dict[str, str | int]]:
     documents: list[dict[str, str | int]] = []
     seen: set[str] = set()
-    group = "起步导览"
+    group = "阅读导览"
 
     for line in INDEX.read_text(encoding="utf-8").splitlines():
         heading = re.match(r"^##\s+(.+?)\s*$", line)
@@ -81,7 +84,7 @@ def main() -> None:
     shutil.copy2(ROOT / "reader" / "styles.css", output / "styles.css")
     payload = {
         "title": "A 股量化研究入门",
-        "description": "从传统因子到机器学习选股的中文自学教材。",
+        "description": "沿研究问题、数据时点、因子、组合和模型比较编排的中文自学教材。",
         "documents": collect_documents(),
     }
     (output / "content.json").write_text(

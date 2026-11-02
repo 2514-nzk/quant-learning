@@ -1,4 +1,4 @@
-# 第 7 章：Boosting 与 LightGBM
+# 第 13 章｜Boosting 与 LightGBM
 
 ## 1. 与随机森林的区别
 

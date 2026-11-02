@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f4ef">
-  <meta name="description" content="从传统因子到机器学习选股的中文量化研究自学教材。">
+  <meta name="description" content="沿着研究问题、数据时点、因子、组合和模型比较读完一整本量化研究入门教材。">
   <title>量化入门 · 在线阅读</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/languages/powershell.min.js"></script>
-  <script defer src="./app.js?v=3"></script>
+  <script defer src="./app.js?v=4"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -65,8 +65,8 @@
         <section class="home-view" id="home-view" hidden>
           <div class="home-intro">
             <div class="eyebrow"><span class="eyebrow-line"></span>一份可以慢慢读的自学教材</div>
-            <h1>从因子开始，<br><em>读懂量化研究。</em></h1>
-            <p class="home-lede">把复杂的研究过程拆成清楚的章节。先建立数据与因子的直觉，再学习组合、回测与机器学习。</p>
+            <h1>从研究问题开始，<br><em>读懂量化研究。</em></h1>
+            <p class="home-lede">沿着一条清楚的主线，从假设、数据时点和因子，一直读到组合、模型比较与完整实训。</p>
             <div class="home-actions">
               <button class="primary-button" id="resume-button">从上次位置继续 <span aria-hidden="true">→</span></button>
               <button class="text-button" id="start-button">从头开始阅读 <span aria-hidden="true">↗</span></button>
@@ -80,18 +80,18 @@
                 <svg viewBox="0 0 280 156" role="presentation"><path class="chart-area" d="M0 135 C24 126 36 112 52 117 S80 98 99 106 S131 72 151 85 S177 61 195 68 S223 32 241 47 S263 18 280 24 V156 H0Z"/><path class="chart-line" d="M0 135 C24 126 36 112 52 117 S80 98 99 106 S131 72 151 85 S177 61 195 68 S223 32 241 47 S263 18 280 24"/></svg>
                 <span class="chart-note">研究 · 验证 · 复现</span>
               </div>
-              <div class="cover-title"><span>QUANT 01 / 02</span><strong>量化研究<br>入门手册</strong><small>从传统因子到机器学习选股</small></div>
+              <div class="cover-title"><span>五编 · 十六章</span><strong>量化研究<br>入门手册</strong><small>从研究问题到样本外证据</small></div>
               <div class="cover-foot"><span>一章一章读，随时接着学</span><span>↗</span></div>
             </div>
             <div class="cover-caption"><span class="caption-dot"></span>你的阅读进度会保存在当前浏览器</div>
           </div>
           <div class="home-meta">
             <div><strong id="home-chapter-count">—</strong><span>篇讲义与参考材料</span></div>
-            <div><strong>2</strong><span>个学习阶段</span></div>
+            <div><strong>5</strong><span>编主线内容</span></div>
             <div><strong id="home-reading-time">—</strong><span>分钟预计阅读</span></div>
           </div>
           <div class="home-paths">
-            <div class="section-heading"><div><span class="eyebrow-small">A SUGGESTED ROUTE</span><h2>循序渐进的学习路线</h2></div><span>按推荐顺序阅读即可</span></div>
+            <div class="section-heading"><div><span class="eyebrow-small">THE BOOK</span><h2>从头到尾的阅读结构</h2></div><span>先读导览，再按五编顺序向前</span></div>
             <div class="path-grid" id="path-grid"></div>
           </div>
           <footer class="home-footer"><span>内容来自本地教材与研究模板</span><a href="https://github.com/2514-nzk/quant-learning" target="_blank" rel="noreferrer">项目源码 ↗</a></footer>
