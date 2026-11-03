@@ -31,6 +31,7 @@
   };
 
   let documents = [];
+  let readingRoute = [];
   let byPath = new Map();
   let current = null;
   let saveTimer = 0;
@@ -61,12 +62,12 @@
   }
 
   function renderOverallProgress() {
-    const completed = state.completed.filter((path) => byPath.has(path)).length;
-    const percent = documents.length ? Math.round(completed / documents.length * 100) : 0;
+    const completed = readingRoute.filter((doc) => state.completed.includes(doc.path)).length;
+    const percent = readingRoute.length ? Math.round(completed / readingRoute.length * 100) : 0;
     els.overallLabel.textContent = `${percent}%`;
     els.overallBar.style.width = `${percent}%`;
     els.overallCopy.textContent = completed
-      ? `已读 ${completed} / ${documents.length} 篇 · 进度保存在当前设备`
+      ? `主线已读 ${completed} / ${readingRoute.length} 篇 · 参考材料按需查阅`
       : "开始阅读，记录会保存在这台设备上";
   }
 
@@ -113,12 +114,12 @@
   function renderHome() {
     const groups = [...new Set(documents.map((doc) => doc.group))];
     const summaries = {
-      "阅读导览": "先手算一次选股，再逐行读懂同一实验的短代码。",
-      "第一编 · 研究问题与证据设计": "定义假设、数据时点和样本外验证边界。",
-      "第二编 · 构造并检验因子": "从基础特征走到单因子证据与稳定性检查。",
-      "第三编 · 从信号到组合": "把因子分数转成组合，并完成多因子手算。",
-      "第四编 · 模型比较": "沿用相同研究口径，判断更复杂模型是否增加信息。",
-      "第五编 · 复现与完整实训": "保存完整研究证据，并核对一次端到端实验。",
+      "阅读导览": "和小林拿出 8,000 元，先手算，再读第一段代码。",
+      "第一编 · 研究问题与证据设计": "赚了 320 元，后来却亏了：成绩单里藏着什么？",
+      "第二编 · 构造并检验因子": "从算错的 6.93% 开始，逐步检查三种选股分数。",
+      "第三编 · 从信号到组合": "C 买不到，费用还要付：重算账户真正剩下的钱。",
+      "第四编 · 模型比较": "让模型接手打分，看看训练的好成绩能否留下来。",
+      "第五编 · 复现与完整实训": "找回那笔 320 元，自己重做并写下完整结论。",
       "参考资料与模板": "按需查阅术语、市场规则、模板和数据字段说明。",
     };
     els.pathGrid.innerHTML = groups.map((group, index) => {
@@ -132,7 +133,7 @@
       </button>`;
     }).join("");
 
-    const totalMinutes = documents.reduce((sum, doc) => sum + Number(doc.minutes || 1), 0);
+    const totalMinutes = readingRoute.reduce((sum, doc) => sum + Number(doc.minutes || 1), 0);
     $("#home-chapter-count").textContent = documents.length;
     $("#home-reading-time").textContent = totalMinutes;
     $("#resume-button").textContent = state.lastPath && byPath.has(state.lastPath) ? "从上次位置继续　→" : "从第一篇开始阅读　→";
@@ -236,7 +237,11 @@
       if (!/^(https?:|data:|\/\/)/i.test(src)) {
         const encodedPath = doc.path.split("/").map(encodeURIComponent).join("/");
         try {
-          image.src = new URL(src, `https://raw.githubusercontent.com/2514-nzk/quant-learning/master/${encodedPath}`).href;
+          const target = new URL(src, `https://raw.githubusercontent.com/2514-nzk/quant-learning/master/${encodedPath}`);
+          const assetPrefix = "https://raw.githubusercontent.com/2514-nzk/quant-learning/master/reader/assets/";
+          image.src = target.href.startsWith(assetPrefix)
+            ? new URL(`assets/${target.href.slice(assetPrefix.length)}`, document.baseURI).href
+            : target.href;
         } catch { /* Keep the original source on malformed paths. */ }
       }
       image.loading = "lazy";
@@ -285,6 +290,8 @@
     els.previous.querySelector("strong").textContent = previous?.title || "已是第一篇";
     els.next.disabled = !next;
     els.next.querySelector("strong").textContent = next?.title || "已到最后一篇";
+    els.next.querySelector("span").textContent = current.group !== "参考资料与模板" && next?.group === "参考资料与模板"
+      ? "主线读完了 · 按需查阅 →" : "下一篇 →";
     els.previous.dataset.path = previous?.path || "";
     els.next.dataset.path = next?.path || "";
   }
@@ -389,6 +396,7 @@
       if (!response.ok) throw new Error(`内容读取失败 (${response.status})`);
       const payload = await response.json();
       documents = payload.documents || [];
+      readingRoute = documents.filter((doc) => doc.group !== "参考资料与模板");
       byPath = new Map(documents.map((doc) => [doc.path, doc]));
       mainChapterCount = documents.filter((doc) => /^#\s*第\s*\d+\s*章/m.test(doc.content)).length;
       state.bookmarks = state.bookmarks.filter((path) => byPath.has(path));

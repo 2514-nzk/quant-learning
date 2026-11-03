@@ -1,0 +1,380 @@
+{
+  "data_kind": "hand-constructed teaching snapshots; not market data",
+  "fixture_sha256": "b30e78ee7eecae5b5d302b589d03da0d25b7c76a26161241b9f1b5c1a215c47c",
+  "history_sha256": "4fc28652b239dd7f84135785204677bf2cb1f873aef1e5ac798c6ae3ce2759d9",
+  "script_sha256": "80933f18795df60e28275b5ca46b74e15a92714a8efcfa9207439ef88b1d54ab",
+  "basic": {
+    "rounds": [
+      {
+        "round": 1,
+        "selected": [
+          "A",
+          "C"
+        ],
+        "gross_return": 0.04,
+        "benchmark_return": 0.0175,
+        "active_return": 0.0225,
+        "wealth": 8320.0,
+        "benchmark_wealth": 8140.000000000001,
+        "drawdown": 0.0,
+        "rank_ic": 0.8,
+        "combined_selected": [
+          "A",
+          "C"
+        ],
+        "combined_wealth": 8320.0
+      },
+      {
+        "round": 2,
+        "selected": [
+          "A",
+          "C"
+        ],
+        "gross_return": 0.04,
+        "benchmark_return": 0.055,
+        "active_return": -0.015,
+        "wealth": 8652.800000000001,
+        "benchmark_wealth": 8587.7,
+        "drawdown": 0.0,
+        "rank_ic": -0.8,
+        "combined_selected": [
+          "A",
+          "C"
+        ],
+        "combined_wealth": 8652.800000000001
+      },
+      {
+        "round": 3,
+        "selected": [
+          "A",
+          "C"
+        ],
+        "gross_return": -0.06,
+        "benchmark_return": -0.010000000000000002,
+        "active_return": -0.049999999999999996,
+        "wealth": 8133.6320000000005,
+        "benchmark_wealth": 8501.823,
+        "drawdown": -0.06000000000000005,
+        "rank_ic": -1.0,
+        "combined_selected": [
+          "A",
+          "C"
+        ],
+        "combined_wealth": 8133.6320000000005
+      },
+      {
+        "round": 4,
+        "selected": [
+          "B",
+          "D"
+        ],
+        "gross_return": -0.02,
+        "benchmark_return": -0.0075,
+        "active_return": -0.0125,
+        "wealth": 7970.959360000001,
+        "benchmark_wealth": 8438.059327500001,
+        "drawdown": -0.07879999999999998,
+        "rank_ic": -0.8,
+        "combined_selected": [
+          "A",
+          "B"
+        ],
+        "combined_wealth": 8133.6320000000005
+      }
+    ],
+    "mean_rank_ic": -0.45,
+    "execution": {
+      "ideal": {
+        "initial_money": 8000.0,
+        "final_money": 8320.0,
+        "profit": 320.0,
+        "fee_per_side": 0.0,
+        "blocked": [],
+        "ledger": [
+          {
+            "code": "A",
+            "status": "filled",
+            "budget": 4000.0,
+            "buy_notional": 4000.0,
+            "buy_fee": 0.0,
+            "quantity": 400.0,
+            "sell_notional": 4200.0,
+            "sell_fee": 0.0,
+            "cash": 4200.0
+          },
+          {
+            "code": "C",
+            "status": "filled",
+            "budget": 4000.0,
+            "buy_notional": 4000.0,
+            "buy_fee": 0.0,
+            "quantity": 500.0,
+            "sell_notional": 4120.0,
+            "sell_fee": 0.0,
+            "cash": 4120.0
+          }
+        ]
+      },
+      "blocked_only": {
+        "initial_money": 8000.0,
+        "final_money": 8200.0,
+        "profit": 200.0,
+        "fee_per_side": 0.0,
+        "blocked": [
+          "C"
+        ],
+        "ledger": [
+          {
+            "code": "A",
+            "status": "filled",
+            "budget": 4000.0,
+            "buy_notional": 4000.0,
+            "buy_fee": 0.0,
+            "quantity": 400.0,
+            "sell_notional": 4200.0,
+            "sell_fee": 0.0,
+            "cash": 4200.0
+          },
+          {
+            "code": "C",
+            "status": "cash",
+            "budget": 4000.0,
+            "cash": 4000.0
+          }
+        ]
+      },
+      "fee_only": {
+        "initial_money": 8000.0,
+        "final_money": 8303.376623376624,
+        "profit": 303.3766233766237,
+        "fee_per_side": 0.001,
+        "blocked": [],
+        "ledger": [
+          {
+            "code": "A",
+            "status": "filled",
+            "budget": 4000.0,
+            "buy_notional": 3996.0039960039962,
+            "buy_fee": 3.996003996003996,
+            "quantity": 399.6003996003996,
+            "sell_notional": 4195.804195804196,
+            "sell_fee": 4.195804195804196,
+            "cash": 4191.608391608392
+          },
+          {
+            "code": "C",
+            "status": "filled",
+            "budget": 4000.0,
+            "buy_notional": 3996.0039960039962,
+            "buy_fee": 3.996003996003996,
+            "quantity": 499.50049950049953,
+            "sell_notional": 4115.884115884116,
+            "sell_fee": 4.115884115884116,
+            "cash": 4111.768231768232
+          }
+        ]
+      },
+      "blocked_and_fee": {
+        "initial_money": 8000.0,
+        "final_money": 8191.608391608392,
+        "profit": 191.60839160839168,
+        "fee_per_side": 0.001,
+        "blocked": [
+          "C"
+        ],
+        "ledger": [
+          {
+            "code": "A",
+            "status": "filled",
+            "budget": 4000.0,
+            "buy_notional": 3996.0039960039962,
+            "buy_fee": 3.996003996003996,
+            "quantity": 399.6003996003996,
+            "sell_notional": 4195.804195804196,
+            "sell_fee": 4.195804195804196,
+            "cash": 4191.608391608392
+          },
+          {
+            "code": "C",
+            "status": "cash",
+            "budget": 4000.0,
+            "cash": 4000.0
+          }
+        ]
+      }
+    }
+  },
+  "models": {
+    "versions": {
+      "python": "3.11.15",
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "sklearn": "1.8.0",
+      "lightgbm": "4.6.0"
+    },
+    "split": {
+      "train": [
+        1,
+        36
+      ],
+      "validation": [
+        37,
+        46
+      ],
+      "test": [
+        47,
+        60
+      ]
+    },
+    "features": [
+      "mom_5",
+      "ep",
+      "roe"
+    ],
+    "seed": 42,
+    "fee_per_side": 0.001,
+    "execution_assumption": "fractional positions; all orders fill; full liquidation each round; no real A-share execution",
+    "trials": [
+      {
+        "family": "Ridge",
+        "parameter": {
+          "alpha": 0.1
+        },
+        "train_rank_ic": 0.4722222222222222,
+        "validation_rank_ic": 0.4
+      },
+      {
+        "family": "Ridge",
+        "parameter": {
+          "alpha": 1.0
+        },
+        "train_rank_ic": 0.4722222222222222,
+        "validation_rank_ic": 0.4
+      },
+      {
+        "family": "Ridge",
+        "parameter": {
+          "alpha": 10.0
+        },
+        "train_rank_ic": 0.48333333333333334,
+        "validation_rank_ic": 0.38
+      },
+      {
+        "family": "RandomForest",
+        "parameter": {
+          "max_depth": 2
+        },
+        "train_rank_ic": 0.5277777777777778,
+        "validation_rank_ic": 0.38
+      },
+      {
+        "family": "RandomForest",
+        "parameter": {
+          "max_depth": 4
+        },
+        "train_rank_ic": 0.7611111111111112,
+        "validation_rank_ic": 0.42000000000000004
+      },
+      {
+        "family": "RandomForest",
+        "parameter": {
+          "max_depth": null
+        },
+        "train_rank_ic": 0.9833333333333334,
+        "validation_rank_ic": 0.26
+      },
+      {
+        "family": "LightGBM",
+        "parameter": {
+          "n_estimators": 15
+        },
+        "train_rank_ic": 0.5942706315066472,
+        "validation_rank_ic": 0.43811388300841897
+      },
+      {
+        "family": "LightGBM",
+        "parameter": {
+          "n_estimators": 50
+        },
+        "train_rank_ic": 0.65,
+        "validation_rank_ic": 0.38
+      },
+      {
+        "family": "LightGBM",
+        "parameter": {
+          "n_estimators": 150
+        },
+        "train_rank_ic": 0.7888888888888889,
+        "validation_rank_ic": 0.22
+      }
+    ],
+    "chosen": {
+      "ridge_alpha": 0.1,
+      "forest_depth": 4,
+      "lightgbm_iteration_by_validation_l2": 14
+    },
+    "ridge_standardized_weights": {
+      "mom_5": 0.05109508960549343,
+      "ep": -0.0023189759540005388,
+      "roe": 0.10217151416771186
+    },
+    "ridge_intercept": 0.625,
+    "validation_ablation_omit": {
+      "mom_5": 0.56,
+      "ep": 0.38,
+      "roe": 0.36
+    },
+    "test": {
+      "momentum": {
+        "mean_rank_ic": 0.4857142857142857,
+        "positive_ic_ratio": 0.7857142857142857,
+        "mean_gross_return": 0.02382333892857143,
+        "final_money": 10793.046338623559,
+        "total_net_return": 0.34913079232794475,
+        "max_drawdown": -0.007243136228771263,
+        "benchmark_final_money": 9648.910599432089,
+        "cumulative_active_difference": 0.14301696739893374
+      },
+      "equal_rank": {
+        "mean_rank_ic": 0.4544733840605619,
+        "positive_ic_ratio": 0.7857142857142857,
+        "mean_gross_return": 0.019758465714285713,
+        "final_money": 10204.92073545699,
+        "total_net_return": 0.27561509193212363,
+        "max_drawdown": -0.018823627062936943,
+        "benchmark_final_money": 9648.910599432089,
+        "cumulative_active_difference": 0.06950126700311261
+      },
+      "Ridge": {
+        "mean_rank_ic": 0.3,
+        "positive_ic_ratio": 0.6428571428571429,
+        "mean_gross_return": 0.022441682142857144,
+        "final_money": 10578.832720413362,
+        "total_net_return": 0.32235409005167015,
+        "max_drawdown": -0.018823627062936832,
+        "benchmark_final_money": 9648.910599432089,
+        "cumulative_active_difference": 0.11624026512265914
+      },
+      "RandomForest": {
+        "mean_rank_ic": 0.1285714285714286,
+        "positive_ic_ratio": 0.5,
+        "mean_gross_return": 0.02089688392857143,
+        "final_money": 10361.941898177543,
+        "total_net_return": 0.29524273727219286,
+        "max_drawdown": -0.018823627062936943,
+        "benchmark_final_money": 9648.910599432089,
+        "cumulative_active_difference": 0.08912891234318181
+      },
+      "LightGBM": {
+        "mean_rank_ic": 0.14285714285714285,
+        "positive_ic_ratio": 0.42857142857142855,
+        "mean_gross_return": 0.02121022142857143,
+        "final_money": 10407.839448453708,
+        "total_net_return": 0.3009799310567134,
+        "max_drawdown": -0.018823627062936943,
+        "benchmark_final_money": 9648.910599432089,
+        "cumulative_active_difference": 0.09486610612770233
+      }
+    }
+  }
+}

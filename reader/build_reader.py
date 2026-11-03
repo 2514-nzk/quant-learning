@@ -86,7 +86,7 @@ def main() -> None:
     shutil.copytree(ROOT / "reader" / "assets", output / "assets", dirs_exist_ok=True)
     payload = {
         "title": "A 股量化研究入门",
-        "description": "沿研究问题、数据时点、因子、组合和模型比较编排的中文自学教材。",
+        "description": "从 8,000 元纸面选股开始，用同一故事读懂数据、因子、组合和模型比较。",
         "documents": collect_documents(),
     }
     (output / "content.json").write_text(

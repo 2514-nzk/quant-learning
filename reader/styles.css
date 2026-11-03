@@ -222,6 +222,14 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .markdown-body li > ul, .markdown-body li > ol { margin-top: .35em; margin-bottom: .4em; }
 .markdown-body blockquote { max-width: 66ch; margin: 1.55em 0; padding: .65em 1em; color: var(--ink); background: var(--paper-raised); border-left: 3px solid var(--green); font-size: .96em; }
 .markdown-body blockquote p:last-child { margin-bottom: 0; }
+.markdown-body details { margin: 1.5em 0; padding: 0 1em; background: var(--paper-raised); border: 1px solid var(--line); border-left: 3px solid var(--green); border-radius: 4px; }
+.markdown-body summary { padding: .7em 0; color: var(--green-dark); cursor: pointer; font-weight: 600; line-height: 1.75; }
+.markdown-body summary::marker { color: var(--green); }
+.markdown-body summary:hover { color: var(--ink); }
+.markdown-body summary:focus-visible { outline: 2px solid var(--green); outline-offset: 4px; border-radius: 2px; }
+.markdown-body details[open] { padding-bottom: .35em; }
+.markdown-body details[open] > summary { margin-bottom: .6em; border-bottom: 1px solid var(--line); }
+.markdown-body details > :last-child { margin-bottom: .8em; }
 .markdown-body hr { width: 36px; height: 1px; margin: 2.5em 0; background: var(--line-strong); border: 0; }
 .markdown-body code { padding: .13em .34em; color: #8f5537; background: var(--paper-deep); border-radius: 2px; font-family: "DM Mono", Consolas, monospace; font-size: .81em; }
 :root[data-theme="dark"] .markdown-body code { color: #ddb091; }
