@@ -82,6 +82,8 @@ def main() -> None:
     shutil.copy2(ROOT / "reader" / "index.html", output / "index.html")
     shutil.copy2(ROOT / "reader" / "app.js", output / "app.js")
     shutil.copy2(ROOT / "reader" / "styles.css", output / "styles.css")
+    shutil.copy2(ROOT / "reader" / "favicon.ico", output / "favicon.ico")
+    shutil.copytree(ROOT / "reader" / "assets", output / "assets", dirs_exist_ok=True)
     payload = {
         "title": "A 股量化研究入门",
         "description": "沿研究问题、数据时点、因子、组合和模型比较编排的中文自学教材。",
