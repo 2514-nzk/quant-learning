@@ -1,8 +1,9 @@
-"""使用 D:/duckdb_data 的只读快照运行真实数据教学示例。"""
+"""使用本地只读 DuckDB 快照运行真实数据教学示例。"""
 
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import yaml
@@ -16,7 +17,8 @@ def main() -> None:
     root = Path(__file__).resolve().parents[1]
     base_config = yaml.safe_load((root / "config" / "research_config.yaml").read_text(encoding="utf-8"))
     data_config = yaml.safe_load((root / "config" / "duckdb_config.yaml").read_text(encoding="utf-8"))
-    database = resolve_snapshot(data_config["snapshot_pointer"])
+    pointer = os.environ.get("QUANT_DUCKDB_SNAPSHOT", str(data_config["snapshot_pointer"]))
+    database = resolve_snapshot(pointer)
     coverage = inspect_database(database)
     print("database:", database)
     print("coverage:", coverage)

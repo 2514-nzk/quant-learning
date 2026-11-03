@@ -20,6 +20,12 @@ python examples/story_research.py
 python examples/story_research.py --models --output outputs/story/report.json
 ```
 
+复算第 14 章的置换检验、bootstrap 区间与 oracle 对照：
+
+```powershell
+python examples/story_evidence.py
+```
+
 基础演算只用 Python 自带功能；模型练习需要项目 `requirements.txt` 中的 NumPy、pandas、scikit-learn 和 LightGBM。报告中的文本指纹统一换行后计算，便于跨系统核对。库版本不同可能产生小的模型差异，应保留自己的实际输出。
 
 ## 日历、输入与答案

@@ -1,3 +1,4 @@
+# 可用环境变量 QUANT_DUCKDB_SNAPSHOT 覆盖此默认路径。
 snapshot_pointer: 'D:/duckdb_data/xc_tushare_data.snapshots/current.json'
 start: '20200102'
 end: '20251231'

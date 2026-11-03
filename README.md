@@ -13,6 +13,7 @@
 ```powershell
 python examples/first_quant_experiment.py
 python examples/story_research.py
+python examples/story_evidence.py
 ```
 
 安装 `requirements.txt` 中的依赖后，可以运行后半本的模型练习并保存报告：
@@ -28,8 +29,9 @@ python examples/story_research.py --models --output outputs/story/report.json
 
 这个入口使用独立的较大日频面板、七个特征和工程配置，结果与正文故事分别记录：
 
+在项目根目录打开 PowerShell：
+
 ```powershell
-cd C:\Users\25148\Desktop\量化入门学习
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
@@ -48,13 +50,14 @@ python -m src.run_demo
 
 教学回测使用与标签一致的非重叠 5 日持有期，并同时报告等权股票池基准和主动收益。它仍是简化回测，不含五组重叠持仓、逐笔成交和完整风格归因。合成数据不是投资数据，也不能证明任何策略有效；真实 A 股数据的最低字段和缺口见 [`data/README.md`](data/README.md)。
 
-如果本地已有 `D:/duckdb_data`，还可以运行只读真实数据示例：
+如果本地已有只读 DuckDB 快照，可以把 `QUANT_DUCKDB_SNAPSHOT` 设为 `current.json` 的路径，再运行真实数据示例：
 
 ```powershell
+$env:QUANT_DUCKDB_SNAPSHOT='D:/duckdb_data/xc_tushare_data.snapshots/current.json'
 python -m src.run_duckdb_demo
 ```
 
-它读取 `D:/duckdb_data/xc_tushare_data.snapshots/current.json` 指向的快照，不会写入或锁定主数据库。真实结果位于 `outputs/duckdb_demo/<run_id>/`，最近一次编号见同目录的 `latest.txt`。
+未设置环境变量时，脚本使用 `config/duckdb_config.yaml` 中的默认路径。它读取快照，不会写入或锁定主数据库。真实结果位于 `outputs/duckdb_demo/<run_id>/`，最近一次编号见同目录的 `latest.txt`。
 
 ## 项目结构
 
