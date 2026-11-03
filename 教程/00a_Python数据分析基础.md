@@ -11,8 +11,8 @@
 量化研究中的数据通常是**面板数据**（Panel Data）：多只股票 × 多个日期 × 多个字段。
 
 ```python
-import pandas as pd
-import numpy as np
+import pandas as pd  # 导入表格工具，后面简称 pd。
+import numpy as np  # 导入数值计算工具，后面简称 np。
 
 # 创建一个简单的股票数据
 data = {
@@ -21,7 +21,7 @@ data = {
     'close': [10.5, 20.3, 10.8, 20.1],
     'volume': [1000000, 800000, 1200000, 750000]
 }
-df = pd.DataFrame(data)
+df = pd.DataFrame(data)  # 把字典转成表格：每个字段是一列，每个列表项对应一行。
 print(df)
 ```
 
@@ -46,11 +46,12 @@ df['date'] = pd.to_datetime(df['date'])
 print(df.dtypes)
 
 # 按日期排序（极其重要！）
+# 依次按股票、日期排序；reset_index(drop=True) 重新生成连续行号。
 df = df.sort_values(['code', 'date']).reset_index(drop=True)
 
 # 筛选日期范围
-mask = (df['date'] >= '2024-01-02')
-recent_data = df[mask]
+mask = (df['date'] >= '2024-01-02')  # 比较后得到一列 True/False，表示哪些行符合日期条件。
+recent_data = df[mask]  # 只保留 mask 为 True 的行。
 ```
 
 **为什么排序重要？** 因为后面计算收益率、滑动窗口时，如果数据乱序会得到错误结果。
@@ -61,11 +62,13 @@ recent_data = df[mask]
 
 ```python
 # 计算每只股票的收益率（当前价格/前一日价格 - 1）
+# groupby 先按股票分堆，避免用另一只股票的价格算收益。
 df['return'] = df.groupby('code')['close'].pct_change(fill_method=None)
 
 # 计算每只股票的5日移动平均
+# transform 将各股票算出的结果放回对应的原始行。
 df['ma5'] = df.groupby('code')['close'].transform(
-    lambda x: x.rolling(window=5, min_periods=1).mean()
+    lambda x: x.rolling(window=5, min_periods=1).mean()  # lambda 把每组价格临时叫 x；最近五行不足五行时也允许求均值。
 )
 
 # 正向 shift：获取同一股票前一行的值；市场交易日语义需要完整日历
@@ -91,16 +94,18 @@ print(df)
 df['return_rank'] = df.groupby('date')['return'].rank()
 
 # 每天计算百分位排名（0-1之间）
+# pct=True 表示用名次除以当日有效数量，并不是上涨概率。
 df['return_pct_rank'] = df.groupby('date')['return'].rank(pct=True)
 
 # 每天标准化（减去均值，除以标准差）
+# 对每个日期的小组执行同一段标准化计算。
 df['return_zscore'] = df.groupby('date')['return'].transform(
     lambda x: (x - x.mean()) / x.std()
 )
 
 # 每天选出收益率最高的前10%
 df['top_decile'] = df.groupby('date')['return'].transform(
-    lambda x: x >= x.quantile(0.9)
+    lambda x: x >= x.quantile(0.9)  # quantile(0.9) 求九成分位的数值，再逐行比较是否达到。
 )
 ```
 
@@ -121,7 +126,7 @@ fundamental = pd.DataFrame({
 })
 
 # 左连接：保留df的所有行
-df_merged = df.merge(fundamental, on='code', how='left')
+df_merged = df.merge(fundamental, on='code', how='left')  # 按 code 对齐；how=left 保留左表的行，未匹配到的字段留空。
 
 # 时间+股票双键连接
 daily_basic = pd.DataFrame({
@@ -131,7 +136,7 @@ daily_basic = pd.DataFrame({
 })
 daily_basic['date'] = pd.to_datetime(daily_basic['date'])
 
-df_full = df.merge(daily_basic, on=['date', 'code'], how='left')
+df_full = df.merge(daily_basic, on=['date', 'code'], how='left')  # 股票和日期都相同才连接，避免把另一日的数据接进来。
 ```
 
 **常见错误：**
@@ -144,13 +149,13 @@ df_full = df.merge(daily_basic, on=['date', 'code'], how='left')
 
 ```python
 # 检查缺失
-print(df.isnull().sum())
+print(df.isnull().sum())  # isnull 标出缺失值；sum 按列统计缺失数量。
 
 # 填充缺失（分组填充）
 df['close_filled'] = df.groupby('code')['close'].ffill()  # 前向填充；仅在语义允许时使用
 
 # 删除缺失
-df_clean = df.dropna(subset=['close', 'volume'])
+df_clean = df.dropna(subset=['close', 'volume'])  # 只删除 close 或 volume 缺失的行，其他列不参与这次筛选。
 
 # 标记缺失
 df['is_missing'] = df['close'].isnull()
@@ -164,10 +169,11 @@ Python循环很慢，pandas操作是向量化的，快得多。
 
 ```python
 # 慢：循环
-returns = []
+returns = []  # 本段仅演示单只股票、已按日期排序的数据；股票面板需先分组。
+# range 生成行位置，循环每次向后走一行。
 for i in range(len(df)):
     if i == 0:
-        returns.append(np.nan)
+        returns.append(np.nan)  # 第一行没有上一行价格，用 NaN 表示缺失。
     else:
         ret = df.loc[i, 'close'] / df.loc[i-1, 'close'] - 1
         returns.append(ret)
@@ -176,7 +182,7 @@ for i in range(len(df)):
 df['return'] = df['close'].pct_change()
 
 # 条件赋值：用np.where
-df['signal'] = np.where(df['return'] > 0.05, 1, 0)
+df['signal'] = np.where(df['return'] > 0.05, 1, 0)  # np.where 按条件逐项选择：满足写 1，否则写 0。
 
 # 多条件：用np.select
 conditions = [
@@ -184,7 +190,7 @@ conditions = [
     df['return'] < -0.05,
 ]
 choices = ['强势', '弱势']
-df['label'] = np.select(conditions, choices, default='中性')
+df['label'] = np.select(conditions, choices, default='中性')  # 按 conditions 的先后次序匹配，不满足时使用 default。
 ```
 
 ## 8. 实战练习：计算股票池
@@ -198,7 +204,7 @@ df['label'] = np.select(conditions, choices, default='中性')
 # 3. 当天不停牌
 
 # 先计算上市天数
-df['days_since_list'] = df.groupby('code').cumcount() + 1
+df['days_since_list'] = df.groupby('code').cumcount() + 1  # cumcount 数已有记录的行数；真实上市天数应另查上市日期和日历。
 
 # 计算过去20日平均成交额（假设已有amount字段）
 df['avg_amount_20d'] = df.groupby('code')['amount'].transform(
@@ -206,6 +212,7 @@ df['avg_amount_20d'] = df.groupby('code')['amount'].transform(
 )
 
 # 标记股票池
+# & 表示各个条件必须同时成立，每个比较都放在括号里。
 df['in_universe'] = (
     (df['days_since_list'] >= 250) &
     (df['avg_amount_20d'] > 50_000_000) &
@@ -213,7 +220,7 @@ df['in_universe'] = (
 )
 
 # 每天有多少只股票符合条件
-universe_size = df[df['in_universe']].groupby('date').size()
+universe_size = df[df['in_universe']].groupby('date').size()  # 先筛出合格行，再按日期数记录条数。
 print(universe_size)
 ```
 
@@ -225,7 +232,7 @@ print(universe_size)
 df['prev'] = df['close'].shift(1)  # 可能拿到别的股票的值！
 
 # 正确：先排序，再分组shift
-df = df.sort_values(['code', 'date'])
+df = df.sort_values(['code', 'date'])  # 先确保同一股票的日期由早到晚，之后才能安全取前一行。
 df['prev'] = df.groupby('code')['close'].shift(1)
 ```
 
@@ -235,13 +242,14 @@ df['prev'] = df.groupby('code')['close'].shift(1)
 df[df['code'] == '000001']['close'] = 999
 
 # 推荐写法
-df.loc[df['code'] == '000001', 'close'] = 999
+df.loc[df['code'] == '000001', 'close'] = 999  # loc[行条件, 列名] 明确指定要修改原表的哪些单元格。
 ```
 
 ### 陷阱3：分组后索引混乱
 ```python
 # groupby后索引可能不连续
-grouped = df.groupby('code').apply(some_function)
+grouped = df.groupby('code').apply(some_function)  # apply 把每组交给自定义函数 some_function，结果索引可能改变。
+# 这里只重排行号，不能靠它修复已经发生的数据错位。
 grouped = grouped.reset_index(drop=True)  # 重置索引
 ```
 
@@ -311,6 +319,7 @@ fwd\_return_T=\frac{scheduled\_exit\_price_T}{entry\_price_T}-1
 import numpy as np
 import pandas as pd
 
+# 创建三只股票、三个日期的虚构行情表。
 raw = pd.DataFrame(
     {
         "trade_date": [
@@ -333,14 +342,15 @@ raw = pd.DataFrame(
 )
 
 df = (
+    # assign 新增或替换一列；这里把日期文字转成日期类型。
     raw.assign(trade_date=lambda x: pd.to_datetime(x["trade_date"]))
        .sort_values(["code", "trade_date"])
        .reset_index(drop=True)
 )
 
-print(df.head())
+print(df.head())  # head() 默认只看前五行，避免整张表输出太长。
 print(df.dtypes)
-print(df.duplicated(["code", "trade_date"]).sum())
+print(df.duplicated(["code", "trade_date"]).sum())  # 以股票加日期识别重复记录，再数出重复数量。
 ```
 
 这些数值只是教学数据；不能从几行样本推断真实市场规律，也不能把 `amount` 的单位当成已经确定。
@@ -364,11 +374,12 @@ print(df.duplicated(["code", "trade_date"]).sum())
 
 ```python
 keys = ["code", "trade_date"]
+# keep=False 把同一重复组里的全部行都标出来，便于检查。
 duplicates = df.loc[df.duplicated(keys, keep=False)].sort_values(keys)
-missing = df.isna().sum().sort_values(ascending=False)
+missing = df.isna().sum().sort_values(ascending=False)  # 逐列数缺失，ascending=False 把缺得最多的放前面。
 ordered = df.sort_values(keys)
 
-assert not ordered.duplicated(keys).any()
+assert not ordered.duplicated(keys).any()  # any() 问是否至少有一个重复；not 要求答案为否。
 assert ordered["trade_date"].dtype == "datetime64[ns]"
 ```
 
@@ -400,15 +411,16 @@ s=\sqrt{\frac{1}{n-1}\sum_{i=1}^{n}(r_i-\bar r)^2}
 
 ```python
 close = np.array([10.0, 10.5, 10.2])
-returns = close[1:] / close[:-1] - 1
+returns = close[1:] / close[:-1] - 1  # [1:] 去掉第一项，[:-1] 去掉最后一项，让相邻价格一一对应。
 print(returns)
 print(np.mean(returns))
-print(np.std(returns, ddof=1))
+print(np.std(returns, ddof=1))  # ddof=1 使用样本标准差的分母约定。
 
 market_cap = np.array([5e9, 8e9, 3e9])
-log_market_cap = np.log(np.clip(market_cap, 1, None))
+log_market_cap = np.log(np.clip(market_cap, 1, None))  # clip 先把过小市值截到 1，再取自然对数。
 
 signal = np.where(returns > 0.03, 1, 0)
+# 按条件选对应文字；都不满足就用 default。
 label = np.select(
     [returns > 0.03, returns < -0.03],
     ["上涨较多", "下跌较多"],
@@ -419,9 +431,9 @@ label = np.select(
 广播可以避免逐行循环：
 
 ```python
-prices = np.array([[10.0, 20.0], [10.5, 19.0], [10.2, 19.5]])
-first_day = prices[0]
-change_from_first = prices / first_day - 1
+prices = np.array([[10.0, 20.0], [10.5, 19.0], [10.2, 19.5]])  # 二维数组中，每行是一天，每列是一只股票。
+first_day = prices[0]  # [0] 取第一行，也就是两只股票第一天的价格。
+change_from_first = prices / first_day - 1  # NumPy 自动把第一行与每一行按列相除，算各自相对首日的涨幅。
 print(change_from_first)
 ```
 
@@ -444,14 +456,14 @@ print(change_from_first)
 
 ```python
 prices = np.array([10.0, 10.2, 10.1, 10.5])
-returns = prices[1:] / prices[:-1] - 1
-mean_return = np.nanmean(returns)
+returns = prices[1:] / prices[:-1] - 1  # 两组切片对齐相邻价格，逐项相除得到单期收益。
+mean_return = np.nanmean(returns)  # nanmean 求均值时跳过缺失；是否允许缺失需按研究规则决定。
 std_return = np.nanstd(returns, ddof=1)
 
 market_cap = np.array([5e9, 0, -1, np.nan])
 valid = market_cap > 0
-safe_cap = np.where(valid, market_cap, 1.0)
-log_market_cap = np.where(valid, np.log(safe_cap), np.nan)
+safe_cap = np.where(valid, market_cap, 1.0)  # 有效市值保留原数，无效位置先放 1，避免直接对零或负数取对数。
+log_market_cap = np.where(valid, np.log(safe_cap), np.nan)  # 最后把原来无效的位置还原为缺失值。
 ```
 
 这里的“安全值 1.0”只是避免 `log` 对无效数报警，最终仍把无效位置设回 `NaN`；它不是对异常市值的业务修复。
@@ -473,16 +485,19 @@ pandas 不只是“带列名的二维数组”，它会按索引标签对齐。�
 #### 小例子或代码
 
 ```python
+# 行条件选股票，列列表选两列；copy 得到独立的小表。
 one_stock = df.loc[df["code"] == "000001", ["trade_date", "close"]].copy()
 
 df.loc[df["close"] > 20, "price_level"] = "高"
 df.loc[df["close"] <= 20, "price_level"] = "低"
 
+# 一次给表新增两列；replace(0, NaN) 避免直接除以零。
 df = df.assign(
     close_open_return=df["close"] / df["open"].replace(0, np.nan) - 1,
     range_1d=(df["high"] - df["low"]) / df["close"].replace(0, np.nan),
 )
 
+# 三个布尔条件用 & 连接，全部为 True 才保留。
 tradable = df.loc[
     df["can_buy"] & df["can_sell"] & df["signal_eligible"],
 ].copy()
@@ -495,14 +510,14 @@ tradable = df.loc[
 df[df["code"] == "000001"]["close"] = 999
 
 # 正确：明确在原表的哪些行、哪一列赋值
-df.loc[df["code"] == "000001", "close"] = 999
+df.loc[df["code"] == "000001", "close"] = 999  # 在原表中直接修改，避免“先切一张临时表再赋值”的歧义。
 ```
 
 另一个常见错误是只调用排序而不保存结果：
 
 ```python
 df.sort_values(["code", "trade_date"])  # df 没有改变
-df = df.sort_values(["code", "trade_date"]).reset_index(drop=True)
+df = df.sort_values(["code", "trade_date"]).reset_index(drop=True)  # 把排序结果重新赋给 df，排序才会保留下来。
 ```
 
 #### 练习
@@ -514,10 +529,10 @@ df = df.sort_values(["code", "trade_date"]).reset_index(drop=True)
 #### 答案框架
 
 ```python
-selected = df.loc[(df["amount"] > 10_000) & df["can_buy"]].copy()
+selected = df.loc[(df["amount"] > 10_000) & df["can_buy"]].copy()  # 括号内的两个条件逐行同时判断，copy 保存独立的筛选结果。
 df["close_open_return"] = df["close"] / df["open"].replace(0, np.nan) - 1
-bad_price = df.loc[df["close"] <= 0, ["code", "trade_date", "close"]]
-counts = df.groupby("code").size().sort_values()
+bad_price = df.loc[df["close"] <= 0, ["code", "trade_date", "close"]]  # 找收盘价非正的行，只显示便于定位问题的三列。
+counts = df.groupby("code").size().sort_values()  # 按股票统计行数，再从少到多排列。
 ```
 
 ### 11.4 时间序列：排序、shift 和交易日历
@@ -531,6 +546,7 @@ counts = df.groupby("code").size().sort_values()
 当前实现使用：
 
 ```python
+# 每只股票只和自己的前一行比较；fill_method=None 禁止先填缺失。
 df["ret_1d"] = df.groupby("code")["close"].pct_change(fill_method=None)
 ```
 
@@ -550,19 +566,20 @@ fwd\_return_T=\frac{close_{T+5}}{open_{T+1}}-1
 df["trade_date"] = pd.to_datetime(df["trade_date"], errors="raise")
 df = df.sort_values(["code", "trade_date"]).reset_index(drop=True)
 
-by_code = df.groupby("code", group_keys=False)
+by_code = df.groupby("code", group_keys=False)  # 保存按股票分组的对象，后续重复使用它。
 df["ret_1d"] = by_code["close"].pct_change(fill_method=None)
 df["prev_close"] = by_code["close"].shift(1)
-df["next_close_demo"] = by_code["close"].shift(-1)
+df["next_close_demo"] = by_code["close"].shift(-1)  # 负向 shift 取未来一行，只能做未来标签的示范。
 
+# between 选择日期区间；默认包含两端。
 period = df.loc[df["trade_date"].between("2024-01-02", "2024-01-04")].copy()
 ```
 
 如果需要检查自然日和交易日的差异：
 
 ```python
-one_stock = df.loc[df["code"] == "000001"].set_index("trade_date")
-print(one_stock["close"].resample("D").last())
+one_stock = df.loc[df["code"] == "000001"].set_index("trade_date")  # 先取一只股票，再让日期成为索引，供时间重采样使用。
+print(one_stock["close"].resample("D").last())  # resample("D") 按自然日取最后一个值，真实交易日仍需查市场日历。
 ```
 
 `resample("D")` 会创建周末等自然日桶，适合观察日历频率，不适合直接替代交易日历。
@@ -584,6 +601,7 @@ print(one_stock["close"].resample("D").last())
 #### 答案框架
 
 ```python
+# 按股票计算相隔三行的价格变化；要称三交易日需先对齐日历。
 df["mom_3"] = df.groupby("code")["close"].pct_change(3, fill_method=None)
 
 # 课程标签口径：
@@ -597,9 +615,11 @@ df["mom_3"] = df.groupby("code")["close"].pct_change(3, fill_method=None)
 ```python
 from src.synthetic_data import build_features_and_labels, make_synthetic_panel
 
+# 生成四只虚构股票；seed 固定随机种子，方便重做相同练习。
 panel = make_synthetic_panel(
     n_stocks=4, start="2024-01-02", end="2024-03-29", seed=42
 )
+# 生成特征和五日标签；min_history 指定最低历史记录要求。
 sample = build_features_and_labels(panel, horizon=5, min_history=1)
 print(sample[["trade_date", "code", "entry_date", "scheduled_exit_date", "fwd_return"]].head())
 ```
@@ -632,35 +652,39 @@ log\_mkt\_cap &= log(max(market\_cap,1))
 
 ```python
 df = df.sort_values(["code", "trade_date"]).reset_index(drop=True)
-by_code = df.groupby("code", group_keys=False)
+by_code = df.groupby("code", group_keys=False)  # 分组后再算各股票自己的历史变化。
 
 df["ret_1d"] = by_code["close"].pct_change(fill_method=None)
 df["mom_5"] = by_code["close"].pct_change(5, fill_method=None)
 df["mom_20"] = by_code["close"].pct_change(20, fill_method=None)
-df["reversal_3"] = -by_code["close"].pct_change(3, fill_method=None)
+df["reversal_3"] = -by_code["close"].pct_change(3, fill_method=None)  # 前面的负号把三期涨幅反过来，当作反转分数。
+# 最近 20 行收益中，至少有 15 个有效值才计算标准差。
 df["vol_20"] = (
     by_code["ret_1d"].rolling(20, min_periods=15).std()
-    .reset_index(level=0, drop=True)
+    .reset_index(level=0, drop=True)  # 移除滚动结果多出的股票索引层，让它按原行标签对齐。
 )
 df["range_1d"] = (df["high"] - df["low"]) / df["close"].replace(0, np.nan)
-df["amount_chg_5"] = by_code["amount"].pct_change(5, fill_method=None)
+df["amount_chg_5"] = by_code["amount"].pct_change(5, fill_method=None)  # 成交额与自己五行前相比，仍需检查前值是否为零。
 df["log_mkt_cap"] = np.log(df["market_cap"].clip(lower=1))
 ```
 
 分组汇总和原表回填：
 
 ```python
+# agg 把每个日期压成一行，分别统计不同股票数和总成交额。
 daily_summary = df.groupby("trade_date").agg(
     stock_count=("code", "nunique"),
     total_amount=("amount", "sum"),
 )
+# transform 把当日均值写回每只股票对应的原行。
 df["daily_mean_amount"] = df.groupby("trade_date")["amount"].transform("mean")
+# 把每天的一行汇总信息，按日期接回原来的多行明细。
 df = df.merge(
     daily_summary["total_amount"],
     left_on="trade_date",
     right_index=True,
     how="left",
-    validate="many_to_one",
+    validate="many_to_one",  # 要求右表每个日期至多一行，防止连接后行数意外膨胀。
 )
 ```
 
@@ -680,6 +704,7 @@ df = df.merge(
 #### 答案框架
 
 ```python
+# 分股票计算五行窗口，至少三个有效收益才算标准差。
 df["vol_5_demo"] = (
     df.groupby("code")["ret_1d"]
       .rolling(5, min_periods=3)
@@ -687,12 +712,13 @@ df["vol_5_demo"] = (
       .reset_index(level=0, drop=True)
 )
 
+# 每个日期汇总成一行；nunique 统计不同股票名字的数量。
 daily = df.groupby("trade_date").agg(
     stock_count=("code", "nunique"),
     total_amount=("amount", "sum"),
 )
 df = df.merge(daily["total_amount"], left_on="trade_date", right_index=True, how="left")
-last_rows = df.sort_values(["code", "trade_date"]).groupby("code").tail(1)
+last_rows = df.sort_values(["code", "trade_date"]).groupby("code").tail(1)  # 先按日期排好，再从每只股票中取最后一行。
 ```
 
 ### 11.6 横截面排名与标签
@@ -706,11 +732,13 @@ last_rows = df.sort_values(["code", "trade_date"]).groupby("code").tail(1)
 `rank(pct=True)` 将组内排序缩放到 0 到 1 附近，并列值通常取平均排名。当前实现的标签为：
 
 ```python
-eligible = df["signal_eligible"] & df["fwd_return"].notna()
+eligible = df["signal_eligible"] & df["fwd_return"].notna()  # & 要求信号合格且未来收益已知，notna 表示不是缺失。
 eligible_returns = df.loc[eligible, ["trade_date", "fwd_return"]]
+# 同一日期的有效股票一起计算未来收益的名次占比。
 label_rank = eligible_returns.groupby("trade_date")["fwd_return"].rank(pct=True)
+# transform 让当日每条记录都附上同一个收益中位数。
 daily_median = eligible_returns.groupby("trade_date")["fwd_return"].transform("median")
-excess_return = eligible_returns["fwd_return"] - daily_median
+excess_return = eligible_returns["fwd_return"] - daily_median  # 每只股票的未来收益减去它所在日期的收益中位数。
 ```
 
 这不是行业中性收益。当前真实数据示例中的历史行业快照不足以做多年严格行业中性，所以课程把 `excess_return` 定义为横截面中位数超额收益。
@@ -719,6 +747,7 @@ excess_return = eligible_returns["fwd_return"] - daily_median
 
 ```python
 df["return_pct_rank"] = df.groupby("trade_date")["ret_1d"].rank(pct=True)
+# lambda 对每个日期单独计算，x 是该日的一组收益。
 df["return_zscore"] = df.groupby("trade_date")["ret_1d"].transform(
     lambda x: (x - x.mean()) / x.std()
 )
@@ -726,14 +755,15 @@ df["return_zscore"] = df.groupby("trade_date")["ret_1d"].transform(
 eligible = df["signal_eligible"] & df["fwd_return"].notna()
 eligible_returns = df.loc[eligible, ["trade_date", "fwd_return"]]
 daily_median = eligible_returns.groupby("trade_date")["fwd_return"].transform("median")
+# 只给条件成立的行写入结果，其他行不动。
 df.loc[eligible, "excess_return"] = eligible_returns["fwd_return"] - daily_median
 df.loc[eligible, "label_rank"] = eligible_returns.groupby("trade_date")["fwd_return"].rank(pct=True)
 
 # 预测值选 Top-N 时，给并列值一个确定的顺序
 df["prediction_rank"] = df.groupby("trade_date")["prediction"].rank(
-    ascending=False, method="first"
+    ascending=False, method="first"  # 从高到低排；同分按当前行顺序区分，需先固定排序规则。
 )
-top_n = df.loc[df["prediction_rank"] <= 10]
+top_n = df.loc[df["prediction_rank"] <= 10]  # 只留下预测名次不大于 10 的行。
 ```
 
 #### 常见错误
@@ -752,13 +782,14 @@ top_n = df.loc[df["prediction_rank"] <= 10]
 #### 答案框架
 
 ```python
+# 每个日期分别按成交额排名。
 df["amount_rank"] = df.groupby("trade_date")["amount"].rank(
     ascending=False, method="first"
 )
-top_amount = df.loc[df["amount_rank"] <= 2].copy()
+top_amount = df.loc[df["amount_rank"] <= 2].copy()  # 保留每天成交额排名前两名的记录。
 
 median_amount = df.groupby("trade_date")["amount"].transform("median")
-df["amount_vs_median"] = df["amount"] / median_amount.replace(0, np.nan)
+df["amount_vs_median"] = df["amount"] / median_amount.replace(0, np.nan)  # 成交额除以当日中位数，分母为零时先保留缺失。
 ```
 
 ### 11.7 合并、缺失值和数据质量
@@ -787,19 +818,19 @@ fundamental = pd.DataFrame(
         "market_cap": [5e9, 8e9, 3e9],
     }
 )
-df = df.merge(fundamental, on="code", how="left", validate="many_to_one")
+df = df.merge(fundamental, on="code", how="left", validate="many_to_one")  # 按股票连接，并检查右表每只股票至多一条。
 
 daily_basic["trade_date"] = pd.to_datetime(daily_basic["trade_date"])
-before = len(df)
+before = len(df)  # 连接前先记住行数，连接后再对照检查。
 df = df.merge(
     daily_basic,
     on=["trade_date", "code"],
     how="left",
-    validate="one_to_one",
+    validate="one_to_one",  # 要求连接键在左右两表都唯一。
 )
 assert len(df) == before
 
-df["close_missing"] = df["close"].isna()
+df["close_missing"] = df["close"].isna()  # 新增布尔列，记下哪些价格原本就是缺失。
 # 仅用于展示：只在同一股票内向前填充，不能跨股票
 df["close_ffill_demo"] = df.groupby("code")["close"].ffill()
 ```
@@ -807,11 +838,11 @@ df["close_ffill_demo"] = df.groupby("code")["close"].ffill()
 训练期填充参数只能来自训练期：
 
 ```python
-train = df.loc[df["trade_date"] < "2024-01-04"].copy()
+train = df.loc[df["trade_date"] < "2024-01-04"].copy()  # 按日期把较早的记录放进训练集。
 test = df.loc[df["trade_date"] >= "2024-01-04"].copy()
-train_median = train["mom_5"].median()
+train_median = train["mom_5"].median()  # 填充值只由训练集计算。
 train["mom_5"] = train["mom_5"].fillna(train_median)
-test["mom_5"] = test["mom_5"].fillna(train_median)
+test["mom_5"] = test["mom_5"].fillna(train_median)  # 测试集沿用训练中位数，避免未来分布参与估计。
 ```
 
 #### 常见错误
@@ -832,11 +863,12 @@ test["mom_5"] = test["mom_5"].fillna(train_median)
 
 ```python
 keys = ["trade_date", "code"]
-assert not daily_basic.duplicated(keys).any()
+assert not daily_basic.duplicated(keys).any()  # 连接前核对右表的日期加股票没有重复。
 merged = df.merge(daily_basic, on=keys, how="left", validate="one_to_one")
 
+# 按股票分别统计缺失价格数；lambda s 里的 s 是这一组价格。
 missing_by_code = df.groupby("code")["close"].apply(lambda s: s.isna().sum())
-codes_with_missing = missing_by_code[missing_by_code > 0].index
+codes_with_missing = missing_by_code[missing_by_code > 0].index  # 只取缺失数大于零的股票名字。
 df["amount_missing"] = df["amount"].isna()
 ```
 
@@ -864,23 +896,25 @@ df["amount_missing"] = df["amount"].isna()
 #### 小例子或代码
 
 ```python
+# 定义检查函数；frame 是传入的表，类型标注帮助阅读。
 def inspect_panel(frame: pd.DataFrame) -> None:
     required = {"trade_date", "code", "close", "amount"}
-    missing_columns = sorted(required - set(frame.columns))
+    missing_columns = sorted(required - set(frame.columns))  # 集合相减，找出必需列中哪些没有出现在表里。
     if missing_columns:
         raise ValueError(f"缺少字段: {missing_columns}")
 
-    print("shape:", frame.shape)
+    print("shape:", frame.shape)  # shape 是行数和列数组成的一对数字。
     print("date range:", frame["trade_date"].min(), "to", frame["trade_date"].max())
     print("code count:", frame["code"].nunique())
     print("missing:")
     print(frame.isna().sum().sort_values(ascending=False).head())
 
-    duplicate_count = frame.duplicated(["code", "trade_date"]).sum()
+    duplicate_count = frame.duplicated(["code", "trade_date"]).sum()  # 用股票加日期识别重复，再累计它们的数量。
     if duplicate_count:
         raise ValueError(f"存在 {duplicate_count} 行重复键")
     if (frame["close"] <= 0).any():
         raise ValueError("发现非正收盘价")
+    # dropna 先排除缺失；再检查剩下的成交额有没有无穷值。
     if not np.isfinite(frame["amount"].dropna()).all():
         raise ValueError("成交额存在无穷值")
 
@@ -892,9 +926,10 @@ inspect_panel(df)
 ```python
 before = len(df)
 joined = df.merge(daily_basic, on=["trade_date", "code"], how="left")
-print({"before": before, "after": len(joined)})
+print({"before": before, "after": len(joined)})  # 用一个小字典并排显示连接前后的行数。
 
 single = (
+    # 只抽一只股票的几个关键字段，方便按日期追踪。
     joined.loc[joined["code"] == "000001", ["trade_date", "close", "ret_1d", "mom_5"]]
     .sort_values("trade_date")
 )
@@ -917,27 +952,27 @@ print(single.head(10))
 找出下面代码的至少四个问题，并改写：
 
 ```python
-subset = df[df["code"] == "000001"]
+subset = df[df["code"] == "000001"]  # 下面是错误对照：筛选后赋值、跨股票 shift 等写法需分别修正。
 subset["ret"] = subset["close"].pct_change()
-df["prev"] = df["close"].shift(1)
-df["selected"] = (df["amount"] > 10000) and (df["close"] > 10)
-joined = df.merge(daily_basic, on="code", how="inner")
+df["prev"] = df["close"].shift(1)  # 未按股票分组，可能把另一只股票的价格当作前值。
+df["selected"] = (df["amount"] > 10000) and (df["close"] > 10)  # Python 的 and 不能逐行组合两列条件，表格条件要用 &。
+joined = df.merge(daily_basic, on="code", how="inner")  # 只按股票连接会把不同日期混在一起，可能造成多对多膨胀。
 ```
 
 #### 答案框架
 
 ```python
-subset = df.loc[df["code"] == "000001"].copy()
+subset = df.loc[df["code"] == "000001"].copy()  # 显式复制筛选结果，后续修改的是这张独立小表。
 subset = subset.sort_values("trade_date")
 subset["ret"] = subset["close"].pct_change(fill_method=None)
 
 df = df.sort_values(["code", "trade_date"]).reset_index(drop=True)
 df["prev"] = df.groupby("code")["close"].shift(1)
-df["selected"] = (df["amount"] > 10000) & (df["close"] > 10)
+df["selected"] = (df["amount"] > 10000) & (df["close"] > 10)  # & 按行合并条件，每项比较分别加括号。
 
 joined = df.merge(
     daily_basic,
-    on=["trade_date", "code"],
+    on=["trade_date", "code"],  # 日期和股票两项都相同才匹配。
     how="left",
     validate="one_to_one",
 )
@@ -958,11 +993,12 @@ joined = df.merge(
 ```python
 df["trade_date"] = pd.to_datetime(df["trade_date"], errors="raise")
 df = df.sort_values(["code", "trade_date"]).reset_index(drop=True)
-by_code = df.groupby("code", group_keys=False)
+by_code = df.groupby("code", group_keys=False)  # 把每只股票各自的时间序列分开处理。
 df["ret_1d"] = by_code["close"].pct_change(fill_method=None)
 df["mom_5"] = by_code["close"].pct_change(5, fill_method=None)
 df["mom_20"] = by_code["close"].pct_change(20, fill_method=None)
-df["reversal_3"] = -by_code["close"].pct_change(3, fill_method=None)
+df["reversal_3"] = -by_code["close"].pct_change(3, fill_method=None)  # 对三期收益取负号，让下跌较多的股票反转分数更高。
+# 滚动标准差按股票计算，结果稍后按原行标签对齐。
 df["vol_20"] = (
     by_code["ret_1d"].rolling(20, min_periods=15).std()
     .reset_index(level=0, drop=True)
@@ -971,12 +1007,13 @@ df["range_1d"] = (df["high"] - df["low"]) / df["close"].replace(0, np.nan)
 df["amount_chg_5"] = by_code["amount"].pct_change(5, fill_method=None)
 df["log_mkt_cap"] = np.log(df["market_cap"].clip(lower=1))
 
+# 把后面必须具备的特征列名放到一个列表里。
 features = [
     "mom_5", "mom_20", "reversal_3",
     "vol_20", "range_1d", "amount_chg_5", "log_mkt_cap",
 ]
 before = len(df)
-df = df.dropna(subset=features).copy()
+df = df.dropna(subset=features).copy()  # 删除特征不齐的行后记录前后数量，明确样本少了多少。
 print({"before": before, "after": len(df)})
 ```
 
@@ -987,11 +1024,11 @@ print({"before": before, "after": len(df)})
 **答案框架：**
 
 ```python
-eligible = df.loc[df["signal_eligible"]].copy()
+eligible = df.loc[df["signal_eligible"]].copy()  # 先筛出当时有信号资格的记录，独立保存。
 eligible["amount_rank"] = eligible.groupby("trade_date")["amount"].rank(
     ascending=False, method="first"
 )
-top_2 = eligible.loc[eligible["amount_rank"] <= 2].copy()
+top_2 = eligible.loc[eligible["amount_rank"] <= 2].copy()  # 每个日期保留成交额名次前两名。
 ```
 
 ### 练习三：构造并检查标签
@@ -1008,10 +1045,11 @@ panel = make_synthetic_panel(
 )
 sample = build_features_and_labels(panel, horizon=5, min_history=20)
 
-assert sample.loc[sample["fwd_return"].isna(), "label_rank"].isna().all()
+assert sample.loc[sample["fwd_return"].isna(), "label_rank"].isna().all()  # 未来收益缺失的行，其排名标签也应该缺失。
+# 先去掉缺少两个价格端点的行，再取第一条做手算。
 one = sample.dropna(subset=["entry_price", "scheduled_exit_price"]).iloc[0]
 manual = one["scheduled_exit_price"] / one["entry_price"] - 1
-assert np.isclose(manual, one["fwd_return"])
+assert np.isclose(manual, one["fwd_return"])  # 用浮点近似比较，检查手算收益是否与生成的标签一致。
 ```
 
 注意：`min_history=20` 只控制最少历史观测，特征本身仍可能因为窗口和停牌产生缺失；`fwd_return` 是计划退出口径，`realized_return` 还要考虑实际成交资格。
@@ -1027,16 +1065,18 @@ features = [
     "mom_5", "mom_20", "reversal_3",
     "vol_20", "range_1d", "amount_chg_5", "log_mkt_cap",
 ]
+# 用字典收集一份数据概况，字段名对应检查项目。
 report = {
     "date_min": str(sample["trade_date"].min()),
     "date_max": str(sample["trade_date"].max()),
     "codes": int(sample["code"].nunique()),
     "duplicate_keys": int(sample.duplicated(["code", "trade_date"]).sum()),
     "non_positive_close": int((sample["close"] <= 0).sum()),
+    # notna 得到是否有标签，求均值就是有标签样本的比例。
     "label_available_rate": float(sample["fwd_return"].notna().mean()),
 }
 print(report)
-print(sample[features].isna().mean().sort_values(ascending=False))
+print(sample[features].isna().mean().sort_values(ascending=False))  # 逐个特征统计缺失比例，并把最高的排在前面。
 ```
 
 ### 自检清单

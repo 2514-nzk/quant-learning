@@ -41,16 +41,16 @@ python examples/quant_python_workshop.py
 import numpy as np
 import pandas as pd
 
-returns = pd.Series([0.10, -0.02], index=['A', 'B'])
-weights = pd.Series([0.80, 0.20], index=['B', 'A'])
+returns = pd.Series([0.10, -0.02], index=['A', 'B'])  # Series 是带标签的一列数；这里行标签是股票 A、B。
+weights = pd.Series([0.80, 0.20], index=['B', 'A'])  # 权重顺序故意写成 B、A，用来观察标签对齐。
 
 # 明确以 returns 的证券顺序对齐，且缺权重时先报错。
-aligned = weights.reindex(returns.index)
-assert aligned.notna().all()
-right = aligned.to_numpy() @ returns.to_numpy()
-wrong = weights.to_numpy() @ returns.to_numpy()
+aligned = weights.reindex(returns.index)  # reindex 按收益列的股票顺序重新排列权重。
+assert aligned.notna().all()  # 先确认每只股票都找到了权重，缺少时立即报错。
+right = aligned.to_numpy() @ returns.to_numpy()  # 转成数组后按位置相乘并加总；@ 表示这个加权求和。
+wrong = weights.to_numpy() @ returns.to_numpy()  # 错误示范：没先对齐，B 的权重会乘到 A 的收益。
 print(f'对齐后：{right:.2%}；直接按位置：{wrong:.2%}')
-assert np.isclose(right, 0.004)
+assert np.isclose(right, 0.004)  # 核对结果与手算近似相等，允许很小的浮点误差。
 assert np.isclose(wrong, 0.076)
 ```
 
@@ -65,16 +65,17 @@ pandas 乘法本身会对齐标签，但默认求和可能跳过缺失。不能�
 下列代码可以作为一个整体，从项目根目录的 Python 会话执行。后续“续接代码”沿用这里的变量：
 
 ```python
+# 从配套脚本导入这些已写好的教学函数。
 from examples.quant_python_workshop import (
     make_market_data, build_panel, attach_labels,
     point_in_time_example, evaluate_daily, verify_workshop,
 )
 
-calendar, raw = make_market_data()
-panel = build_panel(raw, calendar)
-sample = attach_labels(panel, raw, calendar, horizon=5)
-pit = point_in_time_example()
-verify_workshop(raw, calendar, sample, pit)
+calendar, raw = make_market_data()  # 同时接收两个返回值：交易日历和原始行情表。
+panel = build_panel(raw, calendar)  # 补出股票与市场日历的网格，再计算过去特征。
+sample = attach_labels(panel, raw, calendar, horizon=5)  # 接入 T+1 到 T+5 的未来价格，仅供事后评价。
+pit = point_in_time_example()  # 另做一次公告时间与数据修订的连接练习。
+verify_workshop(raw, calendar, sample, pit)  # 运行窗口、缺失和时点核对，不通过时会报错。
 print(len(raw), len(panel))  # 64 66
 ```
 
@@ -99,9 +100,11 @@ vol_5(T) = std(ret_1d(T-4), ..., ret_1d(T), ddof=1)
 
 ```python
 # 续接第 3 节变量，只演示单独计算。
+# 先按股票分组，计算相对前三行价格的变化率；本例已对齐日历。
 check_mom = panel.groupby('code')['close'].pct_change(3, fill_method=None)
+# transform 把每组的计算结果放回原来的每一行。
 check_vol = panel.groupby('code')['ret_1d'].transform(
-    lambda s: s.rolling(5, min_periods=5).std(ddof=1)
+    lambda s: s.rolling(5, min_periods=5).std(ddof=1)  # lambda 给每组收益临时起名 s；五个值齐全才算样本标准差。
 )
 ```
 
@@ -131,9 +134,11 @@ check_vol = panel.groupby('code')['ret_1d'].transform(
 ```python
 # 续接第 3 节变量。仅使用信号日已知字段生成候选。
 date = calendar[6]  # 2024-01-10
+# eq 是相等比较，& 要求日期和候选资格两个条件同时成立。
 candidates = panel[panel['trade_date'].eq(date) & panel['signal_eligible']]
+# 动量从高到低排；同分按股票名字排，再取前两行。
 target = candidates.sort_values(['mom_3', 'code'], ascending=[False, True]).head(2)
-print(target[['code', 'mom_3', 'rank_pct']])
+print(target[['code', 'mom_3', 'rank_pct']])  # 双层方括号按列表一次取出三列。
 assert target['code'].tolist() == ['A', 'C']
 ```
 
@@ -202,8 +207,8 @@ rank_ic：这些有效配对之间的排名相关
 
 ```python
 # 续接第 3 节变量。
-report = evaluate_daily(sample)
-print(report.iloc[5:10])
+report = evaluate_daily(sample)  # 返回按日期记录的样本数量、标签覆盖率和排序评价。
+print(report.iloc[5:10])  # iloc 按行的位置取第 6 到第 10 行，右端位置 10 不包含。
 ```
 
 在 01-10，信号有 3 只，评价配对只有 2 只。本练习要求至少 3 对才输出 RankIC，所以该日为缺失。3 只是演示阈值；真正的研究需要预先设定适合股票池的样本门槛，并检查行业和规模覆盖。
@@ -217,13 +222,14 @@ print(report.iloc[5:10])
 ```python
 import numpy as np
 
-profit = np.array([8., 2., -2.])
-equity = np.array([40., 0., -20.])
+profit = np.array([8., 2., -2.])  # 把三家公司的利润放进一个数值数组，末尾的小数点表示浮点数。
+equity = np.array([40., 0., -20.])  # 三个分母分别为正数、零、负数。
+# isfinite 排除无穷和缺失；这里只允许足够大的正权益。
 valid = np.isfinite(profit) & np.isfinite(equity) & (equity > 1e-8)
-roe = np.full(profit.shape, np.nan)
-np.divide(profit, equity, out=roe, where=valid)
+roe = np.full(profit.shape, np.nan)  # 先建一个同样大小、全部为缺失值 NaN 的结果数组。
+np.divide(profit, equity, out=roe, where=valid)  # 只在 valid 为真的位置相除，把结果写入 roe。
 assert np.isclose(roe[0], 0.2)
-assert np.isnan(roe[1:]).all()
+assert np.isnan(roe[1:]).all()  # [1:] 取第 2 项起的所有结果，它们都应继续保持缺失。
 ```
 
 `np.where(valid, profit/equity, np.nan)` 仍可能先计算两支表达式，产生除零警告；`np.divide(..., where=...)` 可以明确控制计算。阈值必须对应字段单位，`1e-8` 只是此数组例子的约定。

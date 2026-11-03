@@ -52,16 +52,17 @@ f_2(x) ≈ 残差
 当前代码的流程可以简化为：
 
 ```python
+# 用训练输入 x_train 和答案 y_train 拟合候选模型。
 candidate.fit(
     x_train,
     y_train,
-    eval_set=[(x_validation, y_validation)],
-    callbacks=[early_stopping(stopping_rounds=30, verbose=False)],
+    eval_set=[(x_validation, y_validation)],  # 用验证集观察效果，供早停选择轮数。
+    callbacks=[early_stopping(stopping_rounds=30, verbose=False)],  # 验证损失连续 30 轮不改善时，停止继续加树。
 )
-best_iteration = candidate.best_iteration_
+best_iteration = candidate.best_iteration_  # 取出验证阶段选中的树数量。
 
-final = LGBMRegressor(n_estimators=best_iteration, ...)
-final.fit(x_train_validation, y_train_validation)
+final = LGBMRegressor(n_estimators=best_iteration, ...)  # 接口示意：... 代表其余省略的设置，需补齐后运行。
+final.fit(x_train_validation, y_train_validation)  # 用训练加验证数据重训，测试集仍不参与。
 ```
 
 候选模型用 Validation 决定停止轮数；最终模型再用 Train+Validation 重训；Test 不参与停止。必须保存 `best_iteration` 和验证指标，否则别人无法知道最终树数量是预先规定的还是看了测试结果后手工调整的。
