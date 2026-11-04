@@ -1,4 +1,4 @@
-"""用四只虚构股票演示先选股、后计算结果；只依赖 Python 标准功能。"""
+"""用四只虚构股票演示先选股、再计算组合收益和期末资金；只依赖 Python 标准功能。"""
 
 # 决策时已经知道的表：选股函数只读取这里的过去涨幅。
 # 列表里的每个字典是一只股票；0.08 就是 8%。
@@ -42,18 +42,9 @@ for stock in selected:
     selected_total = selected_total + calculate_return(stock["code"])  # 把当前这只股票的收益加到已有合计中。
 portfolio_return = selected_total / len(selected)  # len 统计入选数量；等权时，用合计除以数量得到平均收益。
 
-all_total = 0.0  # 另算全部候选股票的平均收益，作为比较基准。
-# 这次循环遍历全部四只候选股票。
-for stock in known_stocks:
-    all_total = all_total + calculate_return(stock["code"])  # 逐只累加全部候选股票的未来收益。
-benchmark_return = all_total / len(known_stocks)  # 除以候选股票数量，得到它们的等权平均收益。
-
 initial_money = 8000.0  # 保存初始本金，单位是元。
 final_money = initial_money * (1 + portfolio_return)  # 本金乘以 1 加收益率，得到期末金额。
 
 print("入选股票：" + "、".join(selected_codes))  # join 用顿号把名字连起来；print 把结果显示在终端。
 print(f"组合毛收益：{portfolio_return:.2%}")  # f 字符串把变量填入花括号；.2% 按百分数保留两位小数。
-print(f"候选股票等权平均：{benchmark_return:.2%}")
-# 乘 100 把小数差额换成百分点，.2f 保留两位小数。
-print(f"比基准多：{(portfolio_return - benchmark_return) * 100:.2f} 个百分点")
 print(f"8000 元期末变为：{final_money:.2f} 元（未扣费用）")
