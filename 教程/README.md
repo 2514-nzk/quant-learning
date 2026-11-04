@@ -66,6 +66,8 @@
 - [组合与原工程项目实现](参考_组合与项目实现.md)
 - [附录 A：来源材料与内容映射](附录A_课程融合与来源对照.md)
 - [附录 B：A 股回测规则核对](附录B_A股规则与回测核对.md)
+- [附录 C：进阶阅读地图](附录C_进阶阅读地图.md)
+- [附录 D：中英术语对照](附录D_中英术语对照.md)
 - 模板：[研究问题表](../templates/research_question.md)、[研报复现卡](../templates/paper_replication_card.md)、[因子定义卡](../templates/factor_definition_card.md)、[预处理审计](../templates/factor_preprocessing_audit.md)、[单因子报告](../templates/single_factor_report.md)、[多因子项目报告](../templates/multifactor_project_report.md)、[泄漏审计](../templates/leakage_audit.md)
 - [贯穿案例的数据、费率与运行说明](../data/story/README.md)
 - [真实数据需求、字段契约与缺口](../data/README.md)
