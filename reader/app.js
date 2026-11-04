@@ -37,6 +37,11 @@
   let saveTimer = 0;
   let searchTerm = "";
   let mainChapterCount = 0;
+  let labs = {};
+  let pyWorker = null;
+  let labRequestId = 0;
+  const labPending = new Map();
+  const textCache = new Map();
 
   function freshState() {
     return { lastPath: "", bookmarks: [], completed: [], positions: {}, theme: "light", font: 1 };
@@ -115,12 +120,12 @@
     const groups = [...new Set(documents.map((doc) => doc.group))];
     const summaries = {
       "阅读导览": "了解学习路线，完成选股手算与第一段 Python。",
-      "第一编 · 研究问题与证据设计": "明确研究规格、对照与假设，检查数据时点和时间切分。",
-      "第二编 · 构造并检验因子": "学习特征、算子与传统因子，评价排序、覆盖和稳定性。",
-      "第三编 · 从信号到组合": "处理成交约束与费用，检验多因子合成的增量信息。",
-      "第四编 · 模型比较": "比较 Ridge、随机森林与 LightGBM，理解过拟合与评价边界。",
-      "第五编 · 复现与完整实训": "整理可复现项目，完成从选股到研究结论的综合练习。",
-      "参考资料与模板": "按需查阅术语、市场规则、模板和数据字段说明。",
+      "第一循环 · 这笔收益算不算本事？": "算清基准与超额，检查多期成绩、复利与研究规格。",
+      "第二循环 · 数据和因子可不可信？": "检查数据时点、切分与泄漏，构造并评价因子。",
+      "第三循环 · 信号能不能变成钱？": "处理成交约束与费用，检验多因子合成的增量信息。",
+      "第四循环 · 模型有没有增加信息？": "比较 Ridge、随机森林与 LightGBM，理解过拟合与评价边界。",
+      "收尾 · 结论能不能重做？": "整理可复现项目，完成从选股到研究结论的综合练习。",
+      "工具与参考": "按需查阅术语、市场规则、模板和数据字段说明。",
     };
     els.pathGrid.innerHTML = groups.map((group, index) => {
       const items = documents.filter((doc) => doc.group === group);
@@ -222,6 +227,200 @@
     });
   }
 
+  function fetchText(relative) {
+    if (!textCache.has(relative)) {
+      textCache.set(relative, fetch(new URL(relative, document.baseURI)).then((response) => {
+        if (!response.ok) throw new Error(`无法读取 ${relative}（${response.status}）`);
+        return response.text();
+      }));
+    }
+    return textCache.get(relative);
+  }
+
+  function getPyWorker() {
+    if (pyWorker) return pyWorker;
+    pyWorker = new Worker(new URL("pyodide-worker.js?v=9", document.baseURI));
+    pyWorker.onmessage = (event) => {
+      const { id, status, ok, output } = event.data || {};
+      const pending = labPending.get(id);
+      if (!pending) return;
+      if (status) {
+        pending.onStatus?.(status);
+        return;
+      }
+      labPending.delete(id);
+      clearTimeout(pending.timer);
+      pending.resolve({ ok, output: output || "" });
+    };
+    pyWorker.onerror = (event) => {
+      for (const [id, pending] of labPending) {
+        clearTimeout(pending.timer);
+        pending.reject(new Error(event.message || "浏览器运行环境出错"));
+        labPending.delete(id);
+      }
+      pyWorker.terminate();
+      pyWorker = null;
+    };
+    return pyWorker;
+  }
+
+  function runInBrowser({ code, filename, files, argv, onStatus }) {
+    const worker = getPyWorker();
+    const id = ++labRequestId;
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        labPending.delete(id);
+        worker.terminate();
+        pyWorker = null;
+        reject(new Error("运行超过 120 秒，已停止。"));
+      }, 120000);
+      labPending.set(id, { resolve, reject, timer, onStatus });
+      worker.postMessage({ id, code, filename, files, argv });
+    });
+  }
+
+  async function labFiles(lab) {
+    const files = [];
+    for (const relative of lab.files || []) {
+      files.push({ path: `/project/${relative}`, content: await fetchText(relative) });
+    }
+    return files;
+  }
+
+  function setLabStatus(status, value) {
+    if (status.isConnected) status.textContent = value;
+  }
+
+  function labStatusMessage(value) {
+    return value === "booting"
+      ? "正在准备 Python 运行时（首次约十几 MB）…"
+      : "正在运行…";
+  }
+
+  async function runLabScript(lab, config, output, status, button) {
+    button.disabled = true;
+    output.textContent = "";
+    setLabStatus(status, "正在准备…");
+    try {
+      const text = await fetchText(config.script);
+      const files = await labFiles(lab);
+      const filename = `/project/${config.script}`;
+      files.push({ path: filename, content: text });
+      const argv = [config.script.split("/").pop(), ...(config.args || [])];
+      const result = await runInBrowser({
+        code: text,
+        filename,
+        files,
+        argv,
+        onStatus: (value) => setLabStatus(status, labStatusMessage(value)),
+      });
+      if (output.isConnected) output.textContent = result.output || "（没有输出）";
+      setLabStatus(status, result.ok ? "运行完成" : "运行出错");
+    } catch (error) {
+      if (output.isConnected) output.textContent = error.message || String(error);
+      setLabStatus(status, "运行失败");
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  async function runLabEditor(lab, editor, output, status, button) {
+    button.disabled = true;
+    output.textContent = "";
+    setLabStatus(status, "正在准备…");
+    try {
+      const files = await labFiles(lab);
+      const filename = `/project/${lab.script}`;
+      files.push({ path: filename, content: editor.value });
+      const result = await runInBrowser({
+        code: editor.value,
+        filename,
+        files,
+        argv: [lab.script.split("/").pop()],
+        onStatus: (value) => setLabStatus(status, labStatusMessage(value)),
+      });
+      if (output.isConnected) output.textContent = result.output || "（没有输出）";
+      setLabStatus(status, result.ok ? "运行完成" : "运行出错");
+    } catch (error) {
+      if (output.isConnected) output.textContent = error.message || String(error);
+      setLabStatus(status, "运行失败");
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  function renderLabFor(doc) {
+    const lab = labs[doc.path];
+    if (!lab) return;
+    const panel = document.createElement("section");
+    panel.className = "lab-panel";
+    panel.innerHTML = `<div class="lab-head">
+      <span class="lab-kicker">代码实验室 · PYODIDE</span>
+      <h2>${escapeHTML(lab.title)}</h2>
+      <p>${escapeHTML(lab.description)}</p>
+    </div>
+    <div class="lab-body"></div>`;
+    const body = panel.querySelector(".lab-body");
+    const status = document.createElement("span");
+    status.className = "lab-status";
+    status.setAttribute("aria-live", "polite");
+    status.textContent = "首次运行需下载约十几 MB 的 Python 运行时";
+    const output = document.createElement("pre");
+    output.className = "lab-output";
+    output.textContent = "运行结果会显示在这里。";
+
+    if (lab.kind === "editor") {
+      const editor = document.createElement("textarea");
+      editor.className = "lab-editor";
+      editor.spellcheck = false;
+      editor.setAttribute("aria-label", "可编辑的 Python 代码");
+      editor.value = "正在载入代码…";
+      const actions = document.createElement("div");
+      actions.className = "lab-actions";
+      const run = document.createElement("button");
+      run.className = "lab-run";
+      run.type = "button";
+      run.textContent = "运行代码";
+      const reset = document.createElement("button");
+      reset.className = "lab-reset";
+      reset.type = "button";
+      reset.textContent = "恢复原代码";
+      actions.append(run, reset, status);
+      body.append(editor, actions, output);
+      fetchText(lab.script).then((text) => {
+        if (editor.isConnected && editor.value === "正在载入代码…") editor.value = text;
+      }).catch((error) => { editor.value = error.message || String(error); });
+      run.addEventListener("click", () => runLabEditor(lab, editor, output, status, run));
+      reset.addEventListener("click", () => {
+        fetchText(lab.script).then((text) => {
+          editor.value = text;
+          output.textContent = "已恢复原始代码。";
+          setLabStatus(status, "");
+        });
+      });
+      editor.addEventListener("keydown", (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+          event.preventDefault();
+          run.click();
+        }
+      });
+    } else {
+      const actions = document.createElement("div");
+      actions.className = "lab-actions";
+      for (const config of lab.scripts || []) {
+        const run = document.createElement("button");
+        run.className = "lab-run";
+        run.type = "button";
+        run.textContent = config.label;
+        run.addEventListener("click", () => runLabScript(lab, config, output, status, run));
+        actions.append(run);
+      }
+      actions.append(status);
+      body.append(actions, output);
+    }
+    els.article.append(panel);
+  }
+
   function renderArticle(doc) {
     if (!window.marked || !window.DOMPurify) {
       els.article.innerHTML = `<p class="reader-error">正文解析组件没有加载成功。请刷新页面，或检查当前网络是否可以访问 jsDelivr。</p><pre>${escapeHTML(doc.content)}</pre>`;
@@ -265,6 +464,7 @@
       if (headingBySlug.has(fragment)) anchor.setAttribute("href", `#${headingBySlug.get(fragment)}`);
     });
     els.article.replaceChildren(...wrapper.childNodes);
+    renderLabFor(doc);
     if (sections.length) {
       els.sectionIndex.innerHTML = `<div class="section-index-label">本章目录</div><div class="section-index-links">${sections.map((section) => `<a class="${section.level}" href="#${section.id}">${escapeHTML(section.title)}</a>`).join("")}</div>`;
       els.sectionIndex.hidden = false;
@@ -290,7 +490,7 @@
     els.previous.querySelector("strong").textContent = previous?.title || "已是第一篇";
     els.next.disabled = !next;
     els.next.querySelector("strong").textContent = next?.title || "已到最后一篇";
-    els.next.querySelector("span").textContent = current.group !== "参考资料与模板" && next?.group === "参考资料与模板"
+    els.next.querySelector("span").textContent = current.group !== "工具与参考" && next?.group === "工具与参考"
       ? "主线读完了 · 按需查阅 →" : "下一篇 →";
     els.previous.dataset.path = previous?.path || "";
     els.next.dataset.path = next?.path || "";
@@ -301,7 +501,7 @@
     const maximum = Math.max(0, els.reader.scrollHeight - els.reader.clientHeight);
     const percent = maximum ? Math.min(100, Math.round(els.reader.scrollTop / maximum * 100)) : 0;
     const chapter = current.content.match(/^#\s*第\s*(\d+)\s*章/m);
-    let position = current.group === "阅读导览" ? "导读与准备" : "参考资料";
+    let position = current.group === "工具与参考" ? "参考资料" : "导读与准备";
     if (chapter) position = `第 ${chapter[1]} / ${mainChapterCount} 章`;
     els.chapterProgress.textContent = `${position}　·　${percent}%`;
     state.positions[current.path] = els.reader.scrollTop;
@@ -396,7 +596,8 @@
       if (!response.ok) throw new Error(`内容读取失败 (${response.status})`);
       const payload = await response.json();
       documents = payload.documents || [];
-      readingRoute = documents.filter((doc) => doc.group !== "参考资料与模板");
+      labs = payload.labs || {};
+      readingRoute = documents.filter((doc) => doc.group !== "工具与参考");
       byPath = new Map(documents.map((doc) => [doc.path, doc]));
       mainChapterCount = documents.filter((doc) => /^#\s*第\s*\d+\s*章/m.test(doc.content)).length;
       state.bookmarks = state.bookmarks.filter((path) => byPath.has(path));

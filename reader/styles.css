@@ -351,3 +351,24 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
   .markdown-body { color: #111; font-size: 11pt; }
   .markdown-body a { color: #111; }
 }
+
+.lab-panel { margin: 2.6em 0 1em; padding: 20px; background: var(--paper-raised); border: 1px solid var(--line); border-left: 3px solid var(--green); border-radius: 4px; }
+.lab-kicker { color: var(--green-dark); font-family: "DM Mono", monospace; font-size: 8px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; }
+.lab-head h2 { margin: .4em 0 .3em; color: var(--ink); font-family: "Noto Serif SC", serif; font-size: 1.16em; line-height: 1.45; }
+.lab-head p { margin: 0 0 1em; color: var(--ink-soft); font-size: .88em; line-height: 1.78; }
+.lab-editor { width: 100%; min-height: 300px; padding: 14px; color: var(--ink-soft); background: var(--paper); border: 1px solid var(--line); border-radius: 3px; font-family: "DM Mono", Consolas, monospace; font-size: 12px; line-height: 1.68; resize: vertical; tab-size: 4; }
+.lab-editor:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+.lab-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin: 12px 0; }
+.lab-run, .lab-reset { padding: 7px 13px; border: 1px solid var(--green); border-radius: 3px; cursor: pointer; font-family: "DM Sans", "Noto Sans SC", sans-serif; font-size: 12px; transition: background-color .15s ease, color .15s ease; }
+.lab-run { color: var(--paper-raised); background: var(--green); }
+.lab-run:hover { background: var(--green-dark); }
+.lab-run:disabled { opacity: .55; cursor: wait; }
+.lab-reset { color: var(--green-dark); background: var(--paper); }
+.lab-reset:hover { background: var(--green-pale); }
+.lab-status { margin-left: auto; color: var(--ink-faint); font-size: 11px; line-height: 1.5; }
+.lab-output { min-height: 96px; max-height: 380px; margin: 0; padding: 13px 14px; overflow: auto; color: var(--ink-soft); background: var(--paper-deep); border: 1px solid var(--line); border-radius: 3px; font-family: "DM Mono", Consolas, monospace; font-size: 11.5px; line-height: 1.72; white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  .lab-panel { padding: 14px; }
+  .lab-status { width: 100%; margin-left: 0; }
+  .lab-editor { min-height: 230px; font-size: 11px; }
+}

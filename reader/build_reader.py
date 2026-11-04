@@ -24,6 +24,39 @@ GROUPS = {
 }
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+\.md)(?:#[^)]*)?\)")
 
+RUNNABLE_SCRIPTS = [
+    "examples/first_quant_experiment.py",
+    "examples/story_research.py",
+    "examples/story_evidence.py",
+]
+RUNNABLE_DATA = [
+    "data/story/rounds.csv",
+    "data/story/price_history.csv",
+]
+LABS = {
+    "教程/00g_读懂第一段量化代码.md": {
+        "kind": "editor",
+        "title": "在浏览器里运行这段代码",
+        "description": "这段代码只使用 Python 自带的写法，可以直接在浏览器里运行和修改。第一次运行需要下载 Python 运行时（约十几 MB），之后会复用。",
+        "script": "examples/first_quant_experiment.py",
+        "files": [],
+    },
+    "data/story/README.md": {
+        "kind": "scripts",
+        "title": "在浏览器里重做基础演算",
+        "description": "基础演算和证据分析只使用 Python 标准库与故事 CSV。模型模式依赖 LightGBM，仍需在本地运行。浏览器演示使用较少的重抽样次数，数值与书中略有差异。",
+        "files": RUNNABLE_DATA,
+        "scripts": [
+            {"label": "运行基础演算", "script": "examples/story_research.py", "args": []},
+            {
+                "label": "运行证据分析（500 次重抽样）",
+                "script": "examples/story_evidence.py",
+                "args": ["--permutations", "500", "--bootstrap", "500"],
+            },
+        ],
+    },
+}
+
 
 def estimate_minutes(markdown: str) -> int:
     readable = re.sub(r"```.*?```", " ", markdown, flags=re.S)
@@ -84,10 +117,16 @@ def main() -> None:
     shutil.copy2(ROOT / "reader" / "styles.css", output / "styles.css")
     shutil.copy2(ROOT / "reader" / "favicon.ico", output / "favicon.ico")
     shutil.copytree(ROOT / "reader" / "assets", output / "assets", dirs_exist_ok=True)
+    shutil.copy2(ROOT / "reader" / "pyodide-worker.js", output / "pyodide-worker.js")
+    for relative in RUNNABLE_SCRIPTS + RUNNABLE_DATA:
+        target = output / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / relative, target)
     payload = {
         "title": "A 股量化研究入门",
         "description": "按研究问题、数据、因子、组合与模型组织，用同一模拟案例贯穿讲解的中文自学教材。",
         "documents": collect_documents(),
+        "labs": LABS,
     }
     (output / "content.json").write_text(
         json.dumps(payload, ensure_ascii=False, separators=(",", ":")),
