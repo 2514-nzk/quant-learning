@@ -73,6 +73,7 @@
 - [附录 C：进阶阅读地图](附录C_进阶阅读地图.md)
 - [附录 D：中英术语对照](附录D_中英术语对照.md)
 - 模板：[研究问题表](../templates/research_question.md)、[研报复现卡](../templates/paper_replication_card.md)、[因子定义卡](../templates/factor_definition_card.md)、[预处理审计](../templates/factor_preprocessing_audit.md)、[单因子报告](../templates/single_factor_report.md)、[多因子项目报告](../templates/multifactor_project_report.md)、[泄漏审计](../templates/leakage_audit.md)
+- [无额外依赖的研究审计练习](../examples/research_audit_lab.py)：时间检查、Top-2、RankIC 和边界失败测试。
 - [贯穿案例的数据、费率与运行说明](../data/story/README.md)
 - [真实数据需求、字段契约与缺口](../data/README.md)
 
