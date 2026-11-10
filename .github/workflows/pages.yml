@@ -28,6 +28,10 @@ jobs:
           python-version: "3.x"
       - name: Check reader JavaScript syntax
         run: node --check reader/app.js && node --check reader/pyodide-worker.js
+      - name: Verify research-audit lab
+        run: |
+          python -m unittest discover -s tests -p "test_research_audit_lab.py" -v
+          python examples/research_audit_lab.py
       - name: Build reading site
         run: python reader/build_reader.py --output _site
       - name: Upload Pages artifact
