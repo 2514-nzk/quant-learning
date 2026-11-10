@@ -14,6 +14,16 @@
 python examples/story_research.py
 ```
 
+进一步学习如何从 60 期数据生成逐期因子评价，以及如何检查已经保存的模型选参记录：
+
+~~~powershell
+python examples/factor_diagnostics_lab.py
+python examples/factor_diagnostics_lab.py --factor equal_rank
+python examples/model_selection_audit.py
+~~~
+
+它们只使用 Python 标准库。前者输出教学因子的逐期排序与三段统计，后者检查已存模型选择记录的一致性；不提供额外的独立真实市场证据。
+
 重做模型练习并保存自己的报告：
 
 ```powershell
