@@ -372,3 +372,26 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
   .lab-status { width: 100%; margin-left: 0; }
   .lab-editor { min-height: 230px; font-size: 11px; }
 }
+
+/* Reader usability enhancements */
+.search-clear { flex: 0 0 auto; padding: 2px 6px; color: var(--ink-soft); background: transparent; border: 0; border-radius: 3px; cursor: pointer; font-size: 18px; line-height: 1; }
+.search-clear:hover { color: var(--green-dark); background: var(--green-pale); }
+.search-clear[hidden] { display: none; }
+.search-excerpt { margin: 0 7px 7px; padding: 0 6px 8px; color: var(--ink-faint); border-bottom: 1px solid var(--line); font-size: 10px; line-height: 1.65; overflow-wrap: anywhere; }
+.reading-progress-track { position: absolute; right: 0; bottom: 0; left: 0; height: 3px; background: var(--paper-deep); overflow: hidden; }
+.reading-progress-track[hidden] { display: none; }
+.reading-progress-track span { display: block; width: 0; height: 100%; background: var(--green); transition: width .12s linear; }
+.main-column { position: relative; }
+.back-to-top { position: absolute; z-index: 3; right: 24px; bottom: 24px; display: flex; align-items: center; gap: 6px; padding: 9px 12px; color: var(--green-dark); background: var(--paper-raised); border: 1px solid var(--line-strong); border-radius: 24px; box-shadow: 0 4px 16px rgb(0 0 0 / 9%); cursor: pointer; font-size: 11px; }
+.back-to-top[hidden] { display: none; }
+.back-to-top:hover { border-color: var(--green); background: var(--green-pale); }
+@media (max-width: 760px) {
+  .back-to-top { right: 13px; bottom: 17px; padding: 10px; }
+  .search-box kbd { display: none; }
+  .chapter-link { min-height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reader-scroll { scroll-behavior: auto; }
+  .sidebar, .reading-progress-track span, .path-card, .primary-button { transition: none; }
+  .loading-mark { animation-duration: 2s; }
+}

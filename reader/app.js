@@ -6,6 +6,11 @@
   const els = {
     nav: $("#chapter-nav"),
     search: $("#search-input"),
+    searchClear: $("#search-clear"),
+    readingProgress: $("#reading-progress-track"),
+    readingProgressBar: $("#reading-progress-bar"),
+    backToTop: $("#back-to-top"),
+    menuButton: $("#menu-button"),
     searchStatus: $("#search-status"),
     loading: $("#loading-state"),
     home: $("#home-view"),
@@ -86,7 +91,17 @@
     </button>`;
   }
 
+  function searchExcerpt(doc, query) {
+    const text = doc.content.replace(/[#*`>|_~]/g, " ").replace(/\s+/g, " ").trim();
+    const index = text.toLocaleLowerCase().indexOf(query);
+    if (index < 0) return "";
+    const start = Math.max(0, index - 32);
+    const end = Math.min(text.length, index + query.length + 55);
+    return (start ? "…" : "") + text.slice(start, end) + (end < text.length ? "…" : "");
+  }
+
   function renderNavigation() {
+    els.searchClear.hidden = !els.search.value;
     const query = searchTerm.trim().toLocaleLowerCase();
     const matches = documents.filter((doc) => {
       if (!query) return true;
@@ -107,7 +122,10 @@
     for (const group of groups) {
       const items = matches.filter((doc) => doc.group === group);
       if (!items.length) continue;
-      html += `<div class="nav-group"><div class="nav-heading"><span>${escapeHTML(group)}</span><span class="nav-count">${items.length}</span></div>${items.map((doc) => chapterButton(doc)).join("")}</div>`;
+      html += `<div class="nav-group"><div class="nav-heading"><span>${escapeHTML(group)}</span><span class="nav-count">${items.length}</span></div>${items.map((doc) => {
+        const excerpt = query ? searchExcerpt(doc, query) : "";
+        return chapterButton(doc) + (excerpt ? `<p class="search-excerpt">${escapeHTML(excerpt)}</p>` : "");
+      }).join("")}</div>`;
     }
 
     els.nav.innerHTML = html || `<div class="empty-search"><span>⌕</span><strong>没有找到匹配内容</strong><small>试试更短的关键词</small></div>`;
@@ -504,6 +522,9 @@
     let position = current.group === "工具与参考" ? "参考资料" : "导读与准备";
     if (chapter) position = `第 ${chapter[1]} / ${mainChapterCount} 章`;
     els.chapterProgress.textContent = `${position}　·　${percent}%`;
+    els.readingProgressBar.style.width = `${percent}%`;
+    els.readingProgress.setAttribute("aria-valuenow", String(percent));
+    els.backToTop.hidden = els.reader.scrollTop < 380;
     state.positions[current.path] = els.reader.scrollTop;
     if (maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
       state.completed.push(current.path);
@@ -521,6 +542,7 @@
     const index = documents.indexOf(doc);
     els.home.hidden = true;
     els.chapter.hidden = false;
+    els.readingProgress.hidden = false;
     els.breadcrumb.textContent = doc.title;
     els.group.textContent = doc.group;
     els.time.textContent = `${doc.minutes} 分钟阅读`;
@@ -544,6 +566,9 @@
     current = null;
     els.chapter.hidden = true;
     els.home.hidden = false;
+    els.readingProgress.hidden = true;
+    els.readingProgressBar.style.width = "0%";
+    els.backToTop.hidden = true;
     els.breadcrumb.textContent = "量化入门";
     els.chapterProgress.textContent = "";
     els.reader.scrollTop = 0;
@@ -575,12 +600,16 @@
     els.sidebar.classList.add("is-open");
     els.mobileBackdrop.classList.add("is-visible");
     document.body.classList.add("menu-open");
+    els.menuButton.setAttribute("aria-expanded", "true");
+    els.menuButton.setAttribute("aria-label", "关闭目录");
   }
 
   function closeMobileMenu() {
     els.sidebar.classList.remove("is-open");
     els.mobileBackdrop.classList.remove("is-visible");
     document.body.classList.remove("menu-open");
+    els.menuButton.setAttribute("aria-expanded", "false");
+    els.menuButton.setAttribute("aria-label", "打开目录");
   }
 
   function applyAppearance() {
@@ -627,6 +656,15 @@
     searchTerm = els.search.value;
     renderNavigation();
   });
+  els.searchClear.addEventListener("click", () => {
+    els.search.value = "";
+    searchTerm = "";
+    renderNavigation();
+    els.search.focus();
+  });
+  els.backToTop.addEventListener("click", () => {
+    els.reader.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+  });
   $("#resume-button").addEventListener("click", () => {
     const path = state.lastPath && byPath.has(state.lastPath) ? state.lastPath : documents[0]?.path;
     if (path) showChapter(path);
@@ -641,7 +679,10 @@
   $("#font-down").addEventListener("click", () => { state.font = Math.max(0.88, +(state.font - 0.06).toFixed(2)); applyAppearance(); saveState(); });
   $("#font-up").addEventListener("click", () => { state.font = Math.min(1.3, +(state.font + 0.06).toFixed(2)); applyAppearance(); saveState(); });
   $("#theme-button").addEventListener("click", () => { state.theme = state.theme === "dark" ? "light" : "dark"; applyAppearance(); saveState(); });
-  $("#menu-button").addEventListener("click", openMobileMenu);
+  els.menuButton.addEventListener("click", () => {
+    if (els.sidebar.classList.contains("is-open")) closeMobileMenu();
+    else { openMobileMenu(); els.search.focus(); }
+  });
   els.mobileBackdrop.addEventListener("click", closeMobileMenu);
   els.reader.addEventListener("scroll", updateReadingProgress, { passive: true });
   els.article.addEventListener("click", (event) => {
@@ -686,7 +727,9 @@
       els.search.select();
     } else if (event.key === "Escape") {
       els.search.blur();
+      const wasOpen = els.sidebar.classList.contains("is-open");
       closeMobileMenu();
+      if (wasOpen) els.menuButton.focus();
     }
   });
 
