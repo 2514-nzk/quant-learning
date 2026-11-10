@@ -130,7 +130,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .icon-button:hover { color: var(--green-dark); background: var(--green-pale); }
 .font-up { font-size: 10px; }
 .menu-button { display: none; }
-.reader-scroll { position: relative; flex: 1; min-height: 0; overflow: auto; scroll-behavior: smooth; scrollbar-color: var(--line-strong) transparent; scrollbar-width: thin; }
+.reader-scroll { position: relative; flex: 1; min-height: 0; overflow: auto; scroll-behavior: auto; scrollbar-color: var(--line-strong) transparent; scrollbar-width: thin; }
 
 .home-view { max-width: 1110px; margin: 0 auto; padding: 67px 70px 31px; }
 .home-intro { max-width: 580px; padding-top: 10px; }

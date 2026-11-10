@@ -26,6 +26,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.x"
+      - name: Check reader JavaScript syntax
+        run: node --check reader/app.js && node --check reader/pyodide-worker.js
       - name: Build reading site
         run: python reader/build_reader.py --output _site
       - name: Upload Pages artifact

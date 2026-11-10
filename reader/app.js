@@ -2,6 +2,7 @@
   "use strict";
 
   const STORAGE_KEY = "quant-learning-reader-v1";
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   const $ = (selector) => document.querySelector(selector);
   const els = {
     nav: $("#chapter-nav"),
@@ -40,6 +41,8 @@
   let byPath = new Map();
   let current = null;
   let saveTimer = 0;
+  let navigationId = 0;
+  let restoringPosition = false;
   let searchTerm = "";
   let mainChapterCount = 0;
   let labs = {};
@@ -515,7 +518,7 @@
   }
 
   function updateReadingProgress() {
-    if (!current) return;
+    if (!current || restoringPosition) return;
     const maximum = Math.max(0, els.reader.scrollHeight - els.reader.clientHeight);
     const percent = maximum ? Math.min(100, Math.round(els.reader.scrollTop / maximum * 100)) : 0;
     const chapter = current.content.match(/^#\s*第\s*(\d+)\s*章/m);
@@ -535,9 +538,24 @@
     saveTimer = setTimeout(saveState, 400);
   }
 
+  function saveReadingPosition() {
+    if (current && !restoringPosition) {
+      state.positions[current.path] = els.reader.scrollTop;
+    }
+    clearTimeout(saveTimer);
+    saveState();
+  }
+
   function showChapter(path, { route = true, replace = false, restore = true, section = "" } = {}) {
     const doc = byPath.get(path);
     if (!doc) return showHome({ route: false });
+
+    // Save the chapter being left before DOM changes alter its scroll height.
+    saveReadingPosition();
+    const storedPosition = Number(state.positions[doc.path] ?? 0);
+    const targetPosition = restore && Number.isFinite(storedPosition) ? Math.max(0, storedPosition) : 0;
+    const version = ++navigationId;
+    restoringPosition = true;
     current = doc;
     const index = documents.indexOf(doc);
     els.home.hidden = true;
@@ -555,14 +573,19 @@
     saveState();
     closeMobileMenu();
     requestAnimationFrame(() => {
+      if (version !== navigationId) return;
       const sectionTarget = section ? document.getElementById(section) : null;
-      if (sectionTarget) sectionTarget.scrollIntoView({ block: "start" });
-      else els.reader.scrollTop = restore ? Number(state.positions[doc.path] || 0) : 0;
+      if (sectionTarget) sectionTarget.scrollIntoView({ block: "start", behavior: "instant" });
+      else els.reader.scrollTo({ top: targetPosition, behavior: "instant" });
+      restoringPosition = false;
       updateReadingProgress();
     });
   }
 
   function showHome({ route = true } = {}) {
+    saveReadingPosition();
+    ++navigationId;
+    restoringPosition = false;
     current = null;
     els.chapter.hidden = true;
     els.home.hidden = false;
@@ -571,7 +594,7 @@
     els.backToTop.hidden = true;
     els.breadcrumb.textContent = "量化入门";
     els.chapterProgress.textContent = "";
-    els.reader.scrollTop = 0;
+    els.reader.scrollTo({ top: 0, behavior: "instant" });
     renderHome();
     renderNavigation();
     if (route) setRoute("");
@@ -650,7 +673,7 @@
   });
   els.pathGrid.addEventListener("click", (event) => {
     const button = event.target.closest("[data-path]");
-    if (button) showChapter(button.dataset.path, { restore: false });
+    if (button) showChapter(button.dataset.path);
   });
   els.search.addEventListener("input", () => {
     searchTerm = els.search.value;
@@ -663,7 +686,13 @@
     els.search.focus();
   });
   els.backToTop.addEventListener("click", () => {
-    els.reader.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+    // An explicit jump must persist zero, not an intermediate smooth-scroll frame.
+    els.reader.scrollTo({ top: 0, behavior: "instant" });
+    if (current) {
+      state.positions[current.path] = 0;
+      updateReadingProgress();
+      saveState();
+    }
   });
   $("#resume-button").addEventListener("click", () => {
     const path = state.lastPath && byPath.has(state.lastPath) ? state.lastPath : documents[0]?.path;
@@ -674,8 +703,8 @@
   });
   els.bookmark.addEventListener("click", toggleBookmark);
   els.complete.addEventListener("click", toggleComplete);
-  els.previous.addEventListener("click", () => { if (els.previous.dataset.path) showChapter(els.previous.dataset.path, { restore: false }); });
-  els.next.addEventListener("click", () => { if (els.next.dataset.path) showChapter(els.next.dataset.path, { restore: false }); });
+  els.previous.addEventListener("click", () => { if (els.previous.dataset.path) showChapter(els.previous.dataset.path); });
+  els.next.addEventListener("click", () => { if (els.next.dataset.path) showChapter(els.next.dataset.path); });
   $("#font-down").addEventListener("click", () => { state.font = Math.max(0.88, +(state.font - 0.06).toFixed(2)); applyAppearance(); saveState(); });
   $("#font-up").addEventListener("click", () => { state.font = Math.min(1.3, +(state.font + 0.06).toFixed(2)); applyAppearance(); saveState(); });
   $("#theme-button").addEventListener("click", () => { state.theme = state.theme === "dark" ? "light" : "dark"; applyAppearance(); saveState(); });
@@ -685,6 +714,10 @@
   });
   els.mobileBackdrop.addEventListener("click", closeMobileMenu);
   els.reader.addEventListener("scroll", updateReadingProgress, { passive: true });
+  window.addEventListener("pagehide", saveReadingPosition);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") saveReadingPosition();
+  });
   els.article.addEventListener("click", (event) => {
     const copyButton = event.target.closest(".code-copy");
     if (copyButton) {
