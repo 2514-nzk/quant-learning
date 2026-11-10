@@ -1,0 +1,30 @@
+name: Verify learning materials
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate course links
+        run: python -m unittest discover -s tests -p "test_curriculum_links.py" -v
+      - name: Validate audit exercise
+        run: |
+          python -m unittest discover -s tests -p "test_research_audit_lab.py" -v
+          python examples/research_audit_lab.py
+      - name: Build course with advanced learning track
+        run: |
+          python reader/build_reader.py --output _site
+          python -c 'import json; d=json.load(open("_site/content.json",encoding="utf-8")); assert any(x["path"]=="教程/进阶实战_从教学数据到研究级流程.md" for x in d["documents"]); print("Published lessons:",len(d["documents"]))'
