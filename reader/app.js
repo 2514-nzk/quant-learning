@@ -2,6 +2,7 @@
   "use strict";
 
   const STORAGE_KEY = "quant-learning-reader-v1";
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
   const $ = (selector) => document.querySelector(selector);
   const els = {
     nav: $("#chapter-nav"),
