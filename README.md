@@ -4,6 +4,8 @@
 
 正文用四只虚构股票 A、B、C、D 贯穿全书。第一笔在起步课里用手算完成，第二课翻译成 Python；之后每一章只增加一个需要解决的问题。阅读顺序见[阅读指南](教程/00_学习路线.md)，完整目录见[教材目录](教程/README.md)，也可以直接打开[在线阅读器](https://2514-nzk.github.io/quant-learning/)。从零基础到研究级的四阶学习与项目要求见[进阶实战路线](教程/进阶实战_从教学数据到研究级流程.md)。
 
+如果已学到单因子和机器学习，推荐继续读[深度专题 A：因子研究](教程/专题A_单因子到稳健性研究.md)和[深度专题 B：模型验证](教程/专题B_机器学习验证与增量检验.md)，两篇都有不依赖第三方库的审计脚本。
+
 ## 阅读路径
 
 | 阶段 | 章节 | 要回答的问题 |
@@ -26,6 +28,8 @@ python examples/first_quant_experiment.py
 python examples/story_research.py
 python examples/story_evidence.py
 python examples/research_audit_lab.py  # 标准库可运行：时点、边界和 RankIC 审计
+python examples/factor_diagnostics_lab.py  # 单因子逐期诊断、成本和 ICIR
+python examples/model_selection_audit.py  # 核对保存的模型试验和验证选参
 ```
 
 安装 `requirements.txt` 中的依赖后，可以运行后半本的模型练习并保存报告：

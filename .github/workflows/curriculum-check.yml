@@ -24,6 +24,11 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_research_audit_lab.py" -v
           python examples/research_audit_lab.py
+      - name: Verify factor and model deep dives
+        run: |
+          python -m unittest discover -s tests -p "test_deep_dive_labs.py" -v
+          python examples/factor_diagnostics_lab.py
+          python examples/model_selection_audit.py
       - name: Build course with advanced learning track
         run: |
           python reader/build_reader.py --output _site
