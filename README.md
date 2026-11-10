@@ -2,7 +2,7 @@
 
 这是一本面向初学者的量化研究教材。它只做一件事：陪你从 8,000 元虚拟资金出发，完成一次能复查的选股研究，再逐步检查这笔研究哪里可能错。
 
-正文用四只虚构股票 A、B、C、D 贯穿全书。第一笔在起步课里用手算完成，第二课翻译成 Python；之后每一章只增加一个需要解决的问题。阅读顺序见[阅读指南](教程/00_学习路线.md)，完整目录见[教材目录](教程/README.md)，也可以直接打开[在线阅读器](https://2514-nzk.github.io/quant-learning/)。
+正文用四只虚构股票 A、B、C、D 贯穿全书。第一笔在起步课里用手算完成，第二课翻译成 Python；之后每一章只增加一个需要解决的问题。阅读顺序见[阅读指南](教程/00_学习路线.md)，完整目录见[教材目录](教程/README.md)，也可以直接打开[在线阅读器](https://2514-nzk.github.io/quant-learning/)。从零基础到研究级的四阶学习与项目要求见[进阶实战路线](教程/进阶实战_从教学数据到研究级流程.md)。
 
 ## 阅读路径
 
@@ -25,6 +25,7 @@
 python examples/first_quant_experiment.py
 python examples/story_research.py
 python examples/story_evidence.py
+python examples/research_audit_lab.py  # 标准库可运行：时点、边界和 RankIC 审计
 ```
 
 安装 `requirements.txt` 中的依赖后，可以运行后半本的模型练习并保存报告：
