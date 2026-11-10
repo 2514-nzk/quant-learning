@@ -13,7 +13,10 @@ import math
 from collections import defaultdict
 from statistics import mean, stdev
 
-from examples.research_audit_lab import audit, average_ranks, load_rows, spearman
+if __package__:
+    from examples.research_audit_lab import audit, average_ranks, load_rows, spearman
+else:
+    from research_audit_lab import audit, average_ranks, load_rows, spearman
 
 FACTOR_NAMES = ("mom_5", "ep", "roe", "equal_rank")
 FOLDS = (("train", 1, 36), ("validation", 37, 46), ("test", 47, 60))
