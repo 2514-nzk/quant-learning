@@ -33,6 +33,9 @@ jobs:
           python -m unittest discover -s tests -p "test_research_audit_lab.py" -v
           python -m unittest discover -s tests -p "test_curriculum_links.py" -v
           python examples/research_audit_lab.py
+          python -m unittest discover -s tests -p "test_deep_dive_labs.py" -v
+          python examples/factor_diagnostics_lab.py
+          python examples/model_selection_audit.py
       - name: Build reading site
         run: python reader/build_reader.py --output _site
       - name: Upload Pages artifact
