@@ -31,6 +31,8 @@ jobs:
           python examples/model_selection_audit.py
       - name: Verify beginner arithmetic and workbook
         run: python -m unittest discover -s tests -p "test_beginner_examples.py" -v
+      - name: Check self-contained first-pass lessons and fee examples
+        run: python -m unittest discover -s tests -p "test_trader_friendly_route.py" -v
       - name: Build course with advanced learning track
         run: |
           python reader/build_reader.py --output _site
