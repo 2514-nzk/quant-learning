@@ -3,7 +3,7 @@ name: Collect AKShare real A-share teaching charts
 on:
   # Run on the setup branch once, then keep manual refresh available from Actions.
   push:
-    branches: [real-akshare-candles-20261111]
+    branches: [real-famous-a-shares-main-course-20261111]
     paths:
       - scripts/collect_real_a_share.py
       - .github/workflows/collect-real-a-share.yml
