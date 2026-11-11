@@ -33,21 +33,21 @@ RUNNABLE_DATA = [
 ]
 LABS = {
     "教程/真实_Python入门.md": {
-        "kind": "scripts",
+        "kind": "real-data",
         "title": "用真实价格运行这段选股练习",
-        "description": "直接计算四只真实股票的过去五日涨幅、未来收益、组合金额和18期分段比较。",
+        "description": "读取教材保存的真实行情，直接在网页中计算四只股票的涨幅、组合金额与18期比较；无需下载Python运行环境。",
         "files": RUNNABLE_DATA,
-        "scripts": [{"label":"运行真实股票选股", "script":"examples/real_stock_learner.py", "args": []}],
+        "scripts": [{"label":"计算真实股票选股结果", "script":"examples/real_stock_learner.py", "args": []}],
     },
     "教程/真实_08_单因子评价.md": {
-        "kind": "scripts",
+        "kind": "real-data",
         "title": "核对真实股票的 RankIC",
         "description": "重算18个观察期的排名相关性；这些数字不代表已经获得实盘优势。",
         "files": RUNNABLE_DATA,
-        "scripts": [{"label":"运行真实数据评价", "script":"examples/real_stock_learner.py", "args": []}],
+        "scripts": [{"label":"计算各期排名与收益", "script":"examples/real_stock_learner.py", "args": []}],
     },
     "教程/真实_16_综合练习.md": {
-        "kind": "scripts",
+        "kind": "real-data",
         "title": "复核四只真实股票的全部手算",
         "description": "无需单独安装 Python，可在浏览器核对2024年固定行情。",
         "files": RUNNABLE_DATA,
@@ -112,6 +112,7 @@ def main() -> None:
     output.mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT / "reader" / "index.html", output / "index.html")
     shutil.copy2(ROOT / "reader" / "app.js", output / "app.js")
+    shutil.copy2(ROOT / "reader" / "real-case.js", output / "real-case.js")
     shutil.copy2(ROOT / "reader" / "styles.css", output / "styles.css")
     shutil.copy2(ROOT / "reader" / "favicon.ico", output / "favicon.ico")
     shutil.copytree(ROOT / "reader" / "assets", output / "assets", dirs_exist_ok=True)
