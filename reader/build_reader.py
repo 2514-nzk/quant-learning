@@ -26,35 +26,32 @@ GROUPS = {
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+\.md)(?:#[^)]*)?\)")
 
 RUNNABLE_SCRIPTS = [
-    "examples/first_quant_experiment.py",
-    "examples/story_research.py",
-    "examples/story_evidence.py",
+    "examples/real_stock_learner.py",
 ]
 RUNNABLE_DATA = [
-    "data/story/rounds.csv",
-    "data/story/price_history.csv",
+    "data/real_a_share/teaching_case.json",
 ]
 LABS = {
-    "教程/00g_读懂第一段量化代码.md": {
-        "kind": "editor",
-        "title": "在浏览器里运行这段代码",
-        "description": "这段代码只使用 Python 自带的写法，可以直接在浏览器里运行和修改。第一次运行需要下载 Python 运行时（约十几 MB），之后会复用。",
-        "script": "examples/first_quant_experiment.py",
-        "files": [],
-    },
-    "data/story/README.md": {
+    "教程/真实_Python入门.md": {
         "kind": "scripts",
-        "title": "在浏览器里重做基础演算",
-        "description": "基础演算和证据分析只使用 Python 标准库与故事 CSV。模型模式依赖 LightGBM，仍需在本地运行。浏览器演示使用较少的重抽样次数，数值与书中略有差异。",
+        "title": "用真实价格运行这段选股练习",
+        "description": "直接计算四只真实股票的过去五日涨幅、未来收益、组合金额和18期分段比较。",
         "files": RUNNABLE_DATA,
-        "scripts": [
-            {"label": "运行基础演算", "script": "examples/story_research.py", "args": []},
-            {
-                "label": "运行证据分析（500 次重抽样）",
-                "script": "examples/story_evidence.py",
-                "args": ["--permutations", "500", "--bootstrap", "500"],
-            },
-        ],
+        "scripts": [{"label":"运行真实股票选股", "script":"examples/real_stock_learner.py", "args": []}],
+    },
+    "教程/真实_08_单因子评价.md": {
+        "kind": "scripts",
+        "title": "核对真实股票的 RankIC",
+        "description": "重算18个观察期的排名相关性；这些数字不代表已经获得实盘优势。",
+        "files": RUNNABLE_DATA,
+        "scripts": [{"label":"运行真实数据评价", "script":"examples/real_stock_learner.py", "args": []}],
+    },
+    "教程/真实_16_综合练习.md": {
+        "kind": "scripts",
+        "title": "复核四只真实股票的全部手算",
+        "description": "无需单独安装 Python，可在浏览器核对2024年固定行情。",
+        "files": RUNNABLE_DATA,
+        "scripts": [{"label":"重新计算选股与组合", "script":"examples/real_stock_learner.py", "args": []}],
     },
 }
 
@@ -125,7 +122,7 @@ def main() -> None:
         shutil.copy2(ROOT / relative, target)
     payload = {
         "title": "A 股量化研究入门",
-        "description": "按研究问题、数据、因子、组合与模型组织，用同一模拟案例贯穿讲解的中文自学教材。",
+        "description": "从贵州茅台、寒武纪、宁德时代和比亚迪的真实历史K线学习量化研究，先手算再检验。",
         "documents": collect_documents(),
         "labs": LABS,
     }
