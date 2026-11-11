@@ -35,6 +35,10 @@ jobs:
         run: python -m unittest discover -s tests -p "test_trader_friendly_route.py" -v
       - name: Check reading-history reset behavior
         run: python -m unittest discover -s tests -p "test_reader_reset.py" -v
+      - name: Verify actual AKShare historical candles and lessons
+        run: |
+          python -m unittest discover -s tests -p "test_real_a_share.py" -v
+          python examples/real_kline_lab.py --symbol 000001
       - name: Build course with advanced learning track
         run: |
           python reader/build_reader.py --output _site
