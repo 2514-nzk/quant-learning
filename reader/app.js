@@ -329,6 +329,19 @@
     output.textContent = "";
     setLabStatus(status, "正在准备…");
     try {
+      // For this book's fixed historical-data exercises, compute from the saved
+      // four-stock JSON directly. No CDN, WASM, Python worker or extra download.
+      if (lab.kind === "real-data") {
+        setLabStatus(status, "正在读取课堂历史数据…");
+        const source = lab.files?.[0];
+        if (!source) throw new Error("课堂数据配置缺失，请刷新页面后重试。");
+        const sample = JSON.parse(await fetchText(source));
+        if (!window.QuantRealCase?.run) throw new Error("计算模块尚未加载，请刷新页面后重试。");
+        const result = window.QuantRealCase.run(sample);
+        if (output.isConnected) output.textContent = result;
+        setLabStatus(status, "已完成历史行情计算");
+        return;
+      }
       const text = await fetchText(config.script);
       const files = await labFiles(lab);
       const filename = `/project/${config.script}`;
@@ -382,7 +395,7 @@
     const panel = document.createElement("section");
     panel.className = "lab-panel";
     panel.innerHTML = `<div class="lab-head">
-      <span class="lab-kicker">代码实验室 · PYODIDE</span>
+      <span class="lab-kicker">${lab.kind === "real-data" ? "真实数据 · 浏览器计算" : "代码实验室 · PYODIDE"}</span>
       <h2>${escapeHTML(lab.title)}</h2>
       <p>${escapeHTML(lab.description)}</p>
     </div>
@@ -391,7 +404,7 @@
     const status = document.createElement("span");
     status.className = "lab-status";
     status.setAttribute("aria-live", "polite");
-    status.textContent = "首次运行需下载约十几 MB 的 Python 运行时";
+    status.textContent = lab.kind === "real-data" ? "使用已保存的真实历史行情，点击即可计算" : "首次运行需下载约十几 MB 的 Python 运行时";
     const output = document.createElement("pre");
     output.className = "lab-output";
     output.textContent = "运行结果会显示在这里。";
