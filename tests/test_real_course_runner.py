@@ -57,7 +57,7 @@ class RealStockCourseTests(unittest.TestCase):
             self.assertTrue((ROOT / "reader/assets/real-a-share" / f"{symbol}.svg").is_file())
         main_text = "\n".join(d["content"] for d in collect_documents())
         for symbol in ("600519", "688256", "300750", "002594"):
-            self.assertIn(f"real-a-share/{symbol}.svg", main_text) if symbol in ("600519","688256","300750") else self.assertIn("比亚迪", main_text)
+            self.assertIn(f"real-a-share/{symbol}.svg", main_text)
 
 
 if __name__ == "__main__":
