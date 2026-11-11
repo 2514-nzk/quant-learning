@@ -32,12 +32,12 @@ class FoundationOrderTests(unittest.TestCase):
     def test_advanced_basics_are_at_first_use(self):
         pos = self.positions
         self.assertLess(
-            pos["教程/08a_单因子研究与评价.md"],
+            pos["教程/04_时间切分与泄漏.md"],
             pos["教程/00d_量化Python实战.md"],
         )
         self.assertLess(
             pos["教程/00d_量化Python实战.md"],
-            pos["教程/09_预测到组合.md"],
+            pos["教程/08a_单因子研究与评价.md"],
         )
         self.assertLess(
             pos["教程/00b_机器学习基础.md"],
@@ -59,6 +59,31 @@ class FoundationOrderTests(unittest.TestCase):
             "工具与参考",
         )
         self.assertEqual(len(pos), len(self.documents))
+
+    def test_prerequisites_are_taught_before_factor_evaluation(self):
+        # The visible left navigation must match how readers learn, not the old
+        # numbers left in the source filenames.
+        ordered = [
+            "教程/02_数据与标签.md",
+            "教程/03_特征工程.md",
+            "教程/03a_因子表达式与算子.md",
+            "教程/03b_传统因子与预处理.md",
+            "教程/04_时间切分与泄漏.md",
+            "教程/00d_量化Python实战.md",
+            "教程/08a_单因子研究与评价.md",
+        ]
+        positions = [self.positions[path] for path in ordered]
+        self.assertEqual(positions, sorted(positions))
+
+    def test_comprehensive_workbook_is_after_final_lesson(self):
+        self.assertGreater(
+            self.positions["教程/00h_零基础16道小题.md"],
+            self.positions["教程/11_完整手算案例与实验操作.md"],
+        )
+        self.assertLess(
+            self.positions["教程/00h_零基础16道小题.md"],
+            self.positions["教程/参考_因子研究完整方法.md"],
+        )
 
     def test_python_intro_is_first(self):
         content = (ROOT / "教程/00a_Python数据分析基础.md").read_text("utf-8")
