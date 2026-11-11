@@ -45,6 +45,14 @@ class LearningFlowTests(unittest.TestCase):
         for amt in ("954,338.69","985,218.01","215.29","198.67"):
             self.assertIn(amt,intro_doc)
 
+    def test_real_historical_financial_report_is_used_correctly(self):
+        chapter = (COURSE / "真实_06_财务与预处理.md").read_text("utf-8")
+        for term in ("宁德时代", "2023 年年度报告", "2024 年 3 月 15 日", "441.21 亿元", "24.04%", "2024 年 2 月 1 日", "2024 年 6 月 21 日"):
+            self.assertIn(term, chapter)
+        self.assertIn("深交所披露文件", chapter)
+        self.assertNotIn("不能凭空给它们配上", chapter)
+        self.assertLess(chapter.index("## 2. 历史财报能拿到吗"), chapter.index("## 3. 什么叫预处理"))
+
     def test_real_price_terms_appear_before_advanced_statistics(self):
         docs=[d["path"] for d in collect_documents()]
         self.assertLess(docs.index("教程/真实_03_历史K线与时点.md"),
