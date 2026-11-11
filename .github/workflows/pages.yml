@@ -43,6 +43,7 @@ jobs:
           python -m unittest discover -s tests -p "test_foundation_order.py" -v
           python -m unittest discover -s tests -p "test_learning_flow.py" -v
           python -m unittest discover -s tests -p "test_real_course_runner.py" -v
+          python -m unittest discover -s tests -p "test_standalone_book.py" -v
           python examples/real_stock_learner.py
           python examples/real_kline_lab.py --symbol 000001
       - name: Build reading site
