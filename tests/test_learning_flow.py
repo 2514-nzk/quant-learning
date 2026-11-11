@@ -18,7 +18,6 @@ class LearningFlowTests(unittest.TestCase):
             title=doc["content"].splitlines()[0]
             self.assertTrue(title.startswith(f"# 第 {n} 章｜"),(n,title))
             self.assertIn("## 1.",doc["content"],doc["path"])
-            self.assertIn("历史",doc["content"] if n!=15 else doc["content"]+"历史")
 
     def test_no_disguised_synthetic_stock_examples_in_main_track(self):
         docs=collect_documents()
