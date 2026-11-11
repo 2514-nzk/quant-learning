@@ -1,0 +1,52 @@
+{
+  "kind": "historical daily A-share teaching snapshot",
+  "captured_utc": "2026-11-11T01:52:26.784798+00:00",
+  "retriever": "AKShare",
+  "akshare_version": "1.20.37",
+  "start_date_requested": "20240102",
+  "end_date_requested": "20240628",
+  "adjust": "none",
+  "price_unit": "CNY/share (unadjusted OHLC)",
+  "volume_unit": "lots (手), normalized; 1 lot=100 shares for these examples",
+  "turnover_unit": "percent (%); Sina fractional turnover multiplied by 100",
+  "notes": [
+    "Sampled named stocks; not an unbiased backtest universe",
+    "No dividends, corporate-action adjustments, survivorship handling or live execution",
+    "Historical source may revise values: exact CSV sha256 included"
+  ],
+  "items": [
+    {
+      "symbol": "000001",
+      "name": "平安银行",
+      "source": "akshare.stock_zh_a_daily",
+      "records": 117,
+      "first_date": "2024-01-02",
+      "last_date": "2024-06-28",
+      "csv_path": "data/real_a_share/000001.csv",
+      "chart_path": "reader/assets/real-a-share/000001.svg",
+      "csv_sha256": "01415d93220cd2d9228da29eec8642efcb6b7c1196aad4770a5edafc78df0a1a"
+    },
+    {
+      "symbol": "600519",
+      "name": "贵州茅台",
+      "source": "akshare.stock_zh_a_daily",
+      "records": 117,
+      "first_date": "2024-01-02",
+      "last_date": "2024-06-28",
+      "csv_path": "data/real_a_share/600519.csv",
+      "chart_path": "reader/assets/real-a-share/600519.svg",
+      "csv_sha256": "40d7c217ef17501ad7960879d937d2afad66b5e5cbf43fbf476d5cd5004cd8b9"
+    },
+    {
+      "symbol": "300750",
+      "name": "宁德时代",
+      "source": "akshare.stock_zh_a_daily",
+      "records": 117,
+      "first_date": "2024-01-02",
+      "last_date": "2024-06-28",
+      "csv_path": "data/real_a_share/300750.csv",
+      "chart_path": "reader/assets/real-a-share/300750.svg",
+      "csv_sha256": "8211e8be042006469487f06f911abd2ddd0658077b2258283b3a274dddfac501"
+    }
+  ]
+}

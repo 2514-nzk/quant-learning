@@ -39,6 +39,8 @@ jobs:
           python -m unittest discover -s tests -p "test_beginner_examples.py" -v
           python -m unittest discover -s tests -p "test_trader_friendly_route.py" -v
           python -m unittest discover -s tests -p "test_reader_reset.py" -v
+          python -m unittest discover -s tests -p "test_real_a_share.py" -v
+          python examples/real_kline_lab.py --symbol 000001
       - name: Build reading site
         run: python reader/build_reader.py --output _site
       - name: Upload Pages artifact
