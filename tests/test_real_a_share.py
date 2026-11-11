@@ -121,7 +121,10 @@ class AkShareKlineTests(unittest.TestCase):
             self.assertIn(f"../reader/assets/real-a-share/{symbol}.svg", content)
             self.assertTrue((ROOT / "reader" / "assets" / "real-a-share" / f"{symbol}.svg").exists())
         index = (ROOT / "教程" / "README.md").read_text(encoding="utf-8")
-        self.assertIn("真实A股K线_入门实例.md", index)
+        self.assertIn("真实_03_历史K线与时点.md", index)
+        self.assertIn("真实_08_单因子评价.md", index)
+        for symbol in ("600519", "688256", "300750", "002594"):
+            self.assertTrue((ROOT / "reader/assets/real-a-share" / f"{symbol}.svg").exists())
 
     def test_saved_real_snapshot_if_present(self):
         manifest_path = SNAPSHOT / "manifest.json"
