@@ -43,7 +43,11 @@ jobs:
         run: python -m unittest discover -s tests -p "test_foundation_order.py" -v
       - name: Verify concept prerequisites and chapter order
         run: python -m unittest discover -s tests -p "test_learning_flow.py" -v
+      - name: Confirm real-stock pricing and browser labs
+        run: |
+          python -m unittest discover -s tests -p "test_real_course_runner.py" -v
+          python examples/real_stock_learner.py
       - name: Build course with advanced learning track
         run: |
           python reader/build_reader.py --output _site
-          python -c 'import json; d=json.load(open("_site/content.json",encoding="utf-8")); assert any(x["path"]=="教程/进阶实战_从教学数据到研究级流程.md" for x in d["documents"]); print("Published lessons:",len(d["documents"]))'
+          python -c 'import json; d=json.load(open("_site/content.json",encoding="utf-8")); assert len(d["documents"])==21 and any(x["path"]=="教程/真实_起步一课.md" for x in d["documents"]); assert all(x["path"].startswith("教程/真实_") for x in d["documents"]); print("Published real-stock lessons:",len(d["documents"]))'

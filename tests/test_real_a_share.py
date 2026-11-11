@@ -121,7 +121,10 @@ class AkShareKlineTests(unittest.TestCase):
             self.assertIn(f"../reader/assets/real-a-share/{symbol}.svg", content)
             self.assertTrue((ROOT / "reader" / "assets" / "real-a-share" / f"{symbol}.svg").exists())
         index = (ROOT / "教程" / "README.md").read_text(encoding="utf-8")
-        self.assertIn("真实A股K线_入门实例.md", index)
+        self.assertIn("真实_03_历史K线与时点.md", index)
+        self.assertIn("真实_08_单因子评价.md", index)
+        for symbol in ("600519", "688256", "300750", "002594"):
+            self.assertTrue((ROOT / "reader/assets/real-a-share" / f"{symbol}.svg").exists())
 
     def test_saved_real_snapshot_if_present(self):
         manifest_path = SNAPSHOT / "manifest.json"
@@ -130,7 +133,7 @@ class AkShareKlineTests(unittest.TestCase):
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         self.assertEqual(manifest["retriever"], "AKShare")
         self.assertEqual(manifest["adjust"], "none")
-        self.assertEqual({x["symbol"] for x in manifest["items"]}, {"000001", "600519", "300750"})
+        self.assertEqual({x["symbol"] for x in manifest["items"]}, {"600519", "688256", "300750", "002594"})
         for item in manifest["items"]:
             data = (SNAPSHOT / (item["symbol"] + ".csv")).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), item["csv_sha256"])

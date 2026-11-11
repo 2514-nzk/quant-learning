@@ -1,90 +1,61 @@
-"""Regression tests for concept-first chapter order and in-chapter prerequisites.
-
-Do not silently reintroduce 'explaining after use' problems into beginner flow.
-"""
+"""Protect the concept-first, verified-real-market teaching sequence."""
+import csv
+import json
 import re
 import unittest
 from pathlib import Path
-
 from reader.build_reader import collect_documents
 
-
-ROOT = Path(__file__).resolve().parents[1]
-TUTORIAL = ROOT / "教程"
-CHAPTERS = [
-    ("01_研究问题定义.md", 1),
-    ("01a_研究假设与研报复现.md", 2),
-    ("02_数据与标签.md", 3),
-    ("03_特征工程.md", 4),
-    ("03a_因子表达式与算子.md", 5),
-    ("03b_传统因子与预处理.md", 6),
-    ("04_时间切分与泄漏.md", 7),
-    ("08a_单因子研究与评价.md", 8),
-    ("09_预测到组合.md", 9),
-    ("09a_多因子合成与综合实训.md", 10),
-    ("05_线性基线.md", 11),
-    ("06_决策树与随机森林.md", 12),
-    ("07_GBDT与LightGBM.md", 13),
-    ("08_模型评价与解释.md", 14),
-    ("10_研究框架与结课项目.md", 15),
-    ("11_完整手算案例与实验操作.md", 16),
-]
-
+ROOT=Path(__file__).resolve().parents[1]
+COURSE=ROOT/"教程"
 
 class LearningFlowTests(unittest.TestCase):
-    def test_chapter_number_titles_match_sidebar_order(self):
-        documents = collect_documents()
-        order = [doc["path"] for doc in documents]
-        numbers = []
-        for filename, expected in CHAPTERS:
-            path = "教程/" + filename
-            numbers.append(order.index(path))
-            first = (TUTORIAL / filename).read_text("utf-8").splitlines()[0]
-            self.assertTrue(
-                first.startswith(f"# 第 {expected} 章｜"),
-                f"{filename} displays the wrong chapter number: {first}",
-            )
-        self.assertEqual(numbers, sorted(numbers))
+    def test_all_main_chapter_titles_match_sidebar_order(self):
+        docs=collect_documents()
+        chapters=[d for d in docs if "第 " in d["title"] and "章" in d["title"]]
+        self.assertEqual(len(chapters),16)
+        for n,doc in enumerate(chapters,1):
+            title=doc["content"].splitlines()[0]
+            self.assertTrue(title.startswith(f"# 第 {n} 章｜"),(n,title))
+            self.assertIn("## 1.",doc["content"],doc["path"])
 
-    def test_data_before_features_before_model_selection(self):
-        document = (TUTORIAL / "02_数据与标签.md").read_text("utf-8")
-        # Introduce familiar OHLC before a row, then a future label, then PIT.
-        topics = [
-            "## 1. 从交易软件的 K 线",
-            "## 2. 同一张表",
-            "## 3. 当时的输入和未来的答案",
-            "## 4. 财报什么时候公布",
-        ]
-        places = [document.index(part) for part in topics]
-        self.assertEqual(places, sorted(places))
-        self.assertIn("下一章先不急着训练模型", document)
-        time_split = (TUTORIAL / "04_时间切分与泄漏.md").read_text("utf-8")
-        self.assertIn("现在才需要比较", time_split)
-        self.assertIn("下一章会把动量因子的排名", time_split)
+    def test_no_disguised_synthetic_stock_examples_in_main_track(self):
+        docs=collect_documents()
+        text="\n".join(d["content"] for d in docs)
+        self.assertNotIn("A、B、C、D",text)
+        self.assertNotIn("虚构股票 A",text)
+        self.assertNotIn("8,000 元虚拟资金",text)
+        for name in ("贵州茅台","寒武纪","宁德时代","比亚迪"):
+            self.assertIn(name,text)
+        self.assertIn("1,000,000",text)
 
-    def test_python_practice_follows_introduction(self):
-        source = (TUTORIAL / "00g_读懂第一段量化代码.md").read_text("utf-8")
-        self.assertLess(source.index("## 2. 用一条记录"), source.index("ranked = sorted"))
-        self.assertLess(source.index("ranked = sorted"), source.index("### 学过排序后，自己先猜一次"))
+    def test_2024_ohlc_was_checked_in_not_made_up(self):
+        saved=json.loads((ROOT/"data/real_a_share/teaching_case.json").read_text("utf-8"))
+        self.assertEqual(set(saved["stocks"]),{"600519","688256","300750","002594"})
+        self.assertEqual(len(saved["rounds"]),18)
+        intro=saved["intro"]
+        self.assertEqual(intro["signal_date"],"2024-06-21")
+        self.assertEqual(intro["entry_date"],"2024-06-24")
+        self.assertEqual(intro["exit_date"],"2024-06-28")
+        self.assertEqual([r["name"] for r in intro["rows"][:2]],["寒武纪","宁德时代"])
+        self.assertAlmostEqual(intro["theoretical_end"],954338.69,places=2)
+        self.assertAlmostEqual(intro["benchmark_end"],985218.01,places=2)
+        self.assertAlmostEqual(intro["lot_end"],954882,places=2)
+        intro_doc=(COURSE/"真实_起步一课.md").read_text("utf-8")
+        for amt in ("954,338.69","985,218.01","215.29","198.67"):
+            self.assertIn(amt,intro_doc)
 
-    def test_advanced_uncertainty_follows_basic_evaluation(self):
-        lesson = (TUTORIAL / "08_模型评价与解释.md").read_text("utf-8")
-        self.assertLess(lesson.index("## 2. RankIC 与组合收益"), lesson.index("## 3. 复利、净值"))
-        self.assertLess(lesson.index("## 3. 复利、净值"), lesson.index("## 4. 选读｜14 期"))
-        self.assertLess(lesson.index("## 4. 选读｜14 期"), lesson.index("## 5. 特征消融"))
-
-    def test_study_notes_do_not_use_old_chapter_numbers(self):
-        cases = {
-            "00a_Python数据分析基础.md": "第 5 章",
-            "00d_量化Python实战.md": "第 5 章",
-            "参考_因子算子与边界.md": "第 5 章",
-            "参考_模型比较与解释.md": "第 7 章",
-            "真实A股K线_入门实例.md": "第 5 章",
-        }
-        for filename, term in cases.items():
-            with self.subTest(filename=filename):
-                self.assertIn(term, (TUTORIAL / filename).read_text("utf-8"))
+    def test_real_price_terms_appear_before_advanced_statistics(self):
+        docs=[d["path"] for d in collect_documents()]
+        self.assertLess(docs.index("教程/真实_03_历史K线与时点.md"),
+                        docs.index("教程/真实_05_均线与算子.md"))
+        self.assertLess(docs.index("教程/真实_05_均线与算子.md"),
+                        docs.index("教程/真实_07_时间切分与泄漏.md"))
+        self.assertLess(docs.index("教程/真实_07_时间切分与泄漏.md"),
+                        docs.index("教程/真实_08_单因子评价.md"))
+        self.assertLess(docs.index("教程/真实_08_单因子评价.md"),
+                        docs.index("教程/真实_11_线性模型.md"))
 
 
-if __name__ == "__main__":
+if __name__=="__main__":
     unittest.main()
