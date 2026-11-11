@@ -55,9 +55,9 @@ class RealStockCourseTests(unittest.TestCase):
     def test_main_course_images_are_checked_in(self):
         for symbol in ("600519", "688256", "300750", "002594"):
             self.assertTrue((ROOT / "reader/assets/real-a-share" / f"{symbol}.svg").is_file())
-        for item in collect_documents():
-            if "assets/real-a-share" in item["content"]:
-                self.assertIn("不", "不是收益承诺")  # static check for old accidental test no-op
+        main_text = "\n".join(d["content"] for d in collect_documents())
+        for symbol in ("600519", "688256", "300750", "002594"):
+            self.assertIn(f"real-a-share/{symbol}.svg", main_text) if symbol in ("600519","688256","300750") else self.assertIn("比亚迪", main_text)
 
 
 if __name__ == "__main__":
