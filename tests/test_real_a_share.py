@@ -130,7 +130,7 @@ class AkShareKlineTests(unittest.TestCase):
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
         self.assertEqual(manifest["retriever"], "AKShare")
         self.assertEqual(manifest["adjust"], "none")
-        self.assertEqual({x["symbol"] for x in manifest["items"]}, {"000001", "600519", "300750"})
+        self.assertEqual({x["symbol"] for x in manifest["items"]}, {"600519", "688256", "300750", "002594"})
         for item in manifest["items"]:
             data = (SNAPSHOT / (item["symbol"] + ".csv")).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), item["csv_sha256"])
