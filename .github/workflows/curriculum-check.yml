@@ -54,6 +54,8 @@ jobs:
           node --check reader/app.js
           node --check reader/real-case.js
           node tests/real_browser_lab.test.js
+      - name: Verify plain-language terminology and real RankIC examples
+        run: python -m unittest discover -s tests -p "test_rankic_readability.py" -v
       - name: Build course with advanced learning track
         run: |
           python reader/build_reader.py --output _site
