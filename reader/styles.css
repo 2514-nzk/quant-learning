@@ -395,3 +395,61 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
   .sidebar, .reading-progress-track span, .path-card, .primary-button { transition: none; }
   .loading-mark { animation-duration: 2s; }
 }
+
+/* Reading-history management: available on desktop and in the mobile sidebar. */
+.manage-progress-button {
+  display: block;
+  margin-top: 10px;
+  padding: 4px 0;
+  color: var(--ink-soft);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px dashed var(--line-strong);
+  cursor: pointer;
+  font-size: 10px;
+  text-align: left;
+}
+.manage-progress-button:hover { color: var(--green-dark); border-bottom-color: var(--green); }
+.reset-notice {
+  max-width: 480px;
+  margin: 14px 0 0;
+  color: var(--green-dark);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.reset-notice[hidden] { display: none; }
+.reset-progress-dialog {
+  width: min(440px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  overflow-y: auto;
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  box-shadow: 0 18px 60px rgb(0 0 0 / 20%);
+}
+.reset-progress-dialog::backdrop { background: rgb(9 17 14 / 52%); }
+.reset-dialog-content { padding: 25px 26px 23px; }
+.reset-dialog-eyebrow { color: var(--green); font-size: 10px; letter-spacing: .07em; }
+.reset-dialog-content h2 { margin: 9px 0 13px; font-family: "Noto Serif SC", serif; font-size: 21px; font-weight: 600; }
+.reset-dialog-content p { margin: 0; color: var(--ink-soft); font-size: 12px; line-height: 1.9; }
+.reset-bookmarks-option { display: flex; align-items: flex-start; gap: 11px; margin: 18px 0; padding: 13px; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; }
+.reset-bookmarks-option input { flex: 0 0 auto; width: 16px; height: 16px; margin: 3px 0 0; accent-color: var(--green); }
+.reset-bookmarks-option span { display: flex; flex-direction: column; gap: 3px; color: var(--ink); font-size: 12px; }
+.reset-bookmarks-option small { color: var(--ink-faint); font-size: 10px; }
+.reset-dialog-content .reset-dialog-note { color: var(--ink-faint); font-size: 10px; }
+.reset-dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+.reset-cancel-button, .reset-confirm-button { min-height: 38px; padding: 0 15px; border-radius: 5px; cursor: pointer; font-size: 12px; }
+.reset-cancel-button { color: var(--ink-soft); background: transparent; border: 1px solid var(--line-strong); }
+.reset-confirm-button { color: #fff; background: var(--green-dark); border: 1px solid var(--green-dark); }
+.reset-cancel-button:hover { background: var(--paper-deep); }
+.reset-confirm-button:hover { background: var(--green); }
+@media (max-width: 390px) {
+  .reset-dialog-content { padding: 19px; }
+  .reset-dialog-actions { gap: 8px; }
+  .reset-cancel-button, .reset-confirm-button { flex: 1; }
+}
+@media print {
+  .reset-progress-dialog { display: none !important; }
+}
