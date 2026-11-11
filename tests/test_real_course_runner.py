@@ -19,8 +19,24 @@ class RealStockCourseTests(unittest.TestCase):
     def test_price_derived_case_matches_original_snapshot(self):
         self.assertEqual(self.saved["stocks"], self.rebuilt["stocks"])
         self.assertEqual(len(self.saved["rounds"]), 18)
-        self.assertEqual(self.saved["rounds"], self.rebuilt["rounds"])
-        self.assertEqual(self.saved["intro"], self.rebuilt["intro"])
+        # Python 3.11 and newer 3.x may differ by one unit in the ninth
+        # decimal place in floating-point arithmetic. Dates, codes and
+        # quantities must match exactly; numerical ratios may have <5e-8 drift.
+        def compare(saved, rebuilt):
+            if isinstance(saved, dict):
+                self.assertEqual(set(saved), set(rebuilt))
+                for key in saved:
+                    compare(saved[key], rebuilt[key])
+            elif isinstance(saved, list):
+                self.assertEqual(len(saved), len(rebuilt))
+                for left, right in zip(saved, rebuilt):
+                    compare(left, right)
+            elif type(saved) in (int, float) and type(rebuilt) in (int, float):
+                self.assertAlmostEqual(saved, rebuilt, delta=5e-8)
+            else:
+                self.assertEqual(saved, rebuilt)
+        compare(self.saved["rounds"], self.rebuilt["rounds"])
+        compare(self.saved["intro"], self.rebuilt["intro"])
 
     def test_real_example_and_lot_arithmetic(self):
         intro = self.saved["intro"]
