@@ -15,12 +15,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=10">
+  <link rel="stylesheet" href="./styles.css?v=11">
   <script defer src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/languages/powershell.min.js"></script>
-  <script defer src="./app.js?v=11"></script>
+  <script defer src="./app.js?v=12"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -45,6 +45,7 @@
           <div class="progress-heading"><span>学习进度</span><span id="overall-progress-label">0%</span></div>
           <div class="progress-track"><span id="overall-progress-bar"></span></div>
           <small id="overall-progress-copy">开始阅读，记录会保存在这台设备上</small>
+          <button id="manage-progress-button" class="manage-progress-button" type="button" aria-haspopup="dialog" aria-controls="reset-progress-dialog">管理阅读记录</button>
         </div>
         <a class="repository-link" href="https://github.com/2514-nzk/quant-learning" target="_blank" rel="noreferrer">
           <span>查看 GitHub 项目</span><span aria-hidden="true">↗</span>
@@ -77,8 +78,9 @@
             <p class="home-lede">从研究问题与数据时点开始，逐步学习因子评价、组合构建和模型比较。一笔 8,000 元的模拟研究贯穿正文，帮助你把概念、手算和代码对应起来。</p>
             <div class="home-actions">
               <button class="primary-button" id="resume-button">从上次位置继续 <span aria-hidden="true">→</span></button>
-              <button class="text-button" id="start-button">从头开始阅读 <span aria-hidden="true">↗</span></button>
+              <button class="text-button" id="start-button" title="仅从第一篇打开，不会清空阅读进度">从头开始阅读 <span aria-hidden="true">↗</span></button>
             </div>
+            <p class="reset-notice" id="reset-notice" role="status" hidden></p>
           </div>
           <div class="home-aside">
             <div class="book-cover">
@@ -126,5 +128,22 @@
       <button class="back-to-top" id="back-to-top" type="button" title="回到本章顶部" aria-label="回到本章顶部" hidden><span aria-hidden="true">↑</span> 回到顶部</button>
     </div>
   </div>
+
+  <dialog id="reset-progress-dialog" class="reset-progress-dialog" aria-labelledby="reset-progress-title" aria-describedby="reset-progress-description">
+    <div class="reset-dialog-content">
+      <span class="reset-dialog-eyebrow">阅读记录管理</span>
+      <h2 id="reset-progress-title">清空阅读进度？</h2>
+      <p id="reset-progress-description">会清除所有章节的阅读位置、已读标记和“从上次位置继续”的记录，之后可以从第一篇重新开始。</p>
+      <label class="reset-bookmarks-option" for="reset-bookmarks-checkbox">
+        <input type="checkbox" id="reset-bookmarks-checkbox">
+        <span>同时清空我的书签<small>默认不勾选，书签会保留</small></span>
+      </label>
+      <p class="reset-dialog-note">主题与字号设置始终保留。清空后的记录无法恢复，且只影响当前浏览器中的记录。</p>
+      <div class="reset-dialog-actions">
+        <button id="cancel-progress-reset" class="reset-cancel-button" type="button">取消</button>
+        <button id="confirm-progress-reset" class="reset-confirm-button" type="button">确认清空</button>
+      </div>
+    </div>
+  </dialog>
 </body>
 </html>

@@ -33,6 +33,8 @@ jobs:
         run: python -m unittest discover -s tests -p "test_beginner_examples.py" -v
       - name: Check self-contained first-pass lessons and fee examples
         run: python -m unittest discover -s tests -p "test_trader_friendly_route.py" -v
+      - name: Check reading-history reset behavior
+        run: python -m unittest discover -s tests -p "test_reader_reset.py" -v
       - name: Build course with advanced learning track
         run: |
           python reader/build_reader.py --output _site

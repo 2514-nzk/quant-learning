@@ -38,6 +38,7 @@ jobs:
           python examples/model_selection_audit.py
           python -m unittest discover -s tests -p "test_beginner_examples.py" -v
           python -m unittest discover -s tests -p "test_trader_friendly_route.py" -v
+          python -m unittest discover -s tests -p "test_reader_reset.py" -v
       - name: Build reading site
         run: python reader/build_reader.py --output _site
       - name: Upload Pages artifact

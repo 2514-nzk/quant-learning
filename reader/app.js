@@ -27,6 +27,12 @@
     overallLabel: $("#overall-progress-label"),
     overallBar: $("#overall-progress-bar"),
     overallCopy: $("#overall-progress-copy"),
+    manageProgress: $("#manage-progress-button"),
+    resetDialog: $("#reset-progress-dialog"),
+    resetBookmarks: $("#reset-bookmarks-checkbox"),
+    resetCancel: $("#cancel-progress-reset"),
+    resetConfirm: $("#confirm-progress-reset"),
+    resetNotice: $("#reset-notice"),
     bookmark: $("#bookmark-button"),
     complete: $("#complete-button"),
     previous: $("#previous-button"),
@@ -559,6 +565,7 @@
     current = doc;
     const index = documents.indexOf(doc);
     els.home.hidden = true;
+    els.resetNotice.hidden = true;
     els.chapter.hidden = false;
     els.readingProgress.hidden = false;
     els.breadcrumb.textContent = doc.title;
@@ -582,8 +589,9 @@
     });
   }
 
-  function showHome({ route = true } = {}) {
-    saveReadingPosition();
+  function showHome({ route = true, savePrevious = true } = {}) {
+    if (savePrevious) saveReadingPosition();
+    else clearTimeout(saveTimer);
     ++navigationId;
     restoringPosition = false;
     current = null;
@@ -599,6 +607,26 @@
     renderNavigation();
     if (route) setRoute("");
     closeMobileMenu();
+  }
+
+  function resetReadingHistory() {
+    // Do not let a pending scroll-save repopulate data during reset.
+    clearTimeout(saveTimer);
+    const clearBookmarks = els.resetBookmarks.checked;
+    state.positions = {};
+    state.completed = [];
+    state.lastPath = "";
+    if (clearBookmarks) state.bookmarks = [];
+
+    els.resetDialog.close();
+    // Navigating home must not save the now-discarded chapter position.
+    showHome({ savePrevious: false });
+    saveState();
+    els.resetNotice.textContent = clearBookmarks
+      ? "阅读进度与书签已清空，可以重新开始阅读。"
+      : "阅读进度已清空，书签、主题和字号均已保留。";
+    els.resetNotice.hidden = false;
+    $("#start-button").focus();
   }
 
   function toggleBookmark() {
@@ -685,6 +713,12 @@
     renderNavigation();
     els.search.focus();
   });
+  els.manageProgress.addEventListener("click", () => {
+    els.resetBookmarks.checked = false;
+    els.resetDialog.showModal();
+  });
+  els.resetCancel.addEventListener("click", () => els.resetDialog.close());
+  els.resetConfirm.addEventListener("click", resetReadingHistory);
   els.backToTop.addEventListener("click", () => {
     // An explicit jump must persist zero, not an intermediate smooth-scroll frame.
     els.reader.scrollTo({ top: 0, behavior: "instant" });
