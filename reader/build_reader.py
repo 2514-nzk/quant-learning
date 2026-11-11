@@ -122,7 +122,7 @@ def main() -> None:
         shutil.copy2(ROOT / relative, target)
     payload = {
         "title": "A 股量化研究入门",
-        "description": "从贵州茅台、寒武纪、宁德时代和比亚迪的真实历史K线学习量化研究，先手算再检验。",
+        "description": "以100万元课堂模拟账户和四只知名A股的真实历史K线贯穿课程，先手算再检验。",
         "documents": collect_documents(),
         "labs": LABS,
     }
