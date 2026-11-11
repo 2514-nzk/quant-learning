@@ -28,9 +28,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 STOCKS = {
-    "000001": "平安银行",
     "600519": "贵州茅台",
+    "688256": "寒武纪",
     "300750": "宁德时代",
+    "002594": "比亚迪",
 }
 START, END = "20240102", "20240628"
 FIELDS = ["trade_date", "symbol", "name", "open", "high", "low", "close",
