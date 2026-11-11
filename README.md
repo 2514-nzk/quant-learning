@@ -30,6 +30,7 @@ python examples/story_evidence.py
 python examples/research_audit_lab.py  # 标准库可运行：时点、边界和 RankIC 审计
 python examples/factor_diagnostics_lab.py  # 单因子逐期诊断、成本和 ICIR
 python examples/model_selection_audit.py  # 核对保存的模型试验和验证选参
+python examples/real_kline_lab.py --symbol 000001  # 读真实 AKShare 日线并算 MA5、MOM5
 ```
 
 安装 `requirements.txt` 中的依赖后，可以运行后半本的模型练习并保存报告：
