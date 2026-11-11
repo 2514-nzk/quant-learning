@@ -30,6 +30,6 @@ python -m unittest discover -s tests -p "test_real_a_share.py" -v
 python examples/real_kline_lab.py --symbol 000001
 ~~~
 
-由于公共数据源可能限流、不可用、更新数据或调整接口，重新运行可能导致数值变化；不要删除旧版的采集时间、SHA256 与数据快照就直接声称完全复现。自动采集记录在 GitHub Actions 的 `Collect AKShare real A-share teaching charts` 工作流；手动刷新后要重新部署阅读网站才能展示新图。
+由于公共数据源可能限流、不可用、更新数据或调整接口，重新运行可能导致数值变化；应保留已有数据快照的采集时间与 SHA256，不能在数据被覆盖后直接声称完全复现。自动采集记录在 GitHub Actions 的 `Collect AKShare real A-share teaching charts` 工作流；手动刷新后要重新部署阅读网站才能展示新图。
 
 **边界：** 没有按历史时点建立完整股票池，也没有分红复权、财务 PIT、除权事件核对、停牌/涨跌停成交限制与费用账本。不能对这三只股票的纸面历史形态计算策略业绩，再宣称获得真实市场的样本外 Alpha。完整实证要求见 [数据需求与缺口](../README.md)。
