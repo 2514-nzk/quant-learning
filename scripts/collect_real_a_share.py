@@ -83,6 +83,11 @@ def standardized_rows(df, symbol: str, name: str, source: str) -> list[dict]:
         lots = volume if chinese else volume / 100.0
         amount = number(raw.get(fields["amount"]), "amount", allow_empty=True)
         turnover = number(raw.get(fields["turnover"]), "turnover", allow_empty=True)
+        # Sina daily turnover is a fraction (0.006 == 0.6%), while
+        # Eastmoney history labels its column as a percent (0.6 == 0.6%).
+        # Both sources are normalized to percentage points in the CSV.
+        if turnover is not None and not chinese:
+            turnover *= 100.0
         if amount is not None and amount < 0:
             raise ValueError("Negative turnover amount")
         result.append({
@@ -217,6 +222,7 @@ def write_snapshot(output: Path, assets: Path, results, version: str) -> dict:
         "adjust": "none",
         "price_unit": "CNY/share (unadjusted OHLC)",
         "volume_unit": "lots (手), normalized; 1 lot=100 shares for these examples",
+        "turnover_unit": "percent (%); Sina fractional turnover multiplied by 100",
         "notes": [
             "Sampled named stocks; not an unbiased backtest universe",
             "No dividends, corporate-action adjustments, survivorship handling or live execution",
@@ -236,8 +242,8 @@ def write_snapshot(output: Path, assets: Path, results, version: str) -> dict:
             "records": len(rows),
             "first_date": rows[0]["trade_date"],
             "last_date": rows[-1]["trade_date"],
-            "csv_path": csv_path.as_posix(),
-            "chart_path": svg_path.as_posix(),
+            "csv_path": csv_path.relative_to(ROOT).as_posix() if csv_path.is_relative_to(ROOT) else csv_path.as_posix(),
+            "chart_path": svg_path.relative_to(ROOT).as_posix() if svg_path.is_relative_to(ROOT) else svg_path.as_posix(),
             "csv_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
         })
     (output / "manifest.json").write_text(
