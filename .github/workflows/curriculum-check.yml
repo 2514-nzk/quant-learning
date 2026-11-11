@@ -43,6 +43,10 @@ jobs:
         run: python -m unittest discover -s tests -p "test_foundation_order.py" -v
       - name: Verify concept prerequisites and chapter order
         run: python -m unittest discover -s tests -p "test_learning_flow.py" -v
+      - name: Confirm real-stock pricing and browser labs
+        run: |
+          python -m unittest discover -s tests -p "test_real_course_runner.py" -v
+          python examples/real_stock_learner.py
       - name: Build course with advanced learning track
         run: |
           python reader/build_reader.py --output _site
