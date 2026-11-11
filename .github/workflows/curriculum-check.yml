@@ -39,6 +39,8 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_real_a_share.py" -v
           python examples/real_kline_lab.py --symbol 000001
+      - name: Check foundations appear before relevant chapters
+        run: python -m unittest discover -s tests -p "test_foundation_order.py" -v
       - name: Build course with advanced learning track
         run: |
           python reader/build_reader.py --output _site

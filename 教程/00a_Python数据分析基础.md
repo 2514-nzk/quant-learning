@@ -1,11 +1,6 @@
-# 参考手册｜Python 数据分析基础（pandas 与 NumPy）
+# Python 数据分析基础｜从股票表格开始
 
-本参考供处理表格时按问题查阅。刚接触 Python 时，先看[第一段量化代码](00g_读懂第一段量化代码.md)；理解表格和时间窗口后，可以选做[量化数据处理工具](00d_量化Python实战.md)。本参考部分短例子用 `date`，完整课程统一用 `trade_date`，接入时应明确重命名。
-
-本章假设你已经会 Python 基本语法（变量、循环、函数），专注于量化研究中最常用的 pandas 与 NumPy 操作。后面的“扩展模块”补充时间序列、分组窗口、缺失值和调试方法，并把示例对齐到本教程 `src/` 的当前实现。
-
-> 当前项目字段口径：教学代码使用 `trade_date`、`code`、`open`、`high`、`low`、`close`、`volume`、`amount`、`market_cap`；特征列包括 `mom_5`、`mom_20`、`reversal_3`、`vol_20`、`range_1d`、`amount_chg_5`、`log_mkt_cap`。标签为 T 日信号后 T+1 开盘到 T+5 收盘的 `fwd_return`，并在 T 日可用股票池内计算 `label_rank`。真实数据里的 `ts_code`、`adj_open` 等字段由 `src/duckdb_data.py` 转成上述统一字段。
-
+**只炒过股、还没用过 Python 也可以读。** 这一页的第一段先让你用三只股票的价格算涨跌幅；如果看懂了，后面的表格操作可以等需要时再学。
 
 ## 第一次读这里：把 pandas 想成会算数的 Excel 表格
 
@@ -40,6 +35,16 @@ print(df[["股票", "涨跌幅"]])
 
 </details>
 
+<details>
+<summary>选读｜开始独立做项目时，才需要看字段和约定</summary>
+
+本手册供处理股票表格时按问题查阅。刚接触代码时，也可以先读[第一段量化代码](00g_读懂第一段量化代码.md)；理解表格和时间窗口后，继续看[量化数据处理工具](00d_量化Python实战.md)。
+
+后面的正式示例默认你大致理解 Python 的变量、循环、函数；如果还不会，可以暂时只读上面的 Excel 表格例子。示例有时用 `date` 表示日期，课程统一用 `trade_date`；需要放进同一份程序时要先统一名字。
+
+教学工程的字段包括 `trade_date`、`code`、`open`、`high`、`low`、`close`、`volume`、`amount`、`market_cap`；常见特征包括 `mom_5`、`mom_20`、`reversal_3`、`vol_20`、`range_1d`、`amount_chg_5`、`log_mkt_cap`。未来收益标签与其它字段的对接约定在真实项目阶段再查即可。
+
+</details>
 
 ## 1. DataFrame：金融数据的天然容器
 
