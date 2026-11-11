@@ -47,6 +47,8 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_real_course_runner.py" -v
           python examples/real_stock_learner.py
+      - name: Check independent new-book narrative and account consistency
+        run: python -m unittest discover -s tests -p "test_standalone_book.py" -v
       - name: Build course with advanced learning track
         run: |
           python reader/build_reader.py --output _site
