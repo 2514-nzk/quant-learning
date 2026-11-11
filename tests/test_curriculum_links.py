@@ -1,38 +1,23 @@
-"""Check that the published course index and newly expanded chapters link to real files."""
+"""Validate links and entry points for the *published* real-stock textbook."""
 import re
 import unittest
 from pathlib import Path
 from urllib.parse import unquote
 
+from reader.build_reader import collect_documents
+
 
 ROOT = Path(__file__).resolve().parents[1]
 COURSE = ROOT / "教程"
-MAIN_CHAPTERS = [
-    "00_学习路线.md", "00f_从一次选股认识量化.md",
-    "00g_读懂第一段量化代码.md",
-    "01_研究问题定义.md",
-    "01a_研究假设与研报复现.md", "02_数据与标签.md",
-    "03_特征工程.md", "03a_因子表达式与算子.md",
-    "03b_传统因子与预处理.md", "04_时间切分与泄漏.md",
-    "08a_单因子研究与评价.md", "09_预测到组合.md",
-    "09a_多因子合成与综合实训.md", "05_线性基线.md",
-    "06_决策树与随机森林.md", "07_GBDT与LightGBM.md",
-    "08_模型评价与解释.md", "10_研究框架与结课项目.md",
-    "11_完整手算案例与实验操作.md",
-    "00h_零基础16道小题.md",
-    "进阶实战_从教学数据到研究级流程.md",
-    "专题A_单因子到稳健性研究.md",
-    "专题B_机器学习验证与增量检验.md",
-    "真实A股K线_入门实例.md",
-]
 
 
 class CurriculumLinkTests(unittest.TestCase):
-    def test_reading_index_and_chapter_local_links(self):
-        paths = [COURSE / "README.md"] + [COURSE / name for name in MAIN_CHAPTERS]
+    def test_published_index_and_lessons_have_no_broken_local_links(self):
+        documents = collect_documents()
+        paths = [COURSE / "README.md"] + [ROOT / doc["path"] for doc in documents]
         pattern = re.compile(r"!?\[[^\]]+\]\(([^)]+)\)")
         for source in paths:
-            with self.subTest(source=source.name):
+            with self.subTest(source=source.relative_to(ROOT)):
                 self.assertTrue(source.is_file(), f"missing chapter: {source}")
                 content = source.read_text(encoding="utf-8")
                 for href in pattern.findall(content):
@@ -45,13 +30,15 @@ class CurriculumLinkTests(unittest.TestCase):
                         f"broken local link in {source.relative_to(ROOT)}: {href}",
                     )
 
-    def test_four_level_track_is_discoverable(self):
+    def test_new_book_entry_and_real_data_exercise_are_discoverable(self):
         index = (COURSE / "README.md").read_text(encoding="utf-8")
-        guide = (COURSE / "00_学习路线.md").read_text(encoding="utf-8")
+        guide = (COURSE / "真实_阅读指南.md").read_text(encoding="utf-8")
+        project = (ROOT / "README.md").read_text(encoding="utf-8")
         self.assertIn("真实_起步一课.md", index)
         self.assertIn("真实_16_综合练习.md", index)
-        self.assertIn("研究级", guide)
-        self.assertIn("python examples/research_audit_lab.py", (ROOT / "README.md").read_text(encoding="utf-8"))
+        self.assertIn("100 万元课堂模拟资金", guide)
+        self.assertIn("python examples/real_stock_learner.py", project)
+        self.assertIn("2024-06-21", project)
 
 
 if __name__ == "__main__":
