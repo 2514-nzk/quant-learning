@@ -1,6 +1,6 @@
 {
   "kind": "historical daily A-share teaching snapshot",
-  "captured_utc": "2026-11-11T01:52:26.784798+00:00",
+  "captured_utc": "2026-11-11T08:49:59.978674+00:00",
   "retriever": "AKShare",
   "akshare_version": "1.20.37",
   "start_date_requested": "20240102",
@@ -16,17 +16,6 @@
   ],
   "items": [
     {
-      "symbol": "000001",
-      "name": "平安银行",
-      "source": "akshare.stock_zh_a_daily",
-      "records": 117,
-      "first_date": "2024-01-02",
-      "last_date": "2024-06-28",
-      "csv_path": "data/real_a_share/000001.csv",
-      "chart_path": "reader/assets/real-a-share/000001.svg",
-      "csv_sha256": "01415d93220cd2d9228da29eec8642efcb6b7c1196aad4770a5edafc78df0a1a"
-    },
-    {
       "symbol": "600519",
       "name": "贵州茅台",
       "source": "akshare.stock_zh_a_daily",
@@ -38,6 +27,17 @@
       "csv_sha256": "40d7c217ef17501ad7960879d937d2afad66b5e5cbf43fbf476d5cd5004cd8b9"
     },
     {
+      "symbol": "688256",
+      "name": "寒武纪",
+      "source": "akshare.stock_zh_a_daily",
+      "records": 117,
+      "first_date": "2024-01-02",
+      "last_date": "2024-06-28",
+      "csv_path": "data/real_a_share/688256.csv",
+      "chart_path": "reader/assets/real-a-share/688256.svg",
+      "csv_sha256": "7e72d2cc095e06b78dcbe67a7127e09fff8cec9fa749c77f7432b1ca2c7e4675"
+    },
+    {
       "symbol": "300750",
       "name": "宁德时代",
       "source": "akshare.stock_zh_a_daily",
@@ -47,6 +47,17 @@
       "csv_path": "data/real_a_share/300750.csv",
       "chart_path": "reader/assets/real-a-share/300750.svg",
       "csv_sha256": "8211e8be042006469487f06f911abd2ddd0658077b2258283b3a274dddfac501"
+    },
+    {
+      "symbol": "002594",
+      "name": "比亚迪",
+      "source": "akshare.stock_zh_a_daily",
+      "records": 117,
+      "first_date": "2024-01-02",
+      "last_date": "2024-06-28",
+      "csv_path": "data/real_a_share/002594.csv",
+      "chart_path": "reader/assets/real-a-share/002594.svg",
+      "csv_sha256": "a9f91792d6d2eac72e69a03b926a08bec259e20c5b71fffbc9a3445ba9a4315c"
     }
   ]
 }
