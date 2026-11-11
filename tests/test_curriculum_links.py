@@ -48,7 +48,8 @@ class CurriculumLinkTests(unittest.TestCase):
     def test_four_level_track_is_discoverable(self):
         index = (COURSE / "README.md").read_text(encoding="utf-8")
         guide = (COURSE / "00_学习路线.md").read_text(encoding="utf-8")
-        self.assertIn("进阶实战_从教学数据到研究级流程.md", index)
+        self.assertIn("真实_起步一课.md", index)
+        self.assertIn("真实_16_综合练习.md", index)
         self.assertIn("研究级", guide)
         self.assertIn("python examples/research_audit_lab.py", (ROOT / "README.md").read_text(encoding="utf-8"))
 
