@@ -14,6 +14,7 @@ from pathlib import Path
 from scripts.collect_real_a_share import (
     FIELDS, csv_text, moving_average, render_svg, standardized_rows, write_snapshot,
 )
+from examples.real_kline_lab import explain
 
 ROOT = Path(__file__).resolve().parents[1]
 SNAPSHOT = ROOT / "data" / "real_a_share"
@@ -54,6 +55,10 @@ class AkShareKlineTests(unittest.TestCase):
         self.assertEqual(em[0]["trade_date"], "2024-01-02")
         self.assertEqual(em[0]["volume_lots"], "100.00")
         self.assertEqual(sina[0]["volume_lots"], "100.00")
+        turnover_rows = fake_rows("sina")
+        turnover_rows[0]["turnover"] = .006
+        converted = standardized_rows(FakeFrame(turnover_rows), "000001", "平安银行", "akshare.stock_zh_a_daily")
+        self.assertEqual(converted[0]["turnover_pct"], "0.6000")
         self.assertEqual(em[-1]["turnover_pct"], "")
 
     def test_refuse_inconsistent_candle_and_duplicate_date(self):
@@ -90,6 +95,33 @@ class AkShareKlineTests(unittest.TestCase):
             self.assertEqual(record["csv_sha256"], hashlib.sha256(csv_bytes).hexdigest())
             self.assertTrue((base / "charts" / "000001.svg").is_file())
             self.assertEqual(len(list(csv.DictReader(io.StringIO(csv_bytes.decode("utf-8"))))), 55)
+
+    def test_real_worked_examples_from_snapshot(self):
+        if not (SNAPSHOT / "manifest.json").exists():
+            self.skipTest("Actual AKShare snapshot not yet captured")
+        bank = explain("000001")
+        self.assertEqual(bank["date"], "2024-06-28")
+        self.assertAlmostEqual(bank["open"], 10.10)
+        self.assertAlmostEqual(bank["high"], 10.26)
+        self.assertAlmostEqual(bank["low"], 10.09)
+        self.assertAlmostEqual(bank["close"], 10.15)
+        self.assertAlmostEqual(bank["ma5"], 10.084)
+        self.assertAlmostEqual(bank["mom5_pct"], 1.50)
+        moutai = explain("600519")
+        self.assertAlmostEqual(moutai["close"], 1467.39)
+        self.assertAlmostEqual(moutai["ma5"], 1482.06)
+        catl = explain("300750")
+        self.assertAlmostEqual(catl["mom5_pct"], -2.7705767984, places=5)
+
+    def test_reading_site_includes_real_charts(self):
+        chapter = ROOT / "教程" / "真实A股K线_入门实例.md"
+        self.assertTrue(chapter.is_file())
+        content = chapter.read_text(encoding="utf-8")
+        for symbol in ("000001", "600519", "300750"):
+            self.assertIn(f"../reader/assets/real-a-share/{symbol}.svg", content)
+            self.assertTrue((ROOT / "reader" / "assets" / "real-a-share" / f"{symbol}.svg").exists())
+        index = (ROOT / "教程" / "README.md").read_text(encoding="utf-8")
+        self.assertIn("真实A股K线_入门实例.md", index)
 
     def test_saved_real_snapshot_if_present(self):
         manifest_path = SNAPSHOT / "manifest.json"
