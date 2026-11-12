@@ -66,6 +66,8 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_financial_quality_lesson.py" -v
           python examples/financial_quality_lab.py
+      - name: Check Markdown bold punctuation boundaries
+        run: python -m unittest discover -s tests -p "test_markdown_bold_delimiters.py" -v
       - name: Build course with advanced learning track
         run: |
           python reader/build_reader.py --output _site
