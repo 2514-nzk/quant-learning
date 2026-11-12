@@ -42,7 +42,9 @@ jobs:
       - name: Check foundations appear before relevant chapters
         run: python -m unittest discover -s tests -p "test_foundation_order.py" -v
       - name: Verify concept prerequisites and chapter order
-        run: python -m unittest discover -s tests -p "test_learning_flow.py" -v
+        run: |
+          python -m unittest discover -s tests -p "test_learning_flow.py" -v
+          python -m unittest discover -s tests -p "test_concept_first_sequence.py" -v
       - name: Confirm real-stock pricing and browser labs
         run: |
           python -m unittest discover -s tests -p "test_real_course_runner.py" -v
