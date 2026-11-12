@@ -8,6 +8,7 @@ REAL_MAIN=[
     "教程/真实_01_收益与基准.md","教程/真实_02_多期与复利.md",
     "教程/真实_03_历史K线与时点.md","教程/真实_04_特征与走势.md",
     "教程/真实_05_均线与算子.md","教程/真实_06_财务与预处理.md",
+    "教程/真实_06a_合并报表与财务质量.md",
     "教程/真实_07_时间切分与泄漏.md","教程/真实_08_单因子评价.md",
     "教程/真实_09_成交与费用.md","教程/真实_10_多因子.md",
     "教程/真实_11_线性模型.md","教程/真实_12_树与森林.md",
@@ -25,7 +26,8 @@ class FoundationOrderTests(unittest.TestCase):
         self.assertEqual(docs[3]["group"],"基础准备 · 随学随查")
         self.assertEqual(docs[4]["group"],"第一循环 · 这笔收益算不算本事？")
         self.assertEqual(docs[10]["group"],"第二循环 · 数据和因子可不可信？")
-        self.assertEqual(docs[14]["group"],"第四循环 · 模型有没有增加信息？")
+        lookup={doc["path"]:doc["group"] for doc in docs}
+        self.assertEqual(lookup["教程/真实_11_线性模型.md"],"第四循环 · 模型有没有增加信息？")
 
     def test_legacy_synthetic_chapters_are_not_in_sidebar(self):
         paths=[doc["path"] for doc in collect_documents()]
