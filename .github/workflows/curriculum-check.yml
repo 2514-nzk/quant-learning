@@ -59,4 +59,4 @@ jobs:
       - name: Build course with advanced learning track
         run: |
           python reader/build_reader.py --output _site
-          python -c 'import json; d=json.load(open("_site/content.json",encoding="utf-8")); assert len(d["documents"])==21 and any(x["path"]=="教程/真实_起步一课.md" for x in d["documents"]); assert all(x["path"].startswith("教程/真实_") for x in d["documents"]); print("Published real-stock lessons:",len(d["documents"]))'
+          python -c 'import json; d=json.load(open("_site/content.json",encoding="utf-8")); assert len(d["documents"])==22 and any(x["path"]=="教程/真实_起步一课.md" for x in d["documents"]); assert all(x["path"].startswith("教程/真实_") for x in d["documents"]); print("Published real-stock lessons:",len(d["documents"]))'
