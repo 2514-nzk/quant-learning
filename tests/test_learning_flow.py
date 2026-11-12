@@ -47,8 +47,11 @@ class LearningFlowTests(unittest.TestCase):
 
     def test_real_historical_financial_report_is_used_correctly(self):
         chapter = (COURSE / "真实_06_财务与预处理.md").read_text("utf-8")
-        for term in ("宁德时代", "2023 年年度报告", "2024 年 3 月 15 日", "441.21 亿元", "24.04%", "2024 年 2 月 1 日", "2024 年 6 月 21 日"):
+        for term in ("宁德时代", "2023 年年度报告", "2024 年 3 月 15 日", "441.21 亿元", "24.04%", "报告期", "披露日期"):
             self.assertIn(term, chapter)
+        timing = (COURSE / "真实_07_时间切分与泄漏.md").read_text("utf-8")
+        for term in ("2024 年 2 月 1 日", "2024 年 6 月 21 日", "2024 年 3 月 15 日", "PIT"):
+            self.assertIn(term, timing)
         self.assertIn("深交所披露文件", chapter)
         self.assertNotIn("不能凭空给它们配上", chapter)
         self.assertLess(chapter.index("## 2. 历史财报能拿到吗"), chapter.index("## 3. 什么叫预处理"))
