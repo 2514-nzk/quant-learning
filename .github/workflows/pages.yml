@@ -42,6 +42,7 @@ jobs:
           python -m unittest discover -s tests -p "test_real_a_share.py" -v
           python -m unittest discover -s tests -p "test_foundation_order.py" -v
           python -m unittest discover -s tests -p "test_learning_flow.py" -v
+          python -m unittest discover -s tests -p "test_concept_first_sequence.py" -v
           python -m unittest discover -s tests -p "test_rankic_readability.py" -v
           python -m unittest discover -s tests -p "test_cointegration_lesson.py" -v
           python -m unittest discover -s tests -p "test_financial_quality_lesson.py" -v

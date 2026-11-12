@@ -36,7 +36,7 @@ class FinancialQualityTests(unittest.TestCase):
         self.assertLess(paths.index("教程/真实_06a_合并报表与财务质量.md"),
                         paths.index("教程/真实_07_时间切分与泄漏.md"))
         lesson=next(d for d in docs if d["path"].endswith("真实_06a_合并报表与财务质量.md"))
-        self.assertEqual(lesson["group"],"第二循环 · 数据和因子可不可信？")
+        self.assertEqual(lesson["group"],"第二循环 · 从行情到因子评价")
 
     def test_intro_defines_terms_and_fake_hypotheticals_are_separate(self):
         text=LESSON.read_text(encoding="utf-8")
@@ -50,7 +50,7 @@ class FinancialQualityTests(unittest.TestCase):
         self.assertIn("怎样把更多财务项目联系起来看",text)
         self.assertIn("报表附注解释各项指标的变化",text)
         self.assertIn("2024 年 3 月披露",text)
-        self.assertIn("PIT",text)
+        self.assertIn("报告期与披露日期",text)
         self.assertIn("data/financial_reports/catl_2023_annual_excerpt.json",text)
         self.assertIn("python examples/financial_quality_lab.py",text)
         self.assertIn("真实_07_时间切分与泄漏.md",text)
