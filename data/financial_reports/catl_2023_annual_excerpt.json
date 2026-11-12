@@ -1,0 +1,47 @@
+{
+  "issuer": "宁德时代新能源科技股份有限公司",
+  "symbol": "300750",
+  "report": "2023年年度报告（2024年3月公开）",
+  "report_period_end": "2023-12-31",
+  "document_url": "https://static.cninfo.com.cn/finalpage/2024-03-16/1219313047.PDF",
+  "alternative_disclosure_url": "https://disc.static.szse.cn/disc/disk03/finalpage/2024-03-15/c0ad7caf-6ad1-4e15-a806-1173928099ed.PDF",
+  "notes": [
+    "全部数字抄录自2023年年报合并财务报表，单位万元，未与母公司单体报表混用",
+    "2022为该2023年报披露的比较期间数字；资产负债表前期为2023年1月1日即2022年末",
+    "仅用于教学中的会计勾稽和比例计算，不是对公司财务真实性的评价，也不能构成财务舞弊指控",
+    "2024-06-21事后演示只说明这份报告在此前已公开；实际历史因子需逐日期核对最新披露、修订与后续季报"
+  ],
+  "unit": "万元",
+  "source_tables": {
+    "consolidated_balance_sheet": "2023年年报PDF第114至116页，合并资产负债表",
+    "consolidated_income_statement": "2023年年报PDF第118至120页，合并利润表",
+    "consolidated_cash_flow": "2023年年报现金流量表（经营活动现金流量净额）",
+    "stock_inventory_note": "2023年年报PDF存货附注，账面余额、跌价准备、账面价值"
+  },
+  "years": {
+    "2022": {
+      "revenue": 32859398.75,
+      "operating_cash_flow": 6120884.33,
+      "accounts_receivable_net": 5796651.69,
+      "inventory_net": 7666889.88,
+      "parent_equity": 16448125.16,
+      "minority_equity": 1242791.04,
+      "total_equity": 17690916.2
+    },
+    "2023": {
+      "revenue": 40091704.49,
+      "consolidated_net_profit": 4676103.45,
+      "parent_net_profit": 4412124.83,
+      "minority_profit": 263978.61,
+      "operating_cash_flow": 9282612.44,
+      "accounts_receivable_net": 6402053.34,
+      "inventory_net": 4543389.01,
+      "inventory_gross": 5001706.46,
+      "inventory_allowance": 458317.44,
+      "parent_equity": 19770805.24,
+      "minority_equity": 2217509.82,
+      "total_equity": 21988315.06,
+      "reported_weighted_average_roe_percent": 24.04
+    }
+  }
+}

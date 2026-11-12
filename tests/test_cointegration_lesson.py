@@ -52,7 +52,7 @@ class CointegrationLessonTests(unittest.TestCase):
         docs = collect_documents()
         paths = [x["path"] for x in docs]
         advanced = "教程/真实_专题A_协整与配对交易.md"
-        self.assertEqual(len(docs), 22)
+        self.assertEqual(len(docs), 23)
         self.assertEqual(paths[-2], advanced)
         self.assertEqual(paths[-1], "教程/真实_研究边界.md")
         self.assertLess(paths.index("教程/真实_16_综合练习.md"), paths.index(advanced))
