@@ -85,6 +85,33 @@ class ConceptFirstSequenceTests(unittest.TestCase):
         self.assertIn("怎样公平地检验选股指标？", index)
         self.assertIn("一根 K 线怎样变成一行数据？", index)
 
+    def test_scaling_is_taught_when_two_indicators_are_combined(self):
+        chapter6 = (COURSE / "真实_06_财务与预处理.md").read_text("utf-8")
+        chapter10 = (COURSE / "真实_10_多因子.md").read_text("utf-8")
+        chapter11 = (COURSE / "真实_11_线性模型.md").read_text("utf-8")
+        self.assertIn("数据预处理", chapter6)
+        self.assertIn("等到第 10 章", chapter6)
+        self.assertNotIn("## 4. 归一化和标准化", chapter6)
+        self.assertLess(chapter10.index("## 2. 两个指标怎么放到同一张评分表里"),
+                        chapter10.index("### 把不同大小的数字换到一把尺子上"))
+        self.assertLess(chapter10.index("排名只告诉我们谁在前面"),
+                        chapter10.index("**归一化（这里指 Min-Max 缩放）**"))
+        self.assertLess(chapter10.index("**归一化（这里指 Min-Max 缩放）**"),
+                        chapter10.index("**标准化（这里指 Z-score）**"))
+        self.assertIn("**Ridge（岭回归）**：", chapter11)
+        self.assertIn("第 10 章已经用四只股票", chapter11)
+        self.assertNotIn("## 4. 归一化和标准化", chapter11)
+        real_returns = [7.64, 0.15, -0.94, -5.40]
+        minimum, maximum = min(real_returns), max(real_returns)
+        mean = sum(real_returns) / len(real_returns)
+        std = (sum((value-mean)**2 for value in real_returns) / len(real_returns))**0.5
+        normalized = [(value-minimum)/(maximum-minimum) for value in real_returns]
+        standardized = [(value-mean)/std for value in real_returns]
+        for value, expected in zip(normalized, [1.00, 0.43, 0.34, 0.00]):
+            self.assertAlmostEqual(value, expected, delta=0.005)
+        for value, expected in zip(standardized, [1.55, -0.05, -0.28, -1.23]):
+            self.assertAlmostEqual(value, expected, delta=0.005)
+
     def test_later_chapters_lead_with_their_actual_topic(self):
         for filename, terms in {
             "真实_10_多因子.md": ("**多因子**", "综合名次分数"),
