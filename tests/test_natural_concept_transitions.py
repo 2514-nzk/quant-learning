@@ -52,6 +52,28 @@ class NaturalConceptTransitionsTests(unittest.TestCase):
         self.assertIn("假设只用来理解算法", chapter.replace("这个假设只用来理解算法", "假设只用来理解算法"))
         self.assertIn("18 个非重叠观察期", chapter)
 
+    def test_train_validation_error_explained_before_early_stopping(self):
+        chapter = read("真实_13_逐步提升模型.md")
+        headings = [
+            "## 3. 为什么同一个模型会有两种误差？",
+            "## 4. 训练误差越来越小，验证误差为什么反而变大？",
+            "## 5. 什么时候适合真正训练它？",
+        ]
+        self.assertEqual([chapter.index(x) for x in headings],
+                         sorted(chapter.index(x) for x in headings))
+        self.assertLess(chapter.index("**训练误差**"),
+                        chapter.index("**早停**（Early Stopping）"))
+        self.assertLess(chapter.index("**验证误差**"),
+                        chapter.index("| 树的轮数 |"))
+        self.assertIn("平均绝对误差（MAE）", chapter)
+        self.assertIn("不是亏损百分比", chapter)
+        self.assertIn("0.35 → 0.25 → 0.17", chapter)
+        self.assertIn("0.33 → 0.27 → 0.34", chapter)
+        self.assertIn("其他数据上表现变差", chapter)
+        self.assertIn("不是唯一原因", chapter)
+        self.assertIn("不意味着所有模型、所有评价指标都必然每轮下降", chapter)
+        self.assertEqual(chapter.count("<details>"), chapter.count("</details>"))
+
     def test_account_story_precedes_evaluation_metric_table(self):
         chapter = read("真实_14_评价与风险.md")
         self.assertIn("## 1. 同一次选股，为什么会有不一样的成绩？", chapter)
