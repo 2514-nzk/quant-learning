@@ -25,7 +25,7 @@ class FoundationOrderTests(unittest.TestCase):
         self.assertEqual(len(paths),len(set(paths)))
         self.assertEqual(docs[3]["group"],"基础准备 · 随学随查")
         self.assertEqual(docs[4]["group"],"第一循环 · 这笔收益算不算本事？")
-        self.assertEqual(docs[10]["group"],"第二循环 · 数据和因子可不可信？")
+        self.assertEqual(docs[10]["group"],"第二循环 · 从行情到因子评价")
         lookup={doc["path"]:doc["group"] for doc in docs}
         self.assertEqual(lookup["教程/真实_11_线性模型.md"],"第四循环 · 模型有没有增加信息？")
 
