@@ -114,7 +114,7 @@ class ConceptFirstSequenceTests(unittest.TestCase):
 
     def test_later_chapters_lead_with_their_actual_topic(self):
         for filename, terms in {
-            "真实_10_多因子.md": ("**多因子**", "综合名次分数"),
+            "真实_10_多因子.md": ("**多因子**", "综合分数 = 0.5 × 五日涨幅排名分"),
             "真实_11_线性模型.md": ("**线性模型**", "**Ridge（岭回归）**"),
             "真实_12_树与森林.md": ("**随机森林**", "**过拟合**"),
             "真实_13_逐步提升模型.md": ("**LightGBM**", "**早停**"),
