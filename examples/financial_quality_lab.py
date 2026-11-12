@@ -2,7 +2,7 @@
 """Recalculate real 2023 CATL annual-report accounting figures for beginners.
 
 Reads a frozen, cited transcription of CATL's published *consolidated* report;
-does not fetch live figures or infer whether any firm committed fraud.
+does not fetch live figures or make company ratings or investment recommendations.
 No external Python packages required.
 """
 from __future__ import annotations
@@ -60,7 +60,7 @@ def report(data: dict, result: dict[str, float]) -> str:
         f"存货账面价值同比：{result['inventory_growth_pct']:+.2f}%",
         f"营业收入同比：{result['revenue_growth_pct']:+.2f}%",
         f"年报披露的加权平均ROE：{data['years']['2023']['reported_weighted_average_roe_percent']:.2f}%",
-        "这些数字仅用于财报结构、口径和风险线索学习，不构成舞弊认定或投资建议。",
+        "这些数字用于学习财务报表结构、计算口径和指标分析，不代表完整的企业经营评价。",
         f"年报来源：{data['document_url']}",
     ])
 

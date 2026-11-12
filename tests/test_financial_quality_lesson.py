@@ -43,26 +43,33 @@ class FinancialQualityTests(unittest.TestCase):
         for key in ("**少数股东**","**合并报表**","归母净利润",
                     "1,977.08","221.75","2,198.83","467.61","441.21",
                     "26.40","928.26","1.99","640.21","454.34",
-                    "10.44%","-40.74%","24.04%","**不等于**"):
+                    "10.44%","-40.74%","24.04%"):
             with self.subTest(key=key):
-                # Wording may use slightly varied emphasis around caution.
-                if key=="**不等于**":
-                    self.assertIn("财务异常不等于财务造假",text)
-                else:
-                    self.assertIn(key,text)
-        self.assertIn("不是对本书任何具体公司的指控",text)
+                self.assertIn(key,text)
+        self.assertIn("财务质量分析是寻找经营数据之间的联系",text)
+        self.assertIn("怎样把更多财务项目联系起来看",text)
+        self.assertIn("报表附注解释各项指标的变化",text)
         self.assertIn("2024 年 3 月披露",text)
         self.assertIn("PIT",text)
         self.assertIn("data/financial_reports/catl_2023_annual_excerpt.json",text)
         self.assertIn("python examples/financial_quality_lab.py",text)
         self.assertIn("真实_07_时间切分与泄漏.md",text)
 
-    def test_no_fraud_claim_in_lab_or_source(self):
+    def test_neutral_instructional_language_across_lesson_and_exercise(self):
         source=json.loads((ROOT/"data/financial_reports/catl_2023_annual_excerpt.json").read_text("utf-8"))
         self.assertIn("static.cninfo.com.cn",source["document_url"])
         self.assertEqual(source["years"]["2023"]["reported_weighted_average_roe_percent"],24.04)
-        for term in ("涉嫌造假","已经造假","确认舞弊"):
-            self.assertNotIn(term,LESSON.read_text("utf-8"))
+        texts = (
+            LESSON.read_text("utf-8"),
+            (ROOT/"教程/README.md").read_text("utf-8"),
+            (ROOT/"README.md").read_text("utf-8"),
+            (ROOT/"examples/financial_quality_lab.py").read_text("utf-8"),
+            json.dumps(source, ensure_ascii=False),
+        )
+        for term in ("造假","舞弊","财务真假","指控"):
+            for i, content in enumerate(texts):
+                with self.subTest(term=term, source=i):
+                    self.assertNotIn(term, content)
         data=load()
         bad=json.loads(json.dumps(data))
         bad["years"]["2023"]["minority_equity"]+=100
