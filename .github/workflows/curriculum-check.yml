@@ -56,6 +56,10 @@ jobs:
           node tests/real_browser_lab.test.js
       - name: Verify plain-language terminology and real RankIC examples
         run: python -m unittest discover -s tests -p "test_rankic_readability.py" -v
+      - name: Verify real-price cointegration lesson and optional lab
+        run: |
+          python -m unittest discover -s tests -p "test_cointegration_lesson.py" -v
+          python examples/cointegration_pair_lab.py
       - name: Build course with advanced learning track
         run: |
           python reader/build_reader.py --output _site
