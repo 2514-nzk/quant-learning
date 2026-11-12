@@ -153,6 +153,8 @@
       "第四循环 · 模型有没有增加信息？": "比较 Ridge、随机森林与 LightGBM，理解过拟合与评价边界。",
       "收尾 · 结论能不能重做？": "整理可复现项目，完成从选股到研究结论的综合练习。",
       "工具与参考": "按需查阅术语、市场规则、模板和数据字段说明。",
+      "第二卷 · 专业量化研究（规划中）": "研究级方法的学习路线，章节正文和实验待编写。",
+      "第三卷 · A 股策略实战（规划中）": "A 股策略、L2 和交易系统的大纲，尚无实证结论。",
     };
     els.pathGrid.innerHTML = groups.map((group, index) => {
       const items = documents.filter((doc) => doc.group === group);
@@ -542,13 +544,14 @@
     const percent = maximum ? Math.min(100, Math.round(els.reader.scrollTop / maximum * 100)) : 0;
     const chapter = current.content.match(/^#\s*第\s*(\d+)\s*章/m);
     let position = current.group === "工具与参考" ? "参考资料" : "导读与准备";
-    if (chapter) position = `第 ${chapter[1]} / ${mainChapterCount} 章`;
+    if (current.group.includes("规划中")) position = "课程大纲 · 内容待写";
+    else if (chapter) position = `第 ${chapter[1]} / ${mainChapterCount} 章`;
     els.chapterProgress.textContent = `${position}　·　${percent}%`;
     els.readingProgressBar.style.width = `${percent}%`;
     els.readingProgress.setAttribute("aria-valuenow", String(percent));
     els.backToTop.hidden = els.reader.scrollTop < 380;
     state.positions[current.path] = els.reader.scrollTop;
-    if (maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
+    if (!current.group.includes("规划中") && maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
       state.completed.push(current.path);
       updateChapterActions();
       renderNavigation();
@@ -688,11 +691,13 @@
       const response = await fetch(new URL("content.json", document.baseURI));
       if (!response.ok) throw new Error(`内容读取失败 (${response.status})`);
       const payload = await response.json();
-      documents = payload.documents || [];
+      const firstVolume = payload.documents || [];
+      documents = [...firstVolume, ...(payload.framework || [])];
       labs = payload.labs || {};
-      readingRoute = documents.filter((doc) => doc.group !== "工具与参考");
+      // Planned volumes are navigable, but must not alter the completed first-volume progress.
+      readingRoute = firstVolume.filter((doc) => doc.group !== "工具与参考");
       byPath = new Map(documents.map((doc) => [doc.path, doc]));
-      mainChapterCount = documents.filter((doc) => /^#\s*第\s*\d+\s*章/m.test(doc.content)).length;
+      mainChapterCount = firstVolume.filter((doc) => /^#\s*第\s*\d+\s*章/m.test(doc.content)).length;
       state.bookmarks = state.bookmarks.filter((path) => byPath.has(path));
       state.completed = state.completed.filter((path) => byPath.has(path));
       $("#home-chapter-count").textContent = documents.length;
