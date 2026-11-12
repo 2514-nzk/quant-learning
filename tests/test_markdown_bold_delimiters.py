@@ -31,8 +31,8 @@ class MarkdownBoldDelimiterTests(unittest.TestCase):
     def test_affected_emphasis_is_preserved_in_published_book(self):
         docs = {doc["path"]: doc["content"] for doc in collect_documents()}
         samples = {
-            "教程/真实_11_线性模型.md": "**Ridge（岭回归）** 是在",
-            "教程/真实_10_多因子.md": "**214 元 + 7.64%** 并不是",
+            "教程/真实_11_线性模型.md": "**Ridge（岭回归）**：普通线性模型",
+            "教程/真实_10_多因子.md": "**归一化（这里指 Min-Max 缩放）**：",
             "教程/真实_16_综合练习.md": "**RankIC（当时按指标排的名次，与后来按收益排的名次有多一致）** 怎样",
             "教程/真实_专题A_协整与配对交易.md": "**协整（Cointegration）** 研究的是",
         }
