@@ -44,6 +44,7 @@ jobs:
           python -m unittest discover -s tests -p "test_learning_flow.py" -v
           python -m unittest discover -s tests -p "test_concept_first_sequence.py" -v
           python -m unittest discover -s tests -p "test_natural_concept_transitions.py" -v
+          python -m unittest discover -s tests -p "test_random_forest_intro.py" -v
           python -m unittest discover -s tests -p "test_rankic_readability.py" -v
           python -m unittest discover -s tests -p "test_markdown_bold_delimiters.py" -v
           python -m unittest discover -s tests -p "test_cointegration_lesson.py" -v
