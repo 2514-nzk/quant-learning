@@ -54,7 +54,7 @@ class LearningFlowTests(unittest.TestCase):
             self.assertIn(term, timing)
         self.assertIn("深交所披露文件", chapter)
         self.assertNotIn("不能凭空给它们配上", chapter)
-        self.assertLess(chapter.index("## 2. 历史财报能拿到吗"), chapter.index("## 3. 什么叫预处理"))
+        self.assertLess(chapter.index("## 2. 历史财报能拿到吗"), chapter.index("## 3. 为什么财报和行情数字还要整理"))
 
     def test_real_price_terms_appear_before_advanced_statistics(self):
         docs=[d["path"] for d in collect_documents()]
