@@ -51,7 +51,7 @@ class RandomForestIntroTests(unittest.TestCase):
             "2 票“上涨”、1 票“下跌”",
             "**分类**", "**回归**",
             "有放回抽样", "部分指标中挑选",
-            "不是买入当天随便扔骰子", "不保证一定预测得更准",
+            "不是买入当天随便扔骰子", "不能保证比单棵树预测得更准确",
             "叶子节点", "树的深度", "叶子最少样本数"
         ):
             with self.subTest(phrase=phrase):
