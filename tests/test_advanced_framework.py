@@ -25,7 +25,13 @@ class AdvancedFrameworkTests(unittest.TestCase):
             with self.subTest(path=page["path"]):
                 self.assertTrue((ROOT / page["path"]).is_file())
                 self.assertIn("状态", page["content"])
-                if not page["path"].endswith("README.md"):
+                if page["path"].endswith("README.md"):
+                    continue
+                if page["path"].endswith(("01_research_protocol.md", "05_pit_data.md")):
+                    self.assertIn("状态：教学正文初稿", page["content"])
+                    self.assertIn("合成", page["content"])
+                    self.assertIn("python examples/advanced_protocol_pit_lab.py", page["content"])
+                else:
                     self.assertIn("正文待写", page["content"])
                     self.assertIn("实验未运行", page["content"])
                     for heading in ("本章核心问题", "计划知识模块", "计划动手实验", "本章交付物"):
