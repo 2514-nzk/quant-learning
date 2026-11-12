@@ -47,7 +47,7 @@ class FinancialQualityTests(unittest.TestCase):
             with self.subTest(key=key):
                 self.assertIn(key,text)
         self.assertIn("财务质量分析是寻找经营数据之间的联系",text)
-        self.assertIn("怎样把更多财务项目联系起来看",text)
+        self.assertIn("一张财报里，哪些数字值得放在一起看？",text)
         self.assertIn("报表附注解释各项指标的变化",text)
         self.assertIn("2024 年 3 月披露",text)
         self.assertIn("报告期与披露日期",text)
