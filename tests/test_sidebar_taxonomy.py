@@ -7,7 +7,7 @@ from reader.build_reader import collect_documents, collect_framework_documents, 
 class SidebarTaxonomyTests(unittest.TestCase):
     def test_first_volume_uses_two_digit_chapter_numbers(self):
         documents = collect_documents()
-        chapters = [p for p in documents if re.fullmatch(r"教程/真实_\\d{2}_[^/]+\\.md", p["path"])]
+        chapters = [p for p in documents if re.fullmatch(r"教程/真实_\d{2}_[^/]+\.md", p["path"])]
         self.assertEqual(len(chapters), 16)
         self.assertEqual([p["title"].split("章")[0] for p in chapters],
                          [f"第 {n:02d} " for n in range(1, 17)])
@@ -16,8 +16,8 @@ class SidebarTaxonomyTests(unittest.TestCase):
 
     def test_advanced_chapters_show_numbers_and_appendices_are_not_chapters(self):
         advanced = collect_framework_documents()
-        second = [p for p in advanced if re.fullmatch(r"advanced/volume-2/\\d{2}_[^/]+\\.md", p["path"])]
-        third = [p for p in advanced if re.fullmatch(r"advanced/volume-3/\\d{2}_[^/]+\\.md", p["path"])]
+        second = [p for p in advanced if re.fullmatch(r"advanced/volume-2/\d{2}_[^/]+\.md", p["path"])]
+        third = [p for p in advanced if re.fullmatch(r"advanced/volume-3/\d{2}_[^/]+\.md", p["path"])]
         self.assertEqual(len(second), 14)
         self.assertEqual(len(third), 13)
         for entries in (second, third):
