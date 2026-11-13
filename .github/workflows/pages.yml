@@ -30,7 +30,7 @@ jobs:
         with:
           python-version: "3.x"
       - name: Check reader JavaScript syntax
-        run: node --check reader/app.js && node --check reader/pyodide-worker.js && node --check reader/real-case.js && node tests/real_browser_lab.test.js
+        run: node --check reader/app.js && node --check reader/pyodide-worker.js && node --check reader/real-case.js && node tests/real_browser_lab.test.js && node tests/test_reader_volume_pager.js
       - name: Verify research-audit lab
         run: |
           python -m unittest discover -s tests -p "test_research_audit_lab.py" -v
