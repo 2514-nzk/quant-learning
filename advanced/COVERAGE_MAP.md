@@ -47,6 +47,12 @@
 - [覆盖/时序脚本](../examples/advanced_universe_coverage_lab.py) 与 [单元测试](../tests/test_advanced_universe_coverage_lab.py)：显式未知/不合格/价迟到/缺失、无来源分母时禁止输出全市场百分比。
 - **待完成**：完整历史母体、官方交易日历、行业历史成员、来源许可与版本证明。
 
+## 第二卷报价归因复核：摘牌边界与北交所历史代码
+
+- 沪深 2024 年合计 52 条未关联行情行均恰好落在快照 `delist_date` 当天，提示源成员闭区间包含摘牌日的边界问题；对照退市公告，不能将全部视为随机漏采。
+- 北交所 2024 年候选快照 60,463 条行情联表失败；2026-11-13 **真实运行 AKShare 历史日线**返回 2024-06-21 云星宇 9.44 元、纬达光电 8.18 元、万达轴承 52.01 元，和当年独立行情报道一致。存在历史新旧代码和数据源关联两方面待核问题，**不等于真实无交易**。
+- 具体证据及交叉核验方法：[附录 C](volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)、[聚合 JSON](volume-2/local_all_a_2024_aggregate.json)、[AKShare 校验脚本](../examples/advanced_quote_cause_audit.py)。
+
 ## 第二卷研究级升级第四轮（本地真实历史股票池）
 
 - [附录 C](volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md) 已用本地 2026-08-04 冻结 `all_a_membership` 聚合证据升级：17 个年度分区、**14,536,198** 条证券日，2024 年分区 SHA-256 已匹配。
