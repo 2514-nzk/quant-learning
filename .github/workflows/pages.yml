@@ -80,7 +80,7 @@ jobs:
           python -m unittest discover -s tests -p "test_advanced_local_snapshot_audit.py" -v
           python examples/advanced_local_snapshot_audit.py --json > /tmp/volume2_local_real_evidence.json
           python -c 'import json; d=json.load(open("/tmp/volume2_local_real_evidence.json",encoding="utf-8")); assert d["year_2024_rows"] == 1296795 and d["missing_quotes"] == 60515 and not d["historical_pit_verified"] and d["full_market_coverage"] is None; print("Real-source limits reconciled")'
-      - name: Verify delist-date and BJ code-mapping quote-cause audit
+      - name: Verify delisting-day quote join analysis and persisted AKShare corroboration
         run: |
           python -m unittest discover -s tests -p "test_advanced_quote_cause_audit.py" -v
           python examples/advanced_quote_cause_audit.py --json > /tmp/quote_cause_offline.json
