@@ -75,7 +75,7 @@ jobs:
           python -m unittest discover -s tests -p "test_advanced_universe_coverage_lab.py" -v
           python examples/advanced_universe_coverage_lab.py --real-teaching --json > /tmp/real_universe_coverage.json
           python -c 'import json; r=json.load(open("/tmp/real_universe_coverage.json",encoding="utf-8")); assert r["observed_security_sessions"]==468 and r["full_market_coverage_percent"] is None and not r["historical_pit_verified"]; print("Real source coverage audited without false denominator")'
-      - name: Verify repository-owned textbook data and source boundaries
+      - name: Verify textbook dataset catalog, PIT fixture and reader source boundaries
         run: |
           python -m unittest discover -s tests -p "test_teaching_dataset_contract.py" -v
           python scripts/verify_teaching_datasets.py --json > /tmp/course_data.json
