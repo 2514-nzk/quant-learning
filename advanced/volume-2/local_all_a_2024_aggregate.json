@@ -1,0 +1,114 @@
+{
+  "evidence_grade": "REAL_LOCAL_SNAPSHOT_AGGREGATES_ONLY_NOT_PIT_CERTIFIED",
+  "origin": {
+    "project": "PTradePolicy",
+    "source": "xc_tushare",
+    "dataset_id": "all_a_membership",
+    "builder": "factor_platform/universe/historical_all_a.py",
+    "snapshot_id": "ds_all_a_membership_2c151d73c617cf181f0d95f6",
+    "snapshot_as_of": "2026-08-04T12:38:19",
+    "raw_data_included": false
+  },
+  "snapshot": {
+    "start": "2010-01-04",
+    "end": "2026-08-03",
+    "partition_count": 17,
+    "security_day_rows": 14536198,
+    "year_2024": 1296795,
+    "year_2025": 1317342
+  },
+  "year_2024": {
+    "sha256": "11eb9645ef8f6e9b420f24c464e9fd9511503e593a6bc17cafcd179b7e386c34",
+    "first_trade_date": "2024-01-02",
+    "last_trade_date": "2024-12-31",
+    "row_count": 1296795,
+    "source_audit_open_sessions": 242,
+    "exchange_quote_rows": {
+      "SH": {
+        "quote_present": 548475,
+        "quote_missing": 16
+      },
+      "SZ": {
+        "quote_present": 687805,
+        "quote_missing": 36
+      },
+      "BJ": {
+        "quote_present": 0,
+        "quote_missing": 60463
+      }
+    },
+    "duplicate_trade_date_code_groups": 0,
+    "example_day": {
+      "date": "2024-06-21",
+      "exchange_rows": {
+        "SH": 2268,
+        "SZ": 2848,
+        "BJ": 249
+      },
+      "quote_present": 5116,
+      "quote_missing": 249,
+      "is_trading_true": 5095,
+      "is_trading_false": 21,
+      "is_trading_unknown": 249,
+      "is_st_true": 152,
+      "is_st_false": 5213
+    },
+    "previously_delisted_name_example": {
+      "code": "000005.SZ",
+      "observed_on": "2024-01-02",
+      "delist_date_from_snapshot": "2024-04-26",
+      "still_in_universe_on": "2024-01-02",
+      "not_in_universe_on": "2024-06-21"
+    }
+  },
+  "source_manifest_audit": {
+    "stock_basic_rows": 10000,
+    "strict_format_stock_codes": 6681,
+    "missing_list_date_strict_code_rows": 477,
+    "bse_companies_without_canonical_920_code": 464,
+    "daily_basic_duplicate_key_groups": 17079,
+    "daily_basic_conflicting_duplicate_groups": 9,
+    "daily_source_coverage": [
+      "2010-01-04",
+      "2026-08-03"
+    ],
+    "daily_basic_source_coverage": [
+      "2020-01-02",
+      "2026-08-03"
+    ],
+    "warnings_preserved": true
+  },
+  "catalog_only_sources": {
+    "sw2021_member_history_rows_at_catalog_snapshot": 23219,
+    "sw2014_member_history_rows_at_catalog_snapshot": 22148,
+    "sw_official_event_rows_at_catalog_snapshot": 12929,
+    "lumi_2026_11_02_current_stock_financial_target": 5579,
+    "lumi_2026_11_02_completed": 2242,
+    "lumi_2026_11_02_pending": 3337,
+    "lumi_2026_11_02_returned_statements": 253790
+  },
+  "checks": {
+    "sha2024": "MCP_INDEPENDENT_HASH_MATCHES_MANIFEST",
+    "year2024_row_count": "MCP_PARQUET_FOOTER",
+    "quote_matrix": "MCP_PARQUET_GROUPBY_COUNT",
+    "example_day": "MCP_PARQUET_FILTERED_GROUPBY",
+    "catalog_others": "HISTORICAL_LOCAL_CATALOG_SNAPSHOT_NOT_CURRENT_QUERY"
+  },
+  "claims": {
+    "candidate_historical_universe_exists": true,
+    "source_snapshot_content_verified_for_2024": true,
+    "authoritative_full_market_denominator_verified": false,
+    "independently_verified_event_time_PIT": false,
+    "cross_source_price_status_completeness_verified": false,
+    "independent_OOS_verified": false,
+    "tradable_alpha_verified": false,
+    "true_full_market_coverage_percent": null
+  },
+  "caveats": [
+    "BJ daily quotes are missing in this candidate dataset, not necessarily in the market or other local sources.",
+    "Historical list/delist/status was reconstructed in 2026; this is not a 2024-time-stamped source event log.",
+    "Frozen stock_basic hit 10000-record upstream cap and excluded some malformed/missing-date/BSE identities.",
+    "Source directory catalog financial/industry row counts are historical snapshots, not live direct DuckDB checks.",
+    "Dataset aggregates are not a license to redistribute private original source rows."
+  ]
+}
