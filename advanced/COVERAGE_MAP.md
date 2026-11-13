@@ -41,28 +41,10 @@
 - [边界测试](../tests/test_advanced_pit_intake_lab.py)：未来财报修订、无时区、标签已退出但尚不可得、相等时间边界、来源指纹格式失败。
 - [侧栏规范](AUTHORING_GUIDE.md)：三卷章节统一“第 NN 章｜标题”，附录与导读不再混入正文编号，文件与书签路径不变。
 - **尚未完成**：任何完整真实历史 PIT 来源的外部真实性验收、全市场数据回填、独立 OOS 与可成交收益。
-## 第二卷研究级升级第三轮（来源层级与证券覆盖）
+## 教材专用数据体系（当前有效）
 
-- [历史股票池审计](volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：真实四股 468 条股票日、117 个共同已观察日期；样本内部覆盖不等于全市场 PIT。
-- [覆盖/时序脚本](../examples/advanced_universe_coverage_lab.py) 与 [单元测试](../tests/test_advanced_universe_coverage_lab.py)：显式未知/不合格/价迟到/缺失、无来源分母时禁止输出全市场百分比。
-- **待完成**：完整历史母体、官方交易日历、行业历史成员、来源许可与版本证明。
+第二卷不以个人数据池的管理和修复作为主线。核心输入仅为 `data/real_a_share`、`data/story`、`data/teaching` 三套独立课程数据，均在教材仓库中可阅读和复核。
 
-## 第二卷报价归因复核：摘牌边界与北交所历史代码
-
-- 沪深 2024 年合计 52 条未关联行情行均恰好落在快照 `delist_date` 当天，提示源成员闭区间包含摘牌日的边界问题；对照退市公告，不能将全部视为随机漏采。
-- 北交所 2024 年候选快照 60,463 条行情联表失败；2026-11-13 **真实运行 AKShare 历史日线**返回 2024-06-21 云星宇 9.44 元、纬达光电 8.18 元、万达轴承 52.01 元，和当年独立行情报道一致。存在历史新旧代码和数据源关联两方面待核问题，**不等于真实无交易**。
-- 具体证据及交叉核验方法：[附录 C](volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)、[聚合 JSON](volume-2/local_all_a_2024_aggregate.json)、[AKShare 校验脚本](../examples/advanced_quote_cause_audit.py)。
-
-## 第二卷研究级升级第四轮（本地真实历史股票池）
-
-- [附录 C](volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md) 已用本地 2026-08-04 冻结 `all_a_membership` 聚合证据升级：17 个年度分区、**14,536,198** 条证券日，2024 年分区 SHA-256 已匹配。
-- 2024 年 **1,296,795** 条候选成员日中，**60,515** 条 `has_daily_quote=false`（BJ **60,463**、SH **16**、SZ **36**）；这不代表交易所实际无报价、真实停牌或零收益。
-- [公开聚合 JSON](volume-2/local_all_a_2024_aggregate.json) · [可运行复核脚本](../examples/advanced_local_snapshot_audit.py) · [单元测试](../tests/test_advanced_local_snapshot_audit.py)。私有行情和本地数据库均未上传。
-- 来源快照保留单次 10,000 行采集上限、部分缺上市日期、BSE 规范代码及 `daily_basic` 重复冲突。SW 历史成员、官方事件和 QMT PIT 表只是待逐行认证的候选来源，**还不等于完整历史 PIT 或可交易 Alpha**。
-
-## 第二卷来源根因诊断第五轮：只读源表对账入口
-
-- 北交所 2024 年快照 60,463 条无价中有 **19** 条源 `suspend` 标记、**60,444** 条状态未知；万达轴承 IPO 当天实际成交却被标为停牌，是信息源错配的反例。
-- [诊断程序](../examples/advanced_source_join_probe.py) 会在有私有源 DB 的本地环境对 `daily.ts_code`、`stock_basic.comp_code` 和冻结 Parquet 做只读对账。GitHub CI 仅运行合成 SQL 及公开聚合合同，**不会读取或上传私有数据库**。
-- [证据记录](volume-2/local_all_a_2024_aggregate.json) · [附录 C](volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)。原始源核对尚未实跑，不能把 “19 条源停牌标记” 称作“19 条确证整日停牌”。
-
+- [数据字典与版本](../data/teaching/README.md) · [元数据](../data/teaching/manifest.json) · [校验脚本](../scripts/verify_teaching_datasets.py)。
+- [第二卷附录 C](volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md) 已改为教材数据与复现协议，保留原文件路径兼容旧书签，不再载入个人研究审计记录。
+- 真实数据用于价格算术、合成数据用于方法/时间门禁，缺历史 PIT 和独立 OOS 证据时不发布全市场 Alpha 结论。

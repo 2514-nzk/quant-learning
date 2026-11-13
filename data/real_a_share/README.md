@@ -33,6 +33,7 @@ python examples/real_kline_lab.py --symbol 000001
 由于公共数据源可能限流、不可用、更新数据或调整接口，重新运行可能导致数值变化；应保留已有数据快照的采集时间与 SHA256，不能在数据被覆盖后直接声称完全复现。自动采集记录在 GitHub Actions 的 `Collect AKShare real A-share teaching charts` 工作流；手动刷新后要重新部署阅读网站才能展示新图。
 
 **边界：** 没有按历史时点建立完整股票池，也没有分红复权、财务 PIT、除权事件核对、停牌/涨跌停成交限制与费用账本。不能对这三只股票的纸面历史形态计算策略业绩，再宣称获得真实市场的样本外 Alpha。完整实证要求见 [数据需求与缺口](../README.md)。
-## 第二卷历史股票池覆盖审计
+## 教材数据版本
 
-运行 `python examples/advanced_universe_coverage_lab.py --real-teaching --json` 可得到四股真实 CSV 的 SHA、各自日期集合、共同**已观察日期**和来源缺口。**这不是完整 A 股股票池或官方交易日历**；没有权威分母时报告中的 `full_market_coverage_percent` 必须为 `null`。详见 [第二卷附录 C](../../advanced/volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)。
+当前四股固定数据属于 [教材专用真实价格包](../teaching/README.md)，用来复算有限样本的价格与因子算术。全市场 PIT、成交与市场有效性不在此数据包的证明范围。更大真实行情若重新采集，需要新数据版本和来源许可审核。
+

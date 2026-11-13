@@ -1,6 +1,6 @@
 # 教材专用数据集（与个人量化研究数据完全解耦）
 
-> **课程数据版本：course-datasets-v1。** 本文件夹与仓库的 `data/real_a_share`、`data/story` 一起构成教材独立数据包；不依赖本地 PTradePolicy、DuckDB 私有数据池、证券账户或个人研究输出。
+> **课程数据版本：course-datasets-v1。** 本文件夹与仓库的 `data/real_a_share`、`data/story` 一起构成教材独立数据包；不依赖任何私人研究数据库、证券账户或个人策略输出。
 
 ## 已随教材提供的三套数据
 

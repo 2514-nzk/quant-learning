@@ -163,30 +163,22 @@ python examples/advanced_real_evidence_audit.py --json
 python -m unittest discover -s tests -p "test_advanced_real_evidence_audit.py" -v
 ~~~
 
-## 5B. 真实全市场候选数据的**失败先行**：为什么这一轮没有输出全市场 IC？
+## 5B. 同一个指标，在不同教材数据上有什么证据等级？
 
-上一节四股 18 期演示有可复算 RankIC，但研究者不应因为又找到 1,453 万条本地历史证券日，就立即批量算全市场 RankIC。
+本教材使用**两条明确分离的证据路线**：
 
-先查看 [2024 年证券与报价覆盖](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：候选母体有 1,296,795 条证券日，缺日报价 60,515 条，其中北交所 60,463 条。**2024-06-21** 一天则有 5,365 个成员，249 个缺价/未知交易状态。若做以下两件事都会误导：
+- `data/story/rounds.csv` 和 `data/teaching/pit_events_v1.json`：人工编排的研究/时点反例。可用于验证公式、单元测试、训练与 Purge 的边界；即使 IC 显著，也不能声称发现真实 A 股效应。
+- `data/real_a_share/`：经固定源清单与 SHA 验证的真实四只股票日线。可重算前节 18 期 RankIC、毛价差和描述性不确定性；四股事后选择、回顾性采集、缺历史全市场母体和执行证据，**不能用于确认全市场 Alpha**。
 
-1. **只在 `has_daily_quote=true` 的证券上算 IC，却不报告原母体**：被剔除者及缺失机制不再可见；跨交易所绩效不可外推。
-2. **将 `has_daily_quote=false` 的收益填为 0**：把“没有数据”伪装为横盘，并改变排序、分组与置信区间。
+做单因子检验必须在报告中写出 `dataset_id`、`evidence_grade`、`snapshot`、股票池分母和有效证券数。合成数据只验证程序；真实四股只支持限定样本的描述；研究级结论须另准备经合法采集、版本冻结、历史 PIT 审计和独立 OOS 的专属真实数据集。
 
-即便修复价格，仍需逐期把标签入场/退出价格、公司行为、历史证券资格、行业/市值 PIT、特征可得时刻、验证与 OOS 冻结逐项审计。**本轮因此只发布数据质量的证据，不发布新的 IC、显著性、策略回报或 Alpha 声明。** 这正是研究级教材应展示的“停止条件”。
+~~~bash
+python scripts/verify_teaching_datasets.py
+python examples/advanced_factor_research_lab.py --json
+python examples/advanced_real_evidence_audit.py --json
+~~~
 
-可复核的公开聚合和限制说明：[证据 JSON](local_all_a_2024_aggregate.json) · [验证脚本](../../examples/advanced_local_snapshot_audit.py)。
-
-### 5B.1 错误归因同样会损坏因子验证
-
-跟进 [附录 C 2024 年报价异常原因核验](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：沪深全部 52 条快照无报价记录都落在摘牌日期边界；北交所 60,463 条则涉及源交易所覆盖和历史代码映射，已有 2024 年实际成交的外部反例。这意味着“数据缺失”并非同一统计机制。
-
-如果先把它们全部归类成普通停牌、全市场数据漏采或零回报，会直接改变样本数、因子分组、收益标签和损失函数。当前应报告**真实失败分类**，而不是在没有修复面板之前开展可交易 Alpha 验证。
-
-### 5B.2 错误的停牌状态会怎样扭曲 IC 与收益标签？
-
-2024 年北交所 60,463 条未成功关联日报价的证券日中，19 条在 `suspend` 源中有记录，其余 60,444 条交易状态未知。**这不是 19 条被交易所确认全天停牌**。万达轴承 2024-05-30 上市日的真实成交，直接反驳了“见 `suspend` 即认为全天不能交易”的简单规则。
-
-研究者如果把 19 条直接剔除，或者把 60,444 条全部按缺乏流动性处理，再做 RankIC、标签或分组收益，会依赖未经证实的缺失机制。应先运行 [原始源表只读对账](../../examples/advanced_source_join_probe.py) 分类，但该脚本也只授予**候选源/代码匹配**证据，不生成任何新的有效 Alpha 结论。完整案例见 [附录 C](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)。
+本书不依赖任何个人策略研究项目的数据库、研究输出或交易账号。详见 [附录 C：教材数据与复现协议](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)。
 
 ## 6. 练习与核对
 

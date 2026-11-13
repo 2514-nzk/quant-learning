@@ -1,8 +1,8 @@
 # 第二卷｜专业量化研究方法
 
-> **状态：14 章均已有教学正文初稿与合成实验，目录骨架阶段完成。已新增真实四股价格与本地跨年份历史证券池**聚合审计**；尚无独立认证的完整历史事件时间 PIT、独立市场 OOS、可交易净收益或经审校的策略有效性结论。**
+> **状态：14/14 章已有教学正文初稿；使用教材独立封存的真实行情和合成实验，理论、代码与严格真实 PIT/OOS 尚需逐章审校。**
 
-本卷从量化概念转向严谨研究：数据时点、统计推断、样本外、组合交易与可复现性。
+本卷从量化概念转向严谨研究：数据时点、统计推断、样本外、组合交易与可复现性。教材与个人量化研究数据池**相互独立**。
 
 ## 章节路线（01–14）
 
@@ -23,47 +23,14 @@
 | 13 | [第 13 章｜成交仿真、交易成本与回测状态机](13_backtest_execution.md) | 研究信号如何变成真实可持有的仓位？ | 正文初稿 / 合成实验 |
 | 14 | [第 14 章｜可复现研究工程与综合项目](14_reproducible_capstone.md) | 第三方怎样独立复算并判定一个研究结果？ | 正文初稿 / 合成实验 |
 
-## 研究级深化：真实价格证据审计与逐章任务
+## 本卷的数据与实验
 
-- [真实历史价格证据审计](REAL_DATA_EVIDENCE_REVIEW.md)：第 05–08 章共用，四只 A 股 18 期，包含来源哈希、数据重建、时间门禁、RankIC/不确定性与失败证据。
-- [研究级逐章审校台账](REVIEW_BACKLOG.md)：14 章各自仍缺什么，如何验收。
-- [Python 审计](../../examples/advanced_real_evidence_audit.py) · [回归测试](../../tests/test_advanced_real_evidence_audit.py)。
+- [教材专用数据总览](../../data/teaching/README.md)：三个冻结数据集及可复核的来源标签；任何读者克隆仓库即可练习。
+- [附录 A｜真实四股价格证据审计](REAL_DATA_EVIDENCE_REVIEW.md)：有真实历史报价，但没有全市场 PIT 或独立 OOS 证明。
+- [附录 B｜逐章研究级审校台账](REVIEW_BACKLOG.md)：14 章各自的理论/算法/数据/习题问题。
+- [附录 C｜教材数据集与复现规范](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：三套独立课程数据的用途、输入合同、缺失语义、复现与扩充边界。
 
-**新实证只达到“真实价格回顾性审计”，不是历史全市场 PIT、独立 OOS 或可交易 Alpha。**
-
-## 第二轮研究级深化：数据源与标签输入门禁
-
-- [PIT 版本事件接入实验](../../examples/advanced_pit_intake_lab.py)：带偏移时间戳、历史成员、生效区间、财报修订、缺失状态、标签实际可得时间与严格前向 Purge。
-- [配套负例测试](../../tests/test_advanced_pit_intake_lab.py)：晚到版本不可回填、成员未知不可作不合格、历史来源证据缺失拒绝、边界时间泄漏拒绝。
-- 允许本地 JSON 文件输入，**但不把声明的来源时间和 SHA-256 当作已核实的外部证据**；报告明确不授予真实 PIT 或独立 OOS 资格。
-
-## 第三轮研究级深化：历史股票池与数据源覆盖
-
-- [附录 C｜历史股票池与数据源覆盖审计](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：真实四股 CSV 与来源缺口盘点；区分已观察日期覆盖和全市场历史母体覆盖。
-- [可运行的覆盖审计 Python](../../examples/advanced_universe_coverage_lab.py)：真实文件 SHA/日期交并集、合成两期 as-of 成员/价格与本地 JSON 候选校验。
-- [失败门禁测试](../../tests/test_advanced_universe_coverage_lab.py)：成员未知与明确不合格区分、迟到价格、重复记录、来源时刻和不可信分母；缺少权威全市场分母时，覆盖百分比必须为 null。
-
-**本轮真实数据范围仍只有事后挑选的四只股票，不构成完整全市场 PIT。**
-
-## 第四轮研究级深化：借用本地历史数据，补真实失败案例
-
-- [附录 C｜历史股票池与数据源覆盖审计](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：已升级为本地 `all_a_membership` 真实冻结快照的审计，2010–2026 年 **14,536,198** 条历史证券日，重点披露 2024 年 **1,296,795** 条中 **60,515** 条缺日报价的来源问题。
-- [公开聚合证据 JSON](local_all_a_2024_aggregate.json) · [复核与本地重放脚本](../../examples/advanced_local_snapshot_audit.py) · [回归测试](../../tests/test_advanced_local_snapshot_audit.py)：不含私有原始行情、数据库或供应商明细，严格保留快照版本、哈希、范围和不确定性。
-- 第 05–08 章分别深化历史母体、标签不可得、因子分母和拒绝伪造全市场 IC 的研究逻辑。
-
-**已找到真实大截面历史母体候选，不等于历史事件时间 PIT/全市场完整度/独立 OOS 已通过。**
-
-## 异常归因复核：摘牌日、北交所代码及行情来源
-
-- [附录 C 第 2A 节](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：沪深 52 条无报价恰好发生于摘牌日；北交所有历史新旧代码混用，但即使原本已使用 `920002` 的股票也没有联表成功，不能只归因于停牌或代码问题。
-- [可选 AKShare 样本复核工具](../../examples/advanced_quote_cause_audit.py) · [离线失败测试](../../tests/test_advanced_quote_cause_audit.py)：默认无网络；可在有 AKShare 的环境按历史代码和规范代码分别查询真实日线。
-- 当年公开成交报道与 **2026-11-13 实际运行的 AKShare 历史日线查询**已独立交叉确认三只北交所样本的 2024-06-21 收盘价；**但本地源 `daily` 表与跨时点代码映射尚未直接核验和修复**，不可据此宣布全市场量价面板完整。
-
-## 第五轮研究级深化：追查真正的 `daily` 联表失败
-
-- [附录 C 第 2B 节](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：北交所 60,463 条中 19 条存在源 `suspend` 标记，60,444 条交易状态未知；万达轴承上市首日真实成交却被本地标成停牌，是必须保留的反证。
-- [私有原始源只读诊断程序](../../examples/advanced_source_join_probe.py) · [分类与合成 DuckDB 测试](../../tests/test_advanced_source_join_probe.py)：核对 `daily` 是否真正包含 BJ 行情、源直接同码、同公司历史代码别名、摘牌日期和来源停牌状态。
-- 由于机器学习 MCP 不开放任意数据库查询，**尚未实际运行本地 `xc_tushare_data.duckdb` 的直接/别名归因 SQL**；不能把已编写对账代码说成真实源修复完成。
+本卷的 `advanced_protocol_pit_lab.py`、`advanced_factor_research_lab.py` 和 `advanced_model_validation_lab.py` 使用合成教学输入；`advanced_pit_intake_lab.py` 默认读取仓库封存的 PIT 事件 JSON。无需借助作者的其他量化项目，也不会偷偷读取未发布的数据库。
 
 ## 已有章节的实验入口
 
@@ -75,7 +42,7 @@
 - [09–11 模型选择和时间验证实验](../../examples/advanced_model_validation_lab.py)：六候选基线、Ridge/成对排序、开发期消融、冻结选择、逐期可用标签重训及事后漂移。[配套测试](../../tests/test_advanced_model_validation_lab.py)。
 - [12–14 组合、执行和审计实验](../../examples/advanced_portfolio_execution_lab.py)：合成风险协方差、离散权重、整手/T+1、拒单与部分成交、现金/NAV 审计和版本指纹。[配套测试](../../tests/test_advanced_portfolio_execution_lab.py)。
 
-**基础实验多数使用人工数据；新增四股审计使用真实历史 OHLC，但只是回顾性描述，不能作为完整 PIT、独立 OOS 或可交易 Alpha 证据。**
+**部分实验使用人工数据，另有四股真实历史 OHLC 的限定样本描述；二者都不构成完整历史 PIT、独立 OOS 或可交易 Alpha 证据。**
 
 ## 统一交付标准
 
