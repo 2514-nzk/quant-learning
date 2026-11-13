@@ -80,6 +80,11 @@ jobs:
           python -m unittest discover -s tests -p "test_advanced_local_snapshot_audit.py" -v
           python examples/advanced_local_snapshot_audit.py --json > /tmp/volume2_local_real_evidence.json
           python -c 'import json; d=json.load(open("/tmp/volume2_local_real_evidence.json",encoding="utf-8")); assert d["year_2024_rows"] == 1296795 and d["missing_quotes"] == 60515 and not d["historical_pit_verified"] and d["full_market_coverage"] is None; print("Real-source limits reconciled")'
+      - name: Verify delist-date and BJ code-mapping quote-cause audit
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_quote_cause_audit.py" -v
+          python examples/advanced_quote_cause_audit.py --json > /tmp/quote_cause_offline.json
+          python -c 'import json; x=json.load(open("/tmp/quote_cause_offline.json")); assert x["sh_sz_unjoined_and_equal_delist_day"]==52 and x["bj_unjoined"]==60463 and x["historical_pit_proven"] is False; print("Source joins distinguished from missing market trades")'
       - name: Build reading site
         run: python reader/build_reader.py --output _site
       - name: Validate all three volumes on canonical homepage
@@ -116,6 +121,38 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
+
+  akshare_crosscheck:
+    # Public quotes only. This independent, best-effort job never blocks Pages.
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    continue-on-error: true
+    steps:
+      - name: Checkout research text and public quote samples
+        uses: actions/checkout@v4
+        with:
+          ref: docs/three-volume-research-framework
+          persist-credentials: false
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install optional public AKShare API
+        run: python -m pip install -q akshare
+      - name: Query dated public BJ samples (inconclusive if vendor returns empty)
+        run: |
+          python examples/advanced_quote_cause_audit.py --akshare --json > /tmp/akshare_crosscheck.json
+          python - <<'PY'
+          import json
+          r = json.load(open("/tmp/akshare_crosscheck.json", encoding="utf-8"))
+          print("AKShare requests attempted:", r["akshare_queried"])
+          for sample in r["akshare_results"]:
+              print(sample["date"], sample["name"], sample["interpretation"],
+                    [(symbol, result["status"]) for symbol, result in sample["results"].items()],
+                    "matches dated public report:", sample["api_matches_2024_public_report"])
+          if not any(s["api_price_observed"] for s in r["akshare_results"]):
+              print("INCONCLUSIVE: vendor returned no matching historical quote; market absence NOT inferred")
+          PY
 
   deploy:
     environment:
