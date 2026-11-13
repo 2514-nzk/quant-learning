@@ -167,6 +167,43 @@ python -m unittest discover -s tests -p "test_advanced_protocol_pit_lab.py" -v
 
 它和本章的合成 `facts_asof()` 实验**验证不同的命题**：固定文件完整不代表 2024 年实际已知。历史价格发生在 2024 年，AKShare 快照采集于 **2026-11-11**。没有供应商当时发布/接收/入库证据，`L3_2024_historical_PIT_availability` 仍为 `NOT_PROVEN`；四股事后固定选择，历史母体门禁为 `FAIL_SELECTED_SURVIVORS`。不要把这些失败状态隐藏在“真实数据已接入”后面。
 
+### 7.2 第二轮进阶实验：带来源版本的真实数据接入合同
+
+上面真实四股案例已经证明：文件完整性不是历史 PIT。下一步必须先定义**可验证的输入门槛**，再考虑扩充实证。本轮新增 [PIT 输入合同实验](../../examples/advanced_pit_intake_lab.py)；它接受本地 JSON，但默认只使用**合成事件版本**。
+
+**最小字段：**
+
+| 事件 | 必填字段 | 作用 |
+|---|---|---|
+| 研究快照 | `decision_at`、`signal_date`、`validation_first_signal_at`、`universe_scope` | 冻结查询/验证边界及母体声明 |
+| 证券成员版本 | `security_id`、`effective_from`、`effective_to`、`revision_id` | 恢复当时成员的半开生效区间 |
+| 财务/因子事实版本 | `security_id`、`field`、`period_end`、`revision_id`、`value` | 按可得报告期和修订选值 |
+| 每个版本的来源 | `source_ref`、`declared_evidence_sha256`、`source_published_at`、`ingested_at`、`available_at` | 记录原始事件证据和系统可用性，不以今天下载时间倒填 |
+| 每个训练标签 | `signal_at`、`feature_available_at`、`decision_at`、`entry_at`、`exit_at`、`label_available_at` | 检查未来信息与逐条标签可得时刻 |
+
+时间戳必须包含 UTC 偏移，并满足：
+
+\[
+t_{published}\le t_{ingested}\le t_{available}.
+\]
+
+在某个决策截止 `c` 之前，仅允许挑选三个事件时间**都不晚于** `c` 的版本；财务值在已知版本中先按最新报告期，再选该报告期的最新可得修订。若不存在，当时状态是 `UNKNOWN`，**不能自动填 0 或使用未来披露版**。历史证券身份也分 `ELIGIBLE`、`INELIGIBLE`、`UNKNOWN_NO_KNOWN_MEMBERSHIP`。
+
+**重要限制**：提交一个看起来合法的 `declared_evidence_sha256` 或一个带时区的 `source_published_at` 并不证明该事件真实由交易所/供应商在此刻发布。代码只验证**字段与逻辑**，没有检验第三方原始文件内容、供应商当年的发布/接收真实性，也没有自动认定全市场历史母体完整。用户输入的报告始终明确给出 `historical_pit_proven=false`。
+
+### 7.3 合成版本与本地来源候选的复算
+
+~~~bash
+python examples/advanced_pit_intake_lab.py
+python examples/advanced_pit_intake_lab.py --json
+python -m unittest discover -s tests -p "test_advanced_pit_intake_lab.py" -v
+python examples/advanced_pit_intake_lab.py --input /你的本地目录/pit_events.json --json
+~~~
+
+最后一行仅为**数据已在本地时的模板**，不需要将内部数据上传到公开 GitHub 仓库。演示中 A 的 2024-03-20 截止可见 ROE 为 0.10，4 月才发布的 0.15 修订不能回填；B 的成员记录晚到，应该是 `UNKNOWN` 而非“未上市”；C 的已知成员区间截止 3 月 15 日，处于 `INELIGIBLE`。
+
+这为后续正式接入历史证券池建立了**可失败的入口**，不是宣布已经取得历史 PIT 数据。可参考 [审校台账](REVIEW_BACKLOG.md) 的 G1/G2 门禁。
+
 ## 8. 研究级数据表最低设计
 
 | 表名 | 最小关键字段 | 用途 |

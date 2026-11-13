@@ -103,6 +103,13 @@ jobs:
           python -m unittest discover -s tests -p "test_advanced_real_evidence_audit.py" -v
           python examples/advanced_real_evidence_audit.py --json > /tmp/real_a_share_evidence.json
           python -c 'import json; r=json.load(open("/tmp/real_a_share_evidence.json",encoding="utf-8")); assert r["timeline"]["round_count"]==18 and r["gates"]["L6_independent_OOS"].startswith("FAIL_"); print("Real OHLC evidence audit passed")'
+      - name: Verify three-volume canonical sidebar headings
+        run: python -m unittest discover -s tests -p "test_sidebar_taxonomy.py" -v
+      - name: Verify PIT event intake, as-of versions and strict label gates
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_pit_intake_lab.py" -v
+          python examples/advanced_pit_intake_lab.py --json > /tmp/pit_intake_contract.json
+          python -c 'import json; d=json.load(open("/tmp/pit_intake_contract.json", encoding="utf-8")); assert d["train_labels_purged"]==1 and d["membership_asof"]["B"].startswith("UNKNOWN") and not d["historical_pit_proven"]; print("PIT intake source/label gates passed")'
       - name: Validate three-volume framework and chapter outlines
         run: python -m unittest discover -s tests -p "test_advanced_framework.py" -v
       - name: Build course with advanced learning track

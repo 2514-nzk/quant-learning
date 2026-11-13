@@ -82,6 +82,33 @@ label_available_at + safety_gap < valid_first_signal_at
 
 这里的价格来源没有 2024 年逐笔供应商接收/入库时间，也缺 `label_available_at`。这只能算**日期级门禁**，不等于完整的真实 PIT 或训练/Purge/OOS 合格证明。早已在第一卷公开的后四期，不再具有“未触碰 OOS”的证据身份。
 
+### 4.2 第二轮实验：按标签真正可用时间做 Purge
+
+新增 [PIT 事件与标签输入合同](../../examples/advanced_pit_intake_lab.py) 把“标签在哪天退出”和“模型何时**能得到这个标签**”分开：
+
+\[
+signal\le decision<entry\le exit\le label\_available.
+\]
+
+若下一验证段的首个信号时刻是 \(v\)，严格的前向训练标签门禁为：
+
+\[
+label\_available\_at < v.
+\]
+
+**相等也不通过**，因为这份课程采用保守的“必须严格早于验证开始”的冻结标准。一个未来退出尚未发生、或虽退出但尚未完成收集/校验的标签，不能提前作为训练答案。这和根据日历简单“固定删去五行”完全不同。
+
+默认合成例子两条标签：一条 3 月已可用，可以进入 4 月初验证之前的训练集；另一条直到验证开始当天稍后才可得，必须标记 `PURGED_LABEL_NOT_READY`。测试另涵盖边界相等、未来特征、倒序退出、无时区、晚到修订与来源元数据矛盾。
+
+请注意两点：**一**、本实验读取的是人为给出的事件时间，即使逻辑验证通过，也不证明这些时间是真实供应商日志；**二**、这里只实现单向前推训练的标签门禁，不意味着复杂双向交叉验证的 Embargo、行情停牌与所有重叠特征问题已经解决。
+
+运行：
+
+~~~bash
+python examples/advanced_pit_intake_lab.py --json
+python -m unittest discover -s tests -p "test_advanced_pit_intake_lab.py" -v
+~~~
+
 ## 5. 可复核练习
 
 **练习 A**：周五 14:50 已形成退出报价，系统 15:10 才验证并写入标签；验证信号是 15:00，能把这条标签拿来训练验证首个模型吗？
