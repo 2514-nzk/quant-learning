@@ -79,7 +79,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_teaching_dataset_contract.py" -v
           python scripts/verify_teaching_datasets.py --json > /tmp/course_data.json
-          python -c 'import json; d=json.load(open("/tmp/course_data.json",encoding="utf-8")); assert d["verified"] and len(d["datasets"])==3 and not d["real_market_PIT_proven"]; print("Course data is self-contained")'
+          python -c 'import json; d=json.load(open("/tmp/course_data.json",encoding="utf-8")); assert d["verified"] and len(d["datasets"])==4 and not d["real_market_PIT_proven"]; print("Course data is self-contained")'
       - name: Verify Volume II v1, Appendix D and fourteen numerical exercises
         run: |
           python -m unittest discover -s tests -p "test_volume2_quality_gate.py" -v
@@ -88,6 +88,12 @@ jobs:
           python -m unittest discover -s tests -p "test_advanced_factor_research_lab.py" -v
           python -m unittest discover -s tests -p "test_advanced_model_validation_lab.py" -v
           python -m unittest discover -s tests -p "test_advanced_portfolio_execution_lab.py" -v
+      - name: Gate third-volume four chapters and synthetic-only strategy experiment
+        run: |
+          python -m unittest discover -s tests -p "test_volume3_strategy_lab.py" -v
+          python -m unittest discover -s tests -p "test_volume3_chapters.py" -v
+          python examples/volume3_strategy_lab.py --json > /tmp/v3_strategy.json
+          python -c 'import json; x=json.load(open("/tmp/v3_strategy.json",encoding="utf-8")); assert x["weeks"]==16 and x["unknown_members"]==1 and x["source_kind"]=="SYNTHETIC_ONLY" and not x["real_market_OOS_proven"] and not x["execution_proven"]; print("Teaching strategy boundary verified")'
       - name: Build reading site
         run: python reader/build_reader.py --output _site
       - name: Validate all three volumes on canonical homepage
@@ -105,6 +111,7 @@ jobs:
           assert sum(doc["title"].startswith("第 ") and doc["group"].startswith("第二卷｜第 ") for doc in advanced) == 14
           assert sum(doc["title"].startswith("第 ") and doc["group"].startswith("第三卷｜第 ") for doc in advanced) == 13
           assert len(advanced) == 33, "14 chapters and 4 appendices plus third volume expected"
+          assert all(any(p["path"].startswith(f"advanced/volume-3/0{k}_") and "状态：教学正文 v1" in p["content"] for p in advanced) for k in range(1,5))
           assert not (Path("advanced/volume-2/local_all_a_2024_aggregate.json")).exists()
           assert any(doc["path"] == "advanced/volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md"
                      and "教材独立数据集" in doc["content"] for doc in advanced)
