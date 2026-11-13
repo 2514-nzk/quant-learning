@@ -58,6 +58,11 @@ jobs:
           python -m unittest discover -s tests -p "test_standalone_book.py" -v
           python examples/real_stock_learner.py
           python examples/real_kline_lab.py --symbol 000001
+      - name: Verify real historical OHLC evidence gates for volume two
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_real_evidence_audit.py" -v
+          python examples/advanced_real_evidence_audit.py --json > /tmp/real_ohlc_evidence.json
+          python -c 'import json; d=json.load(open("/tmp/real_ohlc_evidence.json", encoding="utf-8")); assert d["evidence_grade"].startswith("DESCRIPTIVE_ONLY") and d["gates"]["L4_historical_full_universe"].startswith("FAIL_"); print("Real-price limitations preserved")'
       - name: Build reading site
         run: python reader/build_reader.py --output _site
       - name: Validate all three volumes on canonical homepage
