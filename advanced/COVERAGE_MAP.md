@@ -41,4 +41,8 @@
 - [边界测试](../tests/test_advanced_pit_intake_lab.py)：未来财报修订、无时区、标签已退出但尚不可得、相等时间边界、来源指纹格式失败。
 - [侧栏规范](AUTHORING_GUIDE.md)：三卷章节统一“第 NN 章｜标题”，附录与导读不再混入正文编号，文件与书签路径不变。
 - **尚未完成**：任何完整真实历史 PIT 来源的外部真实性验收、全市场数据回填、独立 OOS 与可成交收益。
+## 第二卷研究级升级第三轮（来源层级与证券覆盖）
 
+- [历史股票池审计](volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：真实四股 468 条股票日、117 个共同已观察日期；样本内部覆盖不等于全市场 PIT。
+- [覆盖/时序脚本](../examples/advanced_universe_coverage_lab.py) 与 [单元测试](../tests/test_advanced_universe_coverage_lab.py)：显式未知/不合格/价迟到/缺失、无来源分母时禁止输出全市场百分比。
+- **待完成**：完整历史母体、官方交易日历、行业历史成员、来源许可与版本证明。

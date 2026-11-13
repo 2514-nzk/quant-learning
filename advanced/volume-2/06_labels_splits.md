@@ -109,6 +109,12 @@ python examples/advanced_pit_intake_lab.py --json
 python -m unittest discover -s tests -p "test_advanced_pit_intake_lab.py" -v
 ~~~
 
+### 4.3 样本准入不是标签 Purge 的同义词
+
+新增 [历史股票池覆盖审计](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md) 将“证券当时是否在有效研究母体内”与“该证券标签在训练截止是否已经可用”分开：两者都是必要条件，任何一项未知都不能自动跳过审计。即便某条标签 `label_available_at < validation_first_signal_at`，如果其当时证券成员身份为 UNKNOWN，也**不能仅凭标签时间合格而将它认定为历史全市场有效训练样本**。
+
+本轮程序给出覆盖维度的证据门禁，尚未实现真实 A 股全市场样本准入与模型训练联动；该环节仍是未来数据和研发任务。
+
 ## 5. 可复核练习
 
 **练习 A**：周五 14:50 已形成退出报价，系统 15:10 才验证并写入标签；验证信号是 15:00，能把这条标签拿来训练验证首个模型吗？

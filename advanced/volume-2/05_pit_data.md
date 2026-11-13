@@ -204,6 +204,20 @@ python examples/advanced_pit_intake_lab.py --input /你的本地目录/pit_event
 
 这为后续正式接入历史证券池建立了**可失败的入口**，不是宣布已经取得历史 PIT 数据。可参考 [审校台账](REVIEW_BACKLOG.md) 的 G1/G2 门禁。
 
+### 7.4 第三轮实验：历史母体覆盖率的分母门禁
+
+前两轮解决了“版本时刻怎么筛选”和“现有四股价格是否可复算”，但这还不等于**全市场历史股票池已经建立**。[附录 C：历史证券池与来源覆盖](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md) 给出专门的输入审计程序：
+
+~~~bash
+python examples/advanced_universe_coverage_lab.py --real-teaching --json
+python examples/advanced_universe_coverage_lab.py --json
+python -m unittest discover -s tests -p "test_advanced_universe_coverage_lab.py" -v
+~~~
+
+第一种模式对四份真实 CSV 验证哈希、日期并/交集、只在**四只事后固定股票**之间计算重合程度，并且始终返回 `full_market_denominator=null`。第二种模式使用人工 A/B/C 两期版本证明：成员 UNKNOWN 不能等同于已退市；决策时尚未可得的价格也不能当作成交/可用价格。
+
+研究时应明确区分：已知上市范围、已知不合格、未知成员身份、成员已知但行情迟到、行情缺失、供应商来源无法追溯。没有当时真实权威的完整证券母表，不能报告全市场覆盖率。**即使四股样本 117/117 日期完全重合，也绝不意味着 A 股全市场 PIT 覆盖 100%。**
+
 ## 8. 研究级数据表最低设计
 
 | 表名 | 最小关键字段 | 用途 |

@@ -37,6 +37,14 @@
 - [配套负例测试](../../tests/test_advanced_pit_intake_lab.py)：晚到版本不可回填、成员未知不可作不合格、历史来源证据缺失拒绝、边界时间泄漏拒绝。
 - 允许本地 JSON 文件输入，**但不把声明的来源时间和 SHA-256 当作已核实的外部证据**；报告明确不授予真实 PIT 或独立 OOS 资格。
 
+## 第三轮研究级深化：历史股票池与数据源覆盖
+
+- [附录 C｜历史股票池与数据源覆盖审计](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：真实四股 CSV 与来源缺口盘点；区分已观察日期覆盖和全市场历史母体覆盖。
+- [可运行的覆盖审计 Python](../../examples/advanced_universe_coverage_lab.py)：真实文件 SHA/日期交并集、合成两期 as-of 成员/价格与本地 JSON 候选校验。
+- [失败门禁测试](../../tests/test_advanced_universe_coverage_lab.py)：成员未知与明确不合格区分、迟到价格、重复记录、来源时刻和不可信分母；缺少权威全市场分母时，覆盖百分比必须为 null。
+
+**本轮真实数据范围仍只有事后挑选的四只股票，不构成完整全市场 PIT。**
+
 ## 已有章节的实验入口
 
 - [01 研究合同](01_research_protocol.md)：时间合同、严格验证边界及失败标准。

@@ -40,6 +40,8 @@ def sidebar_title(path: str, label: str) -> str:
         return "附录 A｜真实价格证据审计"
     if path.endswith("/REVIEW_BACKLOG.md"):
         return "附录 B｜研究级审校台账"
+    if path.endswith("/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md"):
+        return "附录 C｜历史股票池与来源覆盖审计"
     return label
 
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+\.md)(?:#[^)]*)?\)")
