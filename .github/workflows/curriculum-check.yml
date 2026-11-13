@@ -70,7 +70,13 @@ jobs:
           python examples/financial_quality_lab.py
       - name: Check Markdown bold punctuation boundaries
         run: python -m unittest discover -s tests -p "test_markdown_bold_delimiters.py" -v
+      - name: Verify research contract and PIT lab
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_protocol_pit_lab.py" -v
+          python examples/advanced_protocol_pit_lab.py --json
+      - name: Validate three-volume framework and chapter outlines
+        run: python -m unittest discover -s tests -p "test_advanced_framework.py" -v
       - name: Build course with advanced learning track
         run: |
           python reader/build_reader.py --output _site
-          python -c 'import json; d=json.load(open("_site/content.json",encoding="utf-8")); assert len(d["documents"])==23 and any(x["path"]=="教程/真实_起步一课.md" for x in d["documents"]); assert all(x["path"].startswith("教程/真实_") for x in d["documents"]); print("Published real-stock lessons:",len(d["documents"]))'
+          python -c 'import json; d=json.load(open("_site/content.json",encoding="utf-8")); assert len(d["documents"])==23 and any(x["path"]=="教程/真实_起步一课.md" for x in d["documents"]); assert all(x["path"].startswith("教程/真实_") for x in d["documents"]); assert len(d["framework"])==29; print("Published real-stock lessons:",len(d["documents"]))'
