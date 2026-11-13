@@ -80,7 +80,7 @@ jobs:
           python -m unittest discover -s tests -p "test_teaching_dataset_contract.py" -v
           python scripts/verify_teaching_datasets.py --json > /tmp/course_data.json
           python -c 'import json; d=json.load(open("/tmp/course_data.json",encoding="utf-8")); assert d["verified"] and len(d["datasets"])==3 and not d["real_market_PIT_proven"]; print("Course data is self-contained")'
-      - name: Gate fourteen-chapter Volume II internal quality and reproducible examples
+      - name: Verify Volume II v1, Appendix D and fourteen numerical exercises
         run: |
           python -m unittest discover -s tests -p "test_volume2_quality_gate.py" -v
           python -m unittest discover -s tests -p "test_advanced_framework.py" -v
