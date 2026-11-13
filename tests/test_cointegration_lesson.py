@@ -56,7 +56,7 @@ class CointegrationLessonTests(unittest.TestCase):
         volumes = collect_framework_documents()
         chapter = next(doc for doc in volumes
                        if doc["path"] == "advanced/volume-3/08_stat_arb.md")
-        self.assertEqual(len(volumes), 29)
+        self.assertEqual(len(volumes), 31)
         self.assertIn("第三卷", chapter["group"])
         self.assertIn("协整、价差与统计套利", chapter["title"])
         self.assertIn("从相关性到协整", chapter["content"])

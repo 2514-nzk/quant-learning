@@ -11,13 +11,14 @@ class ReaderPreviewTests(unittest.TestCase):
         first = collect_documents()
         advanced = collect_framework_documents()
         self.assertEqual(len(first), 22)
-        self.assertEqual(len(advanced), 29)
+        self.assertEqual(len(advanced), 31)
         self.assertNotIn("教程/真实_专题A_协整与配对交易.md", [x["path"] for x in first])
         self.assertIn("advanced/volume-3/08_stat_arb.md", [x["path"] for x in advanced])
-        self.assertEqual(sum(p["path"].startswith("advanced/volume-2/") for p in advanced), 15)
+        self.assertEqual(sum(p["path"].startswith("advanced/volume-2/") for p in advanced), 17)
         self.assertEqual(sum(p["path"].startswith("advanced/volume-3/") for p in advanced), 14)
-        self.assertEqual(sum(p["path"].endswith(".md") and not p["path"].endswith("README.md") for p in advanced
-                             if p["path"].startswith("advanced/volume-2/")), 14)
+        self.assertEqual(sum(p["path"].startswith("advanced/volume-2/") and p["path"].split("/")[-1][:2].isdigit() for p in advanced), 14)
+        self.assertIn("advanced/volume-2/REAL_DATA_EVIDENCE_REVIEW.md", [x["path"] for x in advanced])
+        self.assertIn("advanced/volume-2/REVIEW_BACKLOG.md", [x["path"] for x in advanced])
 
     def test_landing_page_exposes_three_volumes_and_preview_warning(self):
         html = (ROOT / "reader/index.html").read_text(encoding="utf-8")
@@ -28,6 +29,8 @@ class ReaderPreviewTests(unittest.TestCase):
                       "第三卷 · A 股策略与交易系统", "advanced/volume-2/"):
             self.assertIn(token, js)
         self.assertIn('readingRoute = firstVolume.filter', js)
+        self.assertIn("const secondChapters = secondVolume.filter", js)
+        self.assertIn("advanced\\/volume-2", js)
 
     def test_volume_boundary_requires_explicit_bookshelf_switch(self):
         js = (ROOT / "reader/app.js").read_text(encoding="utf-8")

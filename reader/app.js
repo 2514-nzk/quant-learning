@@ -92,7 +92,7 @@
     els.overallCopy.textContent = completed
       ? `第一卷已读 ${completed} / ${readingRoute.length} 篇 · 参考材料按需查阅`
       : "第一卷阅读记录保存在当前设备";
-    const secondChapters = secondVolume.filter((doc) => !doc.path.endsWith("/README.md"));
+    const secondChapters = secondVolume.filter((doc) => /^advanced\/volume-2\/\d{2}_[^/]+\.md$/.test(doc.path));
     const secondDone = secondChapters.filter((doc) => state.completed.includes(doc.path)).length;
     if (els.secondVolumeCopy) els.secondVolumeCopy.textContent =
       `第二卷已读 ${secondDone} / ${secondChapters.length} 章 · 初稿试读`;
@@ -152,7 +152,7 @@
   }
 
   function renderHome() {
-    const secondChapters = secondVolume.filter((doc) => !doc.path.endsWith("/README.md"));
+    const secondChapters = secondVolume.filter((doc) => /^advanced\/volume-2\/\d{2}_[^/]+\.md$/.test(doc.path));
     const secondDone = secondChapters.filter((doc) => state.completed.includes(doc.path)).length;
     const volumes = [
       {
