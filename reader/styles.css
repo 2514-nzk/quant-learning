@@ -453,3 +453,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 @media print {
   .reset-progress-dialog { display: none !important; }
 }
+
+/* Link to the separately deployed review site; existing first-volume reading state is unchanged. */
+.preview-entry { margin: 15px 0 0; max-width: 450px; color: var(--ink-soft); font-size: 11px; line-height: 1.85; }
+.preview-entry a { color: var(--green); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
