@@ -70,6 +70,11 @@ jobs:
           python -m unittest discover -s tests -p "test_advanced_pit_intake_lab.py" -v
           python examples/advanced_pit_intake_lab.py --json > /tmp/pit_intake_contract.json
           python -c 'import json; d=json.load(open("/tmp/pit_intake_contract.json", encoding="utf-8")); assert d["train_labels_purged"] == 1 and not d["historical_pit_proven"] and d["membership_asof"]["B"].startswith("UNKNOWN"); print("PIT demonstration gates passed")'
+      - name: Verify historical universe reference and real OHLC coverage
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_universe_coverage_lab.py" -v
+          python examples/advanced_universe_coverage_lab.py --real-teaching --json > /tmp/real_universe_coverage.json
+          python -c 'import json; r=json.load(open("/tmp/real_universe_coverage.json",encoding="utf-8")); assert r["observed_security_sessions"]==468 and r["full_market_coverage_percent"] is None and not r["historical_pit_verified"]; print("Real source coverage audited without false denominator")'
       - name: Build reading site
         run: python reader/build_reader.py --output _site
       - name: Validate all three volumes on canonical homepage
@@ -86,8 +91,8 @@ jobs:
           assert all(doc["group"].startswith("第一卷｜") for doc in first)
           assert sum(doc["title"].startswith("第 ") and doc["group"].startswith("第二卷｜第 ") for doc in advanced) == 14
           assert sum(doc["title"].startswith("第 ") and doc["group"].startswith("第三卷｜第 ") for doc in advanced) == 13
-          assert len(advanced) == 31, "14 chapters and 2 evidence appendices plus third volume expected"
-          assert sum(doc["path"].startswith("advanced/volume-2/") for doc in advanced) == 17
+          assert len(advanced) == 32, "14 chapters and 3 evidence appendices plus third volume expected"
+          assert sum(doc["path"].startswith("advanced/volume-2/") for doc in advanced) == 18
           assert sum(doc["path"].startswith("advanced/volume-3/") for doc in advanced) == 14
           homepage = (site / "index.html").read_text(encoding="utf-8")
           assert "三卷量化研究教材" in homepage
@@ -100,7 +105,7 @@ jobs:
               '<title>正在打开新版阅读器</title>'
               '<script>location.replace("../"+location.search+location.hash)</script>'
               '<a href="../">进入三卷阅读器</a></html>', encoding="utf-8")
-          print("Canonical reader: first 22 items, volume two 14 chapters + 2 evidence appendices, volume three 13 slots")
+          print("Canonical reader: first 22 items, volume two 14 chapters + 3 evidence appendices, volume three 13 slots")
           PY
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
