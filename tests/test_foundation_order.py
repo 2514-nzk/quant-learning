@@ -22,11 +22,12 @@ class FoundationOrderTests(unittest.TestCase):
         paths=[doc["path"] for doc in docs]
         self.assertEqual(paths,REAL_MAIN)
         self.assertEqual(len(paths),len(set(paths)))
-        self.assertEqual(docs[3]["group"],"基础准备 · 随学随查")
-        self.assertEqual(docs[4]["group"],"第一循环 · 这笔收益算不算本事？")
-        self.assertEqual(docs[10]["group"],"第二循环 · 从行情到因子评价")
+        self.assertEqual(docs[3]["group"],"入门准备 · 认识量化研究")
+        self.assertEqual(docs[4]["group"],"第一篇 · 收益计算与策略评价")
+        self.assertEqual(docs[10]["group"],"第二篇 · 数据处理与因子研究")
+        self.assertFalse(any("循环" in doc["group"] for doc in docs))
         lookup={doc["path"]:doc["group"] for doc in docs}
-        self.assertEqual(lookup["教程/真实_11_线性模型.md"],"第四循环 · 模型有没有增加信息？")
+        self.assertEqual(lookup["教程/真实_11_线性模型.md"],"第四篇 · 机器学习与模型评价")
 
     def test_legacy_synthetic_chapters_are_not_in_sidebar(self):
         paths=[doc["path"] for doc in collect_documents()]
