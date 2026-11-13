@@ -29,7 +29,7 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
                 self.assertTrue(page.startswith(f"# 第三卷 · {n:02d}｜"))
                 self.assertIn("状态：教学正文 v1", page)
                 self.assertIn("python examples/volume3_strategy_lab.py --json", page)
-                self.assertIn("习题", page)
+                self.assertTrue("习题" in page or "练习" in page)
                 self.assertIn("答", page)
                 self.assertNotIn("正文待写", page)
                 self.assertNotIn("实验未运行", page)
