@@ -27,6 +27,7 @@
     overallLabel: $("#overall-progress-label"),
     overallBar: $("#overall-progress-bar"),
     overallCopy: $("#overall-progress-copy"),
+    secondVolumeCopy: $("#second-volume-progress-copy"),
     manageProgress: $("#manage-progress-button"),
     resetDialog: $("#reset-progress-dialog"),
     resetBookmarks: $("#reset-bookmarks-checkbox"),
@@ -44,6 +45,9 @@
 
   let documents = [];
   let readingRoute = [];
+  let firstVolume = [];
+  let secondVolume = [];
+  let thirdVolume = [];
   let byPath = new Map();
   let current = null;
   let saveTimer = 0;
@@ -86,8 +90,12 @@
     els.overallLabel.textContent = `${percent}%`;
     els.overallBar.style.width = `${percent}%`;
     els.overallCopy.textContent = completed
-      ? `主线已读 ${completed} / ${readingRoute.length} 篇 · 参考材料按需查阅`
-      : "开始阅读，记录会保存在这台设备上";
+      ? `第一卷已读 ${completed} / ${readingRoute.length} 篇 · 参考材料按需查阅`
+      : "第一卷阅读记录保存在当前设备";
+    const secondChapters = secondVolume.filter((doc) => !doc.path.endsWith("/README.md"));
+    const secondDone = secondChapters.filter((doc) => state.completed.includes(doc.path)).length;
+    if (els.secondVolumeCopy) els.secondVolumeCopy.textContent =
+      `第二卷已读 ${secondDone} / ${secondChapters.length} 章 · 初稿试读`;
   }
 
   function chapterButton(doc) {
@@ -144,33 +152,40 @@
   }
 
   function renderHome() {
-    const groups = [...new Set(documents.map((doc) => doc.group))];
-    const summaries = {
-      "阅读导览": "了解学习路线，完成选股手算与第一段 Python。",
-      "第一循环 · 这笔收益算不算本事？": "算清基准与超额，检查多期成绩、复利与研究规格。",
-      "第二循环 · 数据和因子可不可信？": "检查数据时点、切分与泄漏，构造并评价因子。",
-      "第三循环 · 信号能不能变成钱？": "处理成交约束与费用，检验多因子合成的增量信息。",
-      "第四循环 · 模型有没有增加信息？": "比较 Ridge、随机森林与 LightGBM，理解过拟合与评价边界。",
-      "收尾 · 结论能不能重做？": "整理可复现项目，完成从选股到研究结论的综合练习。",
-      "工具与参考": "按需查阅术语、市场规则、模板和数据字段说明。",
-    };
-    els.pathGrid.innerHTML = groups.map((group, index) => {
-      const items = documents.filter((doc) => doc.group === group);
-      const first = items[0];
-      return `<button class="path-card" data-path="${escapeHTML(first.path)}">
-        <span class="path-card-top"><span class="path-index">0${index + 1}</span><span class="path-arrow" aria-hidden="true">↗</span></span>
-        <strong>${escapeHTML(group)}</strong>
-        <span class="path-description">${escapeHTML(summaries[group] || "按章节阅读，并随手记录研究问题。")}</span>
-        <span class="path-card-foot"><span>${items.length} 篇材料</span><span>${escapeHTML(first.title)} →</span></span>
-      </button>`;
-    }).join("");
-
+    const secondChapters = secondVolume.filter((doc) => !doc.path.endsWith("/README.md"));
+    const secondDone = secondChapters.filter((doc) => state.completed.includes(doc.path)).length;
+    const volumes = [
+      {
+        number: "01", title: "第一卷 · 量化研究基础",
+        description: "四只真实 A 股、100 万元课堂模拟账户，从价格、因子、模型学会量化入门。",
+        path: firstVolume[0]?.path, status: `${firstVolume.length} 篇教学材料`, action: "从第一卷继续",
+      },
+      {
+        number: "02", title: "第二卷 · 专业量化研究方法",
+        description: "14 章正文初稿：PIT 数据、统计推断、因子、机器学习、样本外、组合与执行。",
+        path: secondChapters[0]?.path, status: `${secondDone}/${secondChapters.length} 章已读`, action: "打开新增正文",
+        featured: true,
+      },
+      {
+        number: "03", title: "第三卷 · A 股策略与交易系统",
+        description: "行业轮动、反转、微盘、L2 和交易系统，共 13 章，目前只有目录骨架。",
+        path: thirdVolume[0]?.path, status: "13 章待写", action: "查看规划",
+      },
+    ];
+    els.pathGrid.innerHTML = volumes.filter((volume) => volume.path).map((volume) =>
+      `<button class="path-card volume-card${volume.featured ? " is-featured" : ""}" data-path="${escapeHTML(volume.path)}">` +
+      `<span class="path-card-top"><span class="path-index">VOL. ${volume.number}</span><span class="path-arrow" aria-hidden="true">↗</span></span>` +
+      `<strong>${escapeHTML(volume.title)}</strong>` +
+      `<span class="path-description">${escapeHTML(volume.description)}</span>` +
+      `<span class="path-card-foot"><span>${escapeHTML(volume.status)}</span><span>${escapeHTML(volume.action)} →</span></span>` +
+      `</button>`
+    ).join("");
     const totalMinutes = readingRoute.reduce((sum, doc) => sum + Number(doc.minutes || 1), 0);
     $("#home-chapter-count").textContent = documents.length;
     $("#home-reading-time").textContent = totalMinutes;
-    $("#resume-button").textContent = state.lastPath && byPath.has(state.lastPath) ? "从上次位置继续　→" : "从第一篇开始阅读　→";
+    $("#resume-button").textContent = state.lastPath && byPath.has(state.lastPath)
+      ? "从上次位置继续　→" : "从第一篇开始阅读　→";
   }
-
   function setRoute(path, replace = false, section = "") {
     const url = new URL(location.href);
     if (path) url.searchParams.set("chapter", path);
@@ -201,9 +216,10 @@
     }
     try {
       const encodedPath = doc.path.split("/").map(encodeURIComponent).join("/");
-      const source = new URL(`https://github.com/2514-nzk/quant-learning/blob/master/${encodedPath}`);
+      const sourceBranch = doc.path.startsWith("advanced/") ? "docs/three-volume-research-framework" : "master";
+      const source = new URL(`https://github.com/2514-nzk/quant-learning/blob/${sourceBranch}/${encodedPath}`);
       const target = new URL(href, source);
-      const prefix = "/2514-nzk/quant-learning/blob/master/";
+      const prefix = `/2514-nzk/quant-learning/blob/${sourceBranch}/`;
       if (target.hostname !== "github.com" || !target.pathname.startsWith(prefix)) return;
       const path = decodeURIComponent(target.pathname.slice(prefix.length));
       if (byPath.has(path)) {
@@ -211,7 +227,7 @@
         anchor.classList.add("reader-internal-link");
         return;
       }
-      anchor.href = `https://github.com/2514-nzk/quant-learning/blob/master/${path.split("/").map(encodeURIComponent).join("/")}`;
+      anchor.href = `https://github.com/2514-nzk/quant-learning/blob/${sourceBranch}/${path.split("/").map(encodeURIComponent).join("/")}`;
       anchor.target = "_blank";
       anchor.rel = "noreferrer";
     } catch { /* Keep unparseable links as supplied. */ }
@@ -461,22 +477,50 @@
     els.article.append(panel);
   }
 
+  // Keep TeX delimiters intact through Markdown parsing, without converting code fences.
+  function prepareMath(markdown) {
+    const parts = markdown.split(/(~{3}[\s\S]*?~{3}|\x60{3}[\s\S]*?\x60{3})/g);
+    return parts.map((part, index) => {
+      if (index % 2) return part;
+      return part
+        .replace(/\\\[([\s\S]*?)\\\]/g, (_, tex) =>
+          '<div class="math-block" data-math="' + encodeURIComponent(tex) +
+          '">' + escapeHTML('\\[' + tex + '\\]') + '</div>')
+        .replace(/\\\(([\s\S]*?)\\\)/g, (_, tex) =>
+          '<span class="math-inline" data-math="' + encodeURIComponent(tex) +
+          '">' + escapeHTML('\\(' + tex + '\\)') + '</span>');
+    }).join("");
+  }
+
+  function typesetMath(container) {
+    if (!window.katex) return; // Leave readable source if CDN fails.
+    container.querySelectorAll("[data-math]").forEach((element) => {
+      try {
+        window.katex.render(decodeURIComponent(element.dataset.math),
+          element, { displayMode: element.classList.contains("math-block"),
+                     throwOnError: false, strict: "warn" });
+      } catch { /* Keep source text rather than losing a formula. */ }
+    });
+  }
+
   function renderArticle(doc) {
     if (!window.marked || !window.DOMPurify) {
       els.article.innerHTML = `<p class="reader-error">正文解析组件没有加载成功。请刷新页面，或检查当前网络是否可以访问 jsDelivr。</p><pre>${escapeHTML(doc.content)}</pre>`;
       els.sectionIndex.hidden = true;
       return;
     }
-    const raw = window.marked.parse(doc.content, { gfm: true, breaks: false });
+    const raw = window.marked.parse(prepareMath(doc.content), { gfm: true, breaks: false });
     const wrapper = document.createElement("div");
     wrapper.innerHTML = window.DOMPurify.sanitize(raw);
+    typesetMath(wrapper);
     wrapper.querySelectorAll("a[href]").forEach((anchor) => normalizeMarkdownLink(anchor, doc));
     wrapper.querySelectorAll("img[src]").forEach((image) => {
       const src = image.getAttribute("src") || "";
       if (!/^(https?:|data:|\/\/)/i.test(src)) {
         const encodedPath = doc.path.split("/").map(encodeURIComponent).join("/");
         try {
-          const target = new URL(src, `https://raw.githubusercontent.com/2514-nzk/quant-learning/master/${encodedPath}`);
+          const sourceBranch = doc.path.startsWith("advanced/") ? "docs/three-volume-research-framework" : "master";
+          const target = new URL(src, `https://raw.githubusercontent.com/2514-nzk/quant-learning/${sourceBranch}/${encodedPath}`);
           const assetPrefix = "https://raw.githubusercontent.com/2514-nzk/quant-learning/master/reader/assets/";
           image.src = target.href.startsWith(assetPrefix)
             ? new URL(`assets/${target.href.slice(assetPrefix.length)}`, document.baseURI).href
@@ -542,13 +586,17 @@
     const percent = maximum ? Math.min(100, Math.round(els.reader.scrollTop / maximum * 100)) : 0;
     const chapter = current.content.match(/^#\s*第\s*(\d+)\s*章/m);
     let position = current.group === "工具与参考" ? "参考资料" : "导读与准备";
-    if (chapter) position = `第 ${chapter[1]} / ${mainChapterCount} 章`;
+    const volumeTwoChapter = current.path.match(/^advanced\/volume-2\/(\d{2})_/);
+    if (current.path.startsWith("advanced/volume-3/")) position = "第三卷 · 目录框架待写";
+    else if (volumeTwoChapter) position = `第二卷 第 ${Number(volumeTwoChapter[1])} / 14 章`;
+    else if (current.path === "advanced/volume-2/README.md") position = "第二卷 · 课程目录";
+    else if (chapter) position = `第 ${chapter[1]} / ${mainChapterCount} 章`;
     els.chapterProgress.textContent = `${position}　·　${percent}%`;
     els.readingProgressBar.style.width = `${percent}%`;
     els.readingProgress.setAttribute("aria-valuenow", String(percent));
     els.backToTop.hidden = els.reader.scrollTop < 380;
     state.positions[current.path] = els.reader.scrollTop;
-    if (maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
+    if (!current.path.startsWith("advanced/volume-3/") && maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
       state.completed.push(current.path);
       updateChapterActions();
       renderNavigation();
@@ -688,11 +736,15 @@
       const response = await fetch(new URL("content.json", document.baseURI));
       if (!response.ok) throw new Error(`内容读取失败 (${response.status})`);
       const payload = await response.json();
-      documents = payload.documents || [];
+      firstVolume = payload.documents || [];
+      secondVolume = (payload.framework || []).filter((doc) => doc.path.startsWith("advanced/volume-2/"));
+      thirdVolume = (payload.framework || []).filter((doc) => doc.path.startsWith("advanced/volume-3/"));
+      documents = [...firstVolume, ...secondVolume, ...thirdVolume];
       labs = payload.labs || {};
-      readingRoute = documents.filter((doc) => doc.group !== "工具与参考");
+      // Planned volumes are navigable, but must not alter the completed first-volume progress.
+      readingRoute = firstVolume.filter((doc) => doc.group !== "工具与参考");
       byPath = new Map(documents.map((doc) => [doc.path, doc]));
-      mainChapterCount = documents.filter((doc) => /^#\s*第\s*\d+\s*章/m.test(doc.content)).length;
+      mainChapterCount = firstVolume.filter((doc) => /^#\s*第\s*\d+\s*章/m.test(doc.content)).length;
       state.bookmarks = state.bookmarks.filter((path) => byPath.has(path));
       state.completed = state.completed.filter((path) => byPath.has(path));
       $("#home-chapter-count").textContent = documents.length;

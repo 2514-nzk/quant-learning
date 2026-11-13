@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f4ef">
   <meta name="description" content="从贵州茅台、寒武纪、宁德时代、比亚迪四只真实A股的历史K线开始学习量化研究，先看图与数字，再学因子和模型。">
-  <title>量化入门 · 在线阅读</title>
+  <title>A 股量化研究 · 三卷试读</title>
   <link rel="icon" href="./favicon.ico?v=1" sizes="any">
   <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon-16.png?v=1">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon-32.png?v=1">
@@ -15,13 +15,15 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css?v=11">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="./styles.css?v=12">
   <script defer src="https://cdn.jsdelivr.net/npm/marked@15.0.12/marked.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/languages/powershell.min.js"></script>
   <script defer src="./real-case.js?v=1"></script>
-  <script defer src="./app.js?v=13"></script>
+  <script defer src="./app.js?v=14"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -45,7 +47,8 @@
         <div class="overall-progress">
           <div class="progress-heading"><span>学习进度</span><span id="overall-progress-label">0%</span></div>
           <div class="progress-track"><span id="overall-progress-bar"></span></div>
-          <small id="overall-progress-copy">开始阅读，记录会保存在这台设备上</small>
+          <small id="overall-progress-copy">第一卷阅读进度保存在当前设备</small>
+          <small id="second-volume-progress-copy" class="volume-progress-note">第二卷 · 0/14 章已读</small>
           <button id="manage-progress-button" class="manage-progress-button" type="button" aria-haspopup="dialog" aria-controls="reset-progress-dialog">管理阅读记录</button>
         </div>
         <a class="repository-link" href="https://github.com/2514-nzk/quant-learning" target="_blank" rel="noreferrer">
@@ -74,9 +77,10 @@
       <main class="reader-scroll" id="reader-scroll" tabindex="-1">
         <section class="home-view" id="home-view" hidden>
           <div class="home-intro">
-            <div class="eyebrow"><span class="eyebrow-line"></span>一份可以慢慢读的自学教材</div>
-            <h1>从四只真实股票开始，<br><em>读懂量化研究。</em></h1>
-            <p class="home-lede">本书以 100 万元课堂模拟资金和贵州茅台、寒武纪、宁德时代、比亚迪的真实历史 K 线为起点，依次学习收益率、选股、组合、因子与模型。</p>
+            <div class="eyebrow"><span class="eyebrow-line"></span>三卷量化研究教材 · 第二卷试读</div>
+            <h1>从入门到研究实战，<br><em>系统读懂量化。</em></h1>
+            <p class="home-lede">第一卷从四只真实股票开始，以 100 万元课堂模拟资金和真实历史 K 线讲清收益、因子与模型；新增第二卷 14 章教学初稿，进一步学习 PIT 数据、统计推断、机器学习、组合与执行。第三卷策略专题正在建设。</p>
+            <p class="preview-note">预览版 · 第二卷尚未完成真实市场验证与终审。<a href="../">返回第一卷正式网站</a></p>
             <div class="home-actions">
               <button class="primary-button" id="resume-button">从上次位置继续 <span aria-hidden="true">→</span></button>
               <button class="text-button" id="start-button" title="仅从第一篇打开，不会清空阅读进度">从头开始阅读 <span aria-hidden="true">↗</span></button>
@@ -91,18 +95,18 @@
                 <svg viewBox="0 0 280 156" role="presentation"><path class="chart-area" d="M0 128 L70 78 L140 26 L210 107 L280 133 V156 H0Z"/><path class="chart-line" d="M0 128 L70 78 L140 26 L210 107 L280 133"/></svg>
                 <span class="chart-note">研究 · 验证 · 复现</span>
               </div>
-              <div class="cover-title"><span>四循环 · 十六章</span><strong>量化研究<br>入门手册</strong><small>从研究问题到样本外证据</small></div>
+              <div class="cover-title"><span>三卷课程 · 系统进阶</span><strong>A 股量化<br>研究教材</strong><small>从研究问题到样本外证据</small></div>
               <div class="cover-foot"><span>一章一章读，随时接着学</span><span>↗</span></div>
             </div>
             <div class="cover-caption"><span class="caption-dot"></span>你的阅读进度会保存在当前浏览器</div>
           </div>
           <div class="home-meta">
             <div><strong id="home-chapter-count">—</strong><span>篇讲义与参考材料</span></div>
-            <div><strong>4</strong><span>个循环主线</span></div>
+            <div><strong>3</strong><span>卷课程体系</span></div>
             <div><strong id="home-reading-time">—</strong><span>分钟主线阅读 · 练习另计</span></div>
           </div>
           <div class="home-paths">
-            <div class="section-heading"><div><span class="eyebrow-small">THE BOOK</span><h2>从头到尾的阅读结构</h2></div><span>起步 · 基础准备 · 四个研究循环</span></div>
+            <div class="section-heading"><div><span class="eyebrow-small">THREE VOLUMES</span><h2>选择想读的一卷</h2></div><span>第二卷已开放 14 章初稿</span></div>
             <div class="path-grid" id="path-grid"></div>
           </div>
           <footer class="home-footer"><span>真实历史行情 · 量化研究方法练习</span><a href="https://github.com/2514-nzk/quant-learning" target="_blank" rel="noreferrer">项目源码 ↗</a></footer>

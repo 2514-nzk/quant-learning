@@ -102,6 +102,47 @@ def collect_documents() -> list[dict[str, str | int]]:
     return documents
 
 
+# Advanced volumes are separate from the already verified first-volume route.
+# Do not change collect_documents(): first-volume ordering is a published contract.
+FRAMEWORK_VOLUMES = (
+    ("advanced/volume-2/README.md", "第二卷 · 专业研究方法（14章初稿）", "第二卷｜专业研究方法总览"),
+    ("advanced/volume-3/README.md", "第三卷 · A 股策略实战（待写）", "第三卷｜策略与交易系统总览"),
+)
+
+
+def collect_framework_documents() -> list[dict[str, str | int]]:
+    """Read explicitly linked chapter outlines from both volume indices."""
+    documents: list[dict[str, str | int]] = []
+    for index_path, group, title in FRAMEWORK_VOLUMES:
+        index = (ROOT / index_path).resolve()
+        index_content = index.read_text(encoding="utf-8")
+        documents.append({
+            "path": index_path,
+            "title": title,
+            "group": group,
+            "minutes": estimate_minutes(index_content),
+            "content": index_content,
+        })
+        seen: set[str] = set()
+        for label, href in LINK_RE.findall(index_content):
+            chapter = (index.parent / href.split("#", 1)[0]).resolve()
+            if not chapter.is_relative_to(index.parent) or not chapter.is_file() or chapter.suffix.lower() != ".md":
+                continue
+            path = chapter.relative_to(ROOT).as_posix()
+            if path in seen or path == index_path:
+                continue
+            seen.add(path)
+            content = chapter.read_text(encoding="utf-8")
+            documents.append({
+                "path": path,
+                "title": re.sub(r"\s+", " ", label.strip()),
+                "group": group,
+                "minutes": estimate_minutes(content),
+                "content": content,
+            })
+    return documents
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=ROOT / "dist-reader")
@@ -126,6 +167,7 @@ def main() -> None:
         "title": "A 股量化研究入门",
         "description": "以100万元课堂模拟账户和四只知名A股的真实历史K线贯穿课程，先手算再检验。",
         "documents": collect_documents(),
+        "framework": collect_framework_documents(),
         "labs": LABS,
     }
     (output / "content.json").write_text(

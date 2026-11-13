@@ -77,8 +77,8 @@ class ReaderResetTests(unittest.TestCase):
         self.assertIn(".manage-progress-button", CSS)
         self.assertIn(".reset-progress-dialog", CSS)
         self.assertIn(".reset-progress-dialog::backdrop", CSS)
-        self.assertIn('href="./styles.css?v=11"', HTML)
-        self.assertIn('src="./app.js?v=13"', HTML)
+        self.assertRegex(HTML, r'href="\./styles\.css\?v=\d+"')
+        self.assertRegex(HTML, r'src="\./app\.js\?v=\d+"')
         self.assertIn("从头开始阅读", HTML)
 
 
