@@ -36,7 +36,7 @@ class FinancialQualityTests(unittest.TestCase):
         self.assertLess(paths.index("教程/真实_06a_合并报表与财务质量.md"),
                         paths.index("教程/真实_07_时间切分与泄漏.md"))
         lesson=next(d for d in docs if d["path"].endswith("真实_06a_合并报表与财务质量.md"))
-        self.assertEqual(lesson["group"],"第二循环 · 从行情到因子评价")
+        self.assertEqual(lesson["group"],"第二篇 · 数据处理与因子研究")
 
     def test_intro_defines_terms_and_fake_hypotheticals_are_separate(self):
         text=LESSON.read_text(encoding="utf-8")
