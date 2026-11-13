@@ -9,6 +9,7 @@
 | 真实历史固定行情 | [real_a_share](real_a_share/README.md) | 四只 A 股各 117 根 2024 年不复权日线，固定来源与 SHA；只能做价格算术和限定样本描述 |
 | 合成多期研究案例 | [story](story/README.md) | A/B/C/D、60 期共 240 条虚构证券期；训练、验证、回测与模型选择逻辑 |
 | 合成 PIT/修订事件 | [teaching](teaching/README.md) | A/B/C 成员版本、财报修订、披露/入库时间和标签可用时点 |
+| 第三卷人工周频策略 | [volume3-weekly-synthetic-v1](teaching/volume3_weekly_v1.json) | 16 个人工周、四行业与八股票；状态、行业历史分类、REV20 和成本代理 |
 
 所有正式输入与用途在 [教材数据清单](teaching/manifest.json) 中有明确 `dataset_id` 和 `evidence_grade`。**真实四股行情不等于完整历史 PIT 或全市场回测数据**；合成事件不等于真实公告/行情。
 
@@ -18,6 +19,7 @@
 python scripts/verify_teaching_datasets.py
 python examples/advanced_pit_intake_lab.py --json
 python examples/advanced_real_evidence_audit.py --json
+python examples/volume3_strategy_lab.py --json
 ~~~
 
 数据清单与快照在 Git 里固定；教材 CI 不会自动下载市场数据，不需要任何个人的本地数据库路径。

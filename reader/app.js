@@ -168,8 +168,8 @@
       },
       {
         number: "03", title: "第三卷 · A 股策略与交易系统",
-        description: "行业轮动、反转、微盘与 L2 交易系统，共 13 章；第 08 章已有真实价格配对交易入门案例。",
-        path: thirdVolume[0]?.path, status: "1 章案例初稿 · 12 章待写", action: "查看第三卷",
+        description: "共 13 章；01–04 为策略实战教学正文，第 08 章为真实价格配对交易入门，其余 8 章待写。",
+        path: thirdVolume[0]?.path, status: "4 章教学正文 · 1 章入门案例 · 8 章待写", action: "查看第三卷",
       },
     ];
     els.pathGrid.innerHTML = volumes.filter((volume) => volume.path).map((volume) =>
@@ -609,6 +609,7 @@
     let position = current.group === "工具与参考" ? "参考资料" : "导读与准备";
     const volumeTwoChapter = current.path.match(/^advanced\/volume-2\/(\d{2})_/);
     if (current.path === "advanced/volume-3/08_stat_arb.md") position = "第三卷 第 8 / 13 章 · 入门案例";
+    else if (/^advanced\/volume-3\/0[1-4]_/.test(current.path)) position = `第三卷 第 ${Number(current.path.match(/\/0([1-4])_/)[1])} / 13 章 · 教学正文`;
     else if (current.path.startsWith("advanced/volume-3/")) position = "第三卷 · 目录框架待写";
     else if (volumeTwoChapter) position = `第二卷 第 ${Number(volumeTwoChapter[1])} / 14 章`;
     else if (current.path === "advanced/volume-2/README.md") position = "第二卷 · 课程目录";
@@ -618,7 +619,7 @@
     els.readingProgress.setAttribute("aria-valuenow", String(percent));
     els.backToTop.hidden = els.reader.scrollTop < 380;
     state.positions[current.path] = els.reader.scrollTop;
-    if ((!current.path.startsWith("advanced/volume-3/") || current.path === "advanced/volume-3/08_stat_arb.md") && maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
+    if ((!current.path.startsWith("advanced/volume-3/") || /^advanced\/volume-3\/(0[1-4]|08)_/.test(current.path)) && maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
       state.completed.push(current.path);
       updateChapterActions();
       renderNavigation();

@@ -60,6 +60,15 @@ class AdvancedFrameworkTests(unittest.TestCase):
                     "advanced/volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md",
                 ):
                     self.assertIn("审计", page["content"])
+                elif page["path"] in (
+                    "advanced/volume-3/01_strategy_contract.md",
+                    "advanced/volume-3/02_market_regime.md",
+                    "advanced/volume-3/03_industry_rotation.md",
+                    "advanced/volume-3/04_reversal_momentum.md",
+                ):
+                    self.assertIn("状态：教学正文 v1", page["content"])
+                    self.assertIn("python examples/volume3_strategy_lab.py --json", page["content"])
+                    self.assertNotIn("正文待写", page["content"])
                 elif page["path"] == "advanced/volume-3/08_stat_arb.md":
                     self.assertIn("状态：真实价格入门案例初稿", page["content"])
                     self.assertIn("python examples/cointegration_pair_lab.py", page["content"])
