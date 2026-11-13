@@ -1,6 +1,6 @@
 # 第二卷 · 08｜单因子评价、统计推断与稳健性
 
-> **状态：教学正文初稿；合成因子诊断、HAC 和区块 Bootstrap 实验可复算。** 本章无真实 A 股研究结论。合成样本是数学示例，任何正负 IC、分组收益或置信区间都不能被引用为市场效应。
+> **状态：教学版 v1 方法与例题内部校审完成；合成因子诊断、HAC 和区块 Bootstrap 实验可复算。** 本章无真实 A 股研究结论。合成样本是数学示例，任何正负 IC、分组收益或置信区间都不能被引用为市场效应。
 
 ## 核心问题：一个正 RankIC 究竟证明了什么？
 
@@ -136,7 +136,7 @@ python -m unittest discover -s tests -p "test_advanced_factor_research_lab.py" -
 
 **代码不是市场绩效回测**：它没有真实股票池、历史行业、财务版本、订单或费用，也没有进行真正的模型选择与独立 OOS。因此报告中所有数字必须带 `SYNTHETIC_ONLY` 标签，不得用于买卖判断。
 
-## 5A. 深度实践：真实四股 18 期 RankIC 的证据等级
+### 5.1 真实四股 18 期 RankIC 的证据等级
 
 [审计报告](REAL_DATA_EVIDENCE_REVIEW.md) · [复算脚本](../../examples/advanced_real_evidence_audit.py) · [负例测试](../../tests/test_advanced_real_evidence_audit.py)。
 
@@ -163,7 +163,7 @@ python examples/advanced_real_evidence_audit.py --json
 python -m unittest discover -s tests -p "test_advanced_real_evidence_audit.py" -v
 ~~~
 
-## 5B. 同一个指标，在不同教材数据上有什么证据等级？
+### 5.2 相同指标在不同教材数据上的证据等级
 
 本教材使用**两条明确分离的证据路线**：
 

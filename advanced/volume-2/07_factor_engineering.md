@@ -1,6 +1,6 @@
 # 第二卷 · 07｜因子工程、表达式与中性化
 
-> **状态：教学正文初稿；合成因子流水线可复算。** 本章尚未接入真实大截面 A 股数据、财务公告或完整行业历史版本。代码运行成功只能证明部分算法口径，不代表真实 Alpha。
+> **状态：教学版 v1 方法与例题内部校审完成；合成因子流水线可复算。** 本章尚未接入真实大截面 A 股数据、财务公告或完整行业历史版本。代码运行成功只能证明部分算法口径，不代表真实 Alpha。
 
 ## 研究问题：因子到底在表达什么？
 
@@ -138,11 +138,15 @@ python -m unittest discover -s tests -p "test_advanced_factor_research_lab.py" -
 
 [教材数据集说明](../../data/teaching/README.md) 提供真实四股价格和合成时点成员两条独立练习路线。用 [合成参考池实验](../../examples/advanced_universe_coverage_lab.py) 定义：
 
-[
-N_t^{reference}=#R_t,quad
-N_t^{known}=#{iin R_t:	ext{成员身份可判定}},quad
-N_t^{factor}=#{iin R_t:	ext{因子按截止时刻可用}}.
-]
+\[
+N_t^{\mathrm{reference}}=|R_t|,\qquad
+N_t^{\mathrm{known}}=
+\left|\{i\in R_t:\text{成员身份当时可判定}\}\right|,
+\]
+\[
+N_t^{\mathrm{factor}}=
+\left|\{i\in R_t:\text{因子在决策截止前可用}\}\right|.
+\]
 
 不应以已经算出因子的证券重新定义分母。合成 B 的成员状态在首次观察时未知，不能当作上市已知或删除后报告覆盖 100%。
 
