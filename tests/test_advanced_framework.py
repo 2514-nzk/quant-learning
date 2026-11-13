@@ -18,9 +18,9 @@ class AdvancedFrameworkTests(unittest.TestCase):
         pages = collect_framework_documents()
         second = [p for p in pages if p["group"].startswith("第二卷")]
         third = [p for p in pages if p["group"].startswith("第三卷")]
-        self.assertEqual(len(second), 18)  # index + 14 chapters + 3 evidence appendices
+        self.assertEqual(len(second), 19)  # index + 14 chapters + 4 appendices
         self.assertEqual(len(third), 14)  # index + 13 chapters
-        self.assertEqual(len({p["path"] for p in pages}), 32)
+        self.assertEqual(len({p["path"] for p in pages}), 33)
         for page in pages:
             with self.subTest(path=page["path"]):
                 self.assertTrue((ROOT / page["path"]).is_file())
@@ -52,8 +52,9 @@ class AdvancedFrameworkTests(unittest.TestCase):
                     else:
                         lab = "advanced_protocol_pit_lab.py"
                     self.assertIn("python examples/" + lab, page["content"])
-                elif page["path"] == "advanced/volume-2/REVIEW_BACKLOG.md":
-                    self.assertIn("审校", page["content"])
+                elif page["path"] in ("advanced/volume-2/REVIEW_BACKLOG.md",
+                                      "advanced/volume-2/QUALITY_REVIEW_V1.md"):
+                    self.assertIn("校审", page["content"])
                 elif page["path"] in (
                     "advanced/volume-2/REAL_DATA_EVIDENCE_REVIEW.md",
                     "advanced/volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md",

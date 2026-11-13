@@ -11,15 +11,16 @@ class ReaderPreviewTests(unittest.TestCase):
         first = collect_documents()
         advanced = collect_framework_documents()
         self.assertEqual(len(first), 22)
-        self.assertEqual(len(advanced), 32)
+        self.assertEqual(len(advanced), 33)
         self.assertNotIn("教程/真实_专题A_协整与配对交易.md", [x["path"] for x in first])
         self.assertIn("advanced/volume-3/08_stat_arb.md", [x["path"] for x in advanced])
-        self.assertEqual(sum(p["path"].startswith("advanced/volume-2/") for p in advanced), 18)
+        self.assertEqual(sum(p["path"].startswith("advanced/volume-2/") for p in advanced), 19)
         self.assertEqual(sum(p["path"].startswith("advanced/volume-3/") for p in advanced), 14)
         self.assertEqual(sum(p["path"].startswith("advanced/volume-2/") and p["path"].split("/")[-1][:2].isdigit() for p in advanced), 14)
         self.assertIn("advanced/volume-2/REAL_DATA_EVIDENCE_REVIEW.md", [x["path"] for x in advanced])
         self.assertIn("advanced/volume-2/REVIEW_BACKLOG.md", [x["path"] for x in advanced])
         self.assertIn("advanced/volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md", [x["path"] for x in advanced])
+        self.assertIn("advanced/volume-2/QUALITY_REVIEW_V1.md", [x["path"] for x in advanced])
 
     def test_landing_page_exposes_three_volumes_and_preview_warning(self):
         html = (ROOT / "reader/index.html").read_text(encoding="utf-8")

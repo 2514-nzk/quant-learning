@@ -26,9 +26,10 @@ class SidebarTaxonomyTests(unittest.TestCase):
                 self.assertRegex(item["group"], r"｜第 01–(?:14|13) 章 · ")
         appendix = [p for p in advanced if "｜附录与审计" in p["group"]]
         self.assertEqual([p["title"] for p in appendix],
-                         ["附录 A｜真实价格证据审计", "附录 B｜研究级审校台账",
-                          "附录 C｜教材数据集与复现规范"])
-        self.assertEqual(len({p["path"] for p in advanced}), 32)
+                         ["附录 A｜真实价格证据审计", "附录 B｜教学版校审与外部待办",
+                          "附录 C｜教材数据集与复现规范",
+                          "附录 D｜全卷质量校审与术语表"])
+        self.assertEqual(len({p["path"] for p in advanced}), 33)
 
     def test_titles_are_normalized_idempotently_and_paths_not_renamed(self):
         self.assertEqual(sidebar_title("advanced/volume-2/01_research_protocol.md",
