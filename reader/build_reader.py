@@ -105,8 +105,8 @@ def collect_documents() -> list[dict[str, str | int]]:
 # Advanced volumes are separate from the already verified first-volume route.
 # Do not change collect_documents(): first-volume ordering is a published contract.
 FRAMEWORK_VOLUMES = (
-    ("advanced/volume-2/README.md", "第二卷 · 专业量化研究（规划中）", "第二卷｜研究方法总览"),
-    ("advanced/volume-3/README.md", "第三卷 · A 股策略实战（规划中）", "第三卷｜策略与交易系统总览"),
+    ("advanced/volume-2/README.md", "第二卷 · 专业研究方法（14章初稿）", "第二卷｜专业研究方法总览"),
+    ("advanced/volume-3/README.md", "第三卷 · A 股策略实战（待写）", "第三卷｜策略与交易系统总览"),
 )
 
 
