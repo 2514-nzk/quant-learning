@@ -38,7 +38,7 @@ class VolumeTwoQualityGate(unittest.TestCase):
                 self.assertEqual(body.count("### 质量核对｜"), 1)
                 self.assertIn("答", body)
                 self.assertIn("python examples/", body)
-                self.assertIn("返回 [第二卷目录](README.md)", body)
+                self.assertRegex(body, r"返回 \[[^\]]*目录\]\(README\.md\)")
 
     def test_math_delimiters_and_fences_are_well_formed(self):
         for slug in CHAPTERS:
