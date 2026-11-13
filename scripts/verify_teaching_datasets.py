@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 
 def main() -> None:
@@ -16,7 +19,7 @@ def main() -> None:
     args = parser.parse_args()
     suite = unittest.defaultTestLoader.discover(
         str(ROOT / "tests"), pattern="test_teaching_dataset_contract.py",
-        top_level_dir=str(ROOT))
+        top_level_dir=str(ROOT / "tests"))
     outcome = unittest.TestResult()
     suite.run(outcome)
     manifest = json.loads((ROOT / "data/teaching/manifest.json").read_text("utf-8"))
