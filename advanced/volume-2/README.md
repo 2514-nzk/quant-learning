@@ -1,6 +1,6 @@
 # 第二卷｜专业量化研究方法
 
-> **状态：01、05 章已有正文初稿与可复算的合成实验；其余 12 章仍为章节骨架。尚无真实市场策略验证或已审校研究结论。**
+> **状态：01、05–08 共五章已有教学正文初稿与合成实验；其余九章仍为骨架。尚无真实 A 股严格 OOS 或经审校的策略有效性结论。**
 
 本卷从量化概念转向严谨研究：数据时点、统计推断、样本外、组合交易与可复现性。
 
@@ -13,9 +13,9 @@
 | 03 | [金融时间序列与计量方法](03_time_series.md) | 自相关、异方差和非平稳性怎样改变统计结论？ | 框架待写 |
 | 04 | [A 股制度、时间轴与信息门禁](04_market_rules.md) | 不同证券与历史日期的规则如何影响研究？ | 框架待写 |
 | 05 | [全市场 PIT 数据工程与动态股票池](05_pit_data.md) | 怎样只使用当时真正存在和可得的数据？ | 正文初稿 / 合成实验 |
-| 06 | [标签、时间切分、Purge 与 Embargo](06_labels_splits.md) | 标签何时形成，训练样本何时必须清除？ | 框架待写 |
-| 07 | [因子工程、表达式与中性化](07_factor_engineering.md) | 如何从经济假设得到不泄漏的可复算因子？ | 框架待写 |
-| 08 | [单因子评价、统计推断与稳健性](08_factor_validation.md) | 正的 RankIC 能证明什么，又不能证明什么？ | 框架待写 |
+| 06 | [标签、时间切分、Purge 与 Embargo](06_labels_splits.md) | 标签何时形成，训练样本何时必须清除？ | 正文初稿 / 合成实验 |
+| 07 | [因子工程、表达式与中性化](07_factor_engineering.md) | 如何从经济假设得到不泄漏的可复算因子？ | 正文初稿 / 合成实验 |
+| 08 | [单因子评价、统计推断与稳健性](08_factor_validation.md) | 正的 RankIC 能证明什么，又不能证明什么？ | 正文初稿 / 合成实验 |
 | 09 | [多因子合成、风格暴露与增量](09_factor_combination.md) | 新增因子是在补充信息还是重复投票？ | 框架待写 |
 | 10 | [监督学习、排序学习与模型解释](10_machine_learning.md) | 回归、分类和学习排序到底优化什么？ | 框架待写 |
 | 11 | [严格 OOS、漂移与模型增量检验](11_oos_drift.md) | 调参后还有多少独立证据？ | 框架待写 |
@@ -27,7 +27,10 @@
 
 - [01 研究合同](01_research_protocol.md)：时间合同、严格验证边界及失败标准。
 - [05 PIT 数据](05_pit_data.md)：历史成员、财务版本与 as-of 选择。
-- [实验源码](../../examples/advanced_protocol_pit_lab.py) · [合成单元测试](../../tests/test_advanced_protocol_pit_lab.py)。**仅用于方法验证，不构成真实市场证据。**
+- [研究合同 / PIT 实验源码](../../examples/advanced_protocol_pit_lab.py) · [配套测试](../../tests/test_advanced_protocol_pit_lab.py)。
+- [06–08 因子研究实验源码](../../examples/advanced_factor_research_lab.py)：前向 Purge、当期中性化、逐期 IC、HAC、区块 Bootstrap、分组和 Holm 演示。 [配套测试](../../tests/test_advanced_factor_research_lab.py)。
+
+**所有新增实验均使用人工数据，不构成真实市场证据。**
 
 ## 统一交付标准
 

@@ -27,10 +27,13 @@ class AdvancedFrameworkTests(unittest.TestCase):
                 self.assertIn("状态", page["content"])
                 if page["path"].endswith("README.md"):
                     continue
-                if page["path"].endswith(("01_research_protocol.md", "05_pit_data.md")):
+                if page["path"].endswith(("01_research_protocol.md", "05_pit_data.md", "06_labels_splits.md", "07_factor_engineering.md", "08_factor_validation.md")):
                     self.assertIn("状态：教学正文初稿", page["content"])
                     self.assertIn("合成", page["content"])
-                    self.assertIn("python examples/advanced_protocol_pit_lab.py", page["content"])
+                    lab = ("advanced_factor_research_lab.py" if page["path"].endswith((
+                        "06_labels_splits.md", "07_factor_engineering.md", "08_factor_validation.md"
+                    )) else "advanced_protocol_pit_lab.py")
+                    self.assertIn("python examples/" + lab, page["content"])
                 else:
                     self.assertIn("正文待写", page["content"])
                     self.assertIn("实验未运行", page["content"])

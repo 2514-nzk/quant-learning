@@ -74,6 +74,10 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_advanced_protocol_pit_lab.py" -v
           python examples/advanced_protocol_pit_lab.py --json
+      - name: Verify factor time-splits, neutralization and inference lab
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_factor_research_lab.py" -v
+          python examples/advanced_factor_research_lab.py --json
       - name: Validate three-volume framework and chapter outlines
         run: python -m unittest discover -s tests -p "test_advanced_framework.py" -v
       - name: Build course with advanced learning track
