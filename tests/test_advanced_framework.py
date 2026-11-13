@@ -52,9 +52,10 @@ class AdvancedFrameworkTests(unittest.TestCase):
                     else:
                         lab = "advanced_protocol_pit_lab.py"
                     self.assertIn("python examples/" + lab, page["content"])
+                elif page["path"] == "advanced/volume-2/REVIEW_BACKLOG.md":
+                    self.assertIn("审校", page["content"])
                 elif page["path"] in (
                     "advanced/volume-2/REAL_DATA_EVIDENCE_REVIEW.md",
-                    "advanced/volume-2/REVIEW_BACKLOG.md",
                     "advanced/volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md",
                 ):
                     self.assertIn("审计", page["content"])
