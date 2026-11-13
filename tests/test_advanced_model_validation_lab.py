@@ -35,7 +35,7 @@ class AdvancedModelValidationTests(unittest.TestCase):
         initial = run_prequential(rows, selection["selected"])
         modified = copy.deepcopy(rows)
         for row in modified[30*12:]:
-            row["future_return"] += 100.0
+            row["future_return"] = -row["future_return"]
         later = run_prequential(modified, selection["selected"])
         self.assertEqual(initial["folds"][0]["prediction_scores"],
                          later["folds"][0]["prediction_scores"])
