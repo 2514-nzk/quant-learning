@@ -81,7 +81,7 @@ class ConceptFirstSequenceTests(unittest.TestCase):
         self.assertLess(paths.index("教程/真实_06a_合并报表与财务质量.md"),
                         paths.index("教程/真实_07_时间切分与泄漏.md"))
         index = (COURSE / "README.md").read_text("utf-8")
-        self.assertIn("第二循环：从行情到因子评价", index)
+        self.assertIn("第二篇｜数据处理与因子研究", index)
         self.assertIn("怎样公平地检验选股指标？", index)
         self.assertIn("一根 K 线怎样变成一行数据？", index)
 
