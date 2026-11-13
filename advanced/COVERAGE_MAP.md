@@ -46,3 +46,10 @@
 - [历史股票池审计](volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：真实四股 468 条股票日、117 个共同已观察日期；样本内部覆盖不等于全市场 PIT。
 - [覆盖/时序脚本](../examples/advanced_universe_coverage_lab.py) 与 [单元测试](../tests/test_advanced_universe_coverage_lab.py)：显式未知/不合格/价迟到/缺失、无来源分母时禁止输出全市场百分比。
 - **待完成**：完整历史母体、官方交易日历、行业历史成员、来源许可与版本证明。
+
+## 第二卷研究级升级第四轮（本地真实历史股票池）
+
+- [附录 C](volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md) 已用本地 2026-08-04 冻结 `all_a_membership` 聚合证据升级：17 个年度分区、**14,536,198** 条证券日，2024 年分区 SHA-256 已匹配。
+- 2024 年 **1,296,795** 条候选成员日中，**60,515** 条 `has_daily_quote=false`（BJ **60,463**、SH **16**、SZ **36**）；这不代表交易所实际无报价、真实停牌或零收益。
+- [公开聚合 JSON](volume-2/local_all_a_2024_aggregate.json) · [可运行复核脚本](../examples/advanced_local_snapshot_audit.py) · [单元测试](../tests/test_advanced_local_snapshot_audit.py)。私有行情和本地数据库均未上传。
+- 来源快照保留单次 10,000 行采集上限、部分缺上市日期、BSE 规范代码及 `daily_basic` 重复冲突。SW 历史成员、官方事件和 QMT PIT 表只是待逐行认证的候选来源，**还不等于完整历史 PIT 或可交易 Alpha**。
