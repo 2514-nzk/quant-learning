@@ -163,6 +163,19 @@ python examples/advanced_real_evidence_audit.py --json
 python -m unittest discover -s tests -p "test_advanced_real_evidence_audit.py" -v
 ~~~
 
+## 5B. 真实全市场候选数据的**失败先行**：为什么这一轮没有输出全市场 IC？
+
+上一节四股 18 期演示有可复算 RankIC，但研究者不应因为又找到 1,453 万条本地历史证券日，就立即批量算全市场 RankIC。
+
+先查看 [2024 年证券与报价覆盖](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：候选母体有 1,296,795 条证券日，缺日报价 60,515 条，其中北交所 60,463 条。**2024-06-21** 一天则有 5,365 个成员，249 个缺价/未知交易状态。若做以下两件事都会误导：
+
+1. **只在 `has_daily_quote=true` 的证券上算 IC，却不报告原母体**：被剔除者及缺失机制不再可见；跨交易所绩效不可外推。
+2. **将 `has_daily_quote=false` 的收益填为 0**：把“没有数据”伪装为横盘，并改变排序、分组与置信区间。
+
+即便修复价格，仍需逐期把标签入场/退出价格、公司行为、历史证券资格、行业/市值 PIT、特征可得时刻、验证与 OOS 冻结逐项审计。**本轮因此只发布数据质量的证据，不发布新的 IC、显著性、策略回报或 Alpha 声明。** 这正是研究级教材应展示的“停止条件”。
+
+可复核的公开聚合和限制说明：[证据 JSON](local_all_a_2024_aggregate.json) · [验证脚本](../../examples/advanced_local_snapshot_audit.py)。
+
 ## 6. 练习与核对
 
 **题 A：** 因子在某段样本里 IC 均值为 0.06，可以直接说“策略赚了 6%”吗？
