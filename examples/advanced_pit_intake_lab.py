@@ -199,54 +199,9 @@ def train_label_gate(payload: dict) -> list[dict]:
 
 
 def demo_payload() -> dict:
-    """Synthetic examples only; fake provenance hashes are intentionally not trustable."""
-    base = {
-        "source_ref": "SYNTHETIC_FAKE_EVENT_NOT_A_REAL_SOURCE",
-        "declared_evidence_sha256": "0" * 64,
-    }
-    def row(revision: str, published: str, ingested: str, available: str, **fields: Any) -> dict:
-        return {**base, "revision_id": revision, "source_published_at": published,
-                "ingested_at": ingested, "available_at": available, **fields}
-    old = ("2024-01-03T16:00:00+08:00", "2024-01-03T16:10:00+08:00",
-           "2024-01-03T16:20:00+08:00")
-    late = ("2024-04-10T16:00:00+08:00", "2024-04-10T16:10:00+08:00",
-            "2024-04-10T16:20:00+08:00")
-    return {
-        "data_kind": "SYNTHETIC_DEMONSTRATION", "universe_scope": "SELECTED_SAMPLE",
-        "signal_date": "2024-03-20", "decision_at": "2024-03-20T18:00:00+08:00",
-        "validation_first_signal_at": "2024-04-03T09:30:00+08:00",
-        "membership_events": [
-            row("A-original", *old, security_id="A", effective_from="2024-01-01", effective_to=None),
-            row("A-correction", *late, security_id="A", effective_from="2024-01-01", effective_to="2024-03-01"),
-            row("B-later", "2024-03-25T16:00:00+08:00",
-                "2024-03-25T16:15:00+08:00", "2024-03-25T16:30:00+08:00",
-                security_id="B", effective_from="2024-03-01", effective_to=None),
-            row("C-inactive", *old, security_id="C", effective_from="2024-01-01", effective_to="2024-03-15"),
-        ],
-        "facts": [
-            row("A-roe-1", "2024-03-15T16:00:00+08:00", "2024-03-15T16:10:00+08:00",
-                "2024-03-15T16:20:00+08:00", security_id="A", field="roe",
-                period_end="2023-12-31", value=0.10),
-            row("A-roe-2", *late, security_id="A", field="roe",
-                period_end="2023-12-31", value=0.15),
-            row("C-roe", *old, security_id="C", field="roe",
-                period_end="2023-09-30", value=None, missing_reason="NOT_COLLECTED"),
-        ],
-        "labels": [
-            {"security_id": "A", "signal_at": "2024-03-01T15:00:00+08:00",
-             "feature_available_at": "2024-03-01T15:01:00+08:00",
-             "decision_at": "2024-03-01T18:00:00+08:00",
-             "entry_at": "2024-03-04T09:30:00+08:00",
-             "exit_at": "2024-03-20T15:00:00+08:00",
-             "label_available_at": "2024-03-20T15:20:00+08:00"},
-            {"security_id": "A", "signal_at": "2024-03-19T15:00:00+08:00",
-             "feature_available_at": "2024-03-19T15:01:00+08:00",
-             "decision_at": "2024-03-19T18:00:00+08:00",
-             "entry_at": "2024-03-20T09:30:00+08:00",
-             "exit_at": "2024-04-03T15:00:00+08:00",
-             "label_available_at": "2024-04-03T15:15:00+08:00"}
-        ]
-    }
+    """Load the frozen synthetic PIT event dataset owned by this textbook."""
+    path = Path(__file__).resolve().parents[1] / "data/teaching/pit_events_v1.json"
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def evaluate(payload: dict) -> dict:

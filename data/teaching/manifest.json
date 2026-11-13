@@ -1,0 +1,66 @@
+{
+  "schema_version": "course-datasets-v1",
+  "project": "quant-learning",
+  "public_repository_owned": true,
+  "requires_external_local_db": false,
+  "datasets": [
+    {
+      "id": "a-share-real-four-v1",
+      "evidence_grade": "REAL_FIXED_RETROSPECTIVE_DEMONSTRATION",
+      "frozen": true,
+      "license_note": "Verify upstream provider terms before redistributing or publishing a larger dataset",
+      "source": "AKShare historic quotation snapshot",
+      "manifest": "data/real_a_share/manifest.json",
+      "data_root": "data/real_a_share",
+      "expected_primary_symbols": [
+        "600519",
+        "688256",
+        "300750",
+        "002594"
+      ],
+      "expected_period": "2024-01-02/2024-06-28",
+      "per_symbol_records": 117,
+      "allowed_chapters": [
+        "volume-1",
+        "volume-2:05-08",
+        "volume-3:08"
+      ],
+      "not_allowed_claims": [
+        "PIT full market",
+        "independent OOS",
+        "total-return strategy"
+      ]
+    },
+    {
+      "id": "story-synthetic-v1",
+      "evidence_grade": "SYNTHETIC_ONLY",
+      "frozen": true,
+      "source": "authored classroom cases with a deterministic generation seed",
+      "data_files": [
+        "data/story/rounds.csv",
+        "data/story/price_history.csv",
+        "data/story/model_results.json"
+      ],
+      "expected_rounds": 60,
+      "assets_per_round": 4,
+      "not_allowed_claims": [
+        "real market quote",
+        "real trading alpha"
+      ]
+    },
+    {
+      "id": "pit-events-synthetic-v1",
+      "evidence_grade": "SYNTHETIC_ONLY",
+      "frozen": true,
+      "source": "authored and versioned curriculum PIT event scenarios",
+      "data_file": "data/teaching/pit_events_v1.json",
+      "expected_membership_events": 4,
+      "expected_fact_revisions": 3,
+      "expected_labels": 2,
+      "not_allowed_claims": [
+        "historical vendor timestamps verified",
+        "real universe PIT"
+      ]
+    }
+  ]
+}
