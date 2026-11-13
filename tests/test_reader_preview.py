@@ -24,7 +24,7 @@ class ReaderPreviewTests(unittest.TestCase):
     def test_landing_page_exposes_three_volumes_and_preview_warning(self):
         html = (ROOT / "reader/index.html").read_text(encoding="utf-8")
         js = (ROOT / "reader/app.js").read_text(encoding="utf-8")
-        for token in ("三卷量化研究教材", "第二卷 14 章教学初稿", "preview-note", "second-volume-progress-copy"):
+        for token in ("三卷量化研究教材", "第二卷 14 章教学版 v1", "preview-note", "second-volume-progress-copy"):
             self.assertIn(token, html)
         for token in ("第一卷 · 量化研究基础", "第二卷 · 专业量化研究方法",
                       "第三卷 · A 股策略与交易系统", "advanced/volume-2/"):

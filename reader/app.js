@@ -95,7 +95,7 @@
     const secondChapters = secondVolume.filter((doc) => /^advanced\/volume-2\/\d{2}_[^/]+\.md$/.test(doc.path));
     const secondDone = secondChapters.filter((doc) => state.completed.includes(doc.path)).length;
     if (els.secondVolumeCopy) els.secondVolumeCopy.textContent =
-      `第二卷已读 ${secondDone} / ${secondChapters.length} 章 · 初稿试读`;
+      `第二卷已读 ${secondDone} / ${secondChapters.length} 章 · 教学版 v1`;
   }
 
   function chapterButton(doc) {
@@ -162,7 +162,7 @@
       },
       {
         number: "02", title: "第二卷 · 专业量化研究方法",
-        description: "14 章正文初稿：PIT 数据、统计推断、因子、机器学习、样本外、组合与执行。",
+        description: "14 章校审后教学版：PIT 数据、统计推断、因子、机器学习、样本外、组合与执行。",
         path: secondChapters[0]?.path, status: `${secondDone}/${secondChapters.length} 章已读`, action: "打开新增正文",
         featured: true,
       },

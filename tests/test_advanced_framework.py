@@ -30,7 +30,7 @@ class AdvancedFrameworkTests(unittest.TestCase):
                 if page["path"].endswith(("01_research_protocol.md", "02_math_statistics.md", "03_time_series.md", "04_market_rules.md", "05_pit_data.md", "06_labels_splits.md", "07_factor_engineering.md", "08_factor_validation.md",
                     "09_factor_combination.md", "10_machine_learning.md", "11_oos_drift.md",
                     "12_portfolio_optimization.md", "13_backtest_execution.md", "14_reproducible_capstone.md")):
-                    self.assertIn("状态：教学正文初稿", page["content"])
+                    self.assertIn("状态：教学版 v1 方法与例题内部校审完成", page["content"])
                     self.assertIn("合成", page["content"])
                     if page["path"].endswith((
                         "02_math_statistics.md", "03_time_series.md", "04_market_rules.md"
