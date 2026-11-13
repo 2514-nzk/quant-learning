@@ -28,7 +28,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
       - name: Check reader JavaScript syntax
         run: node --check reader/app.js && node --check reader/pyodide-worker.js && node --check reader/real-case.js && node tests/real_browser_lab.test.js && node tests/test_reader_volume_pager.js
       - name: Verify research-audit lab
@@ -97,6 +97,10 @@ jobs:
           assert sum(doc["title"].startswith("第 ") and doc["group"].startswith("第二卷｜第 ") for doc in advanced) == 14
           assert sum(doc["title"].startswith("第 ") and doc["group"].startswith("第三卷｜第 ") for doc in advanced) == 13
           assert len(advanced) == 32, "14 chapters and 3 evidence appendices plus third volume expected"
+          assert not (Path("advanced/volume-2/local_all_a_2024_aggregate.json")).exists()
+          assert any(doc["path"] == "advanced/volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md"
+                     and "教材独立数据集" in doc["content"] for doc in advanced)
+          assert "PTradePolicy" not in json.dumps(advanced, ensure_ascii=False)
           assert sum(doc["path"].startswith("advanced/volume-2/") for doc in advanced) == 18
           assert sum(doc["path"].startswith("advanced/volume-3/") for doc in advanced) == 14
           homepage = (site / "index.html").read_text(encoding="utf-8")
