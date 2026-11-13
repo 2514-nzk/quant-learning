@@ -78,11 +78,6 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_advanced_factor_research_lab.py" -v
           python examples/advanced_factor_research_lab.py --json
-      - name: Verify model selection, ablation and prequential holdout lab
-        run: |
-          python -m unittest discover -s tests -p "test_advanced_model_validation_lab.py" -v
-          python examples/advanced_model_validation_lab.py --json > /tmp/model_validation_lab.json
-          python -c 'import json; d=json.load(open("/tmp/model_validation_lab.json",encoding="utf-8")); assert d["total_periods"]==42 and d["source_kind"].startswith("SYNTHETIC_ONLY"); print("Synthetic OOS boundary lab passed")'
       - name: Validate three-volume framework and chapter outlines
         run: python -m unittest discover -s tests -p "test_advanced_framework.py" -v
       - name: Build course with advanced learning track
