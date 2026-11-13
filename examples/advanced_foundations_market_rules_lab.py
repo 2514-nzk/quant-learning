@@ -362,7 +362,7 @@ def run_lab() -> dict:
                 "same_us_day_close": known_before_decision(after, sig),
             },
             "listed_next_session": next_session(
-                ["2026-10-01", "2026-10-09", "2026-10-12"], "2026-10-01"),
+                ["2026-09-30", "2026-10-09", "2026-10-12"], "2026-09-30"),
             "case_not_fills": "PRICE_BAND_AND_BUY_SIZE_VALIDATION_ARE_NOT_FILL_CERTIFICATES",
             "rule_sources": SOURCES,
         },

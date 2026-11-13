@@ -27,12 +27,16 @@ class AdvancedFrameworkTests(unittest.TestCase):
                 self.assertIn("状态", page["content"])
                 if page["path"].endswith("README.md"):
                     continue
-                if page["path"].endswith(("01_research_protocol.md", "05_pit_data.md", "06_labels_splits.md", "07_factor_engineering.md", "08_factor_validation.md",
+                if page["path"].endswith(("01_research_protocol.md", "02_math_statistics.md", "03_time_series.md", "04_market_rules.md", "05_pit_data.md", "06_labels_splits.md", "07_factor_engineering.md", "08_factor_validation.md",
                     "09_factor_combination.md", "10_machine_learning.md", "11_oos_drift.md",
                     "12_portfolio_optimization.md", "13_backtest_execution.md", "14_reproducible_capstone.md")):
                     self.assertIn("状态：教学正文初稿", page["content"])
                     self.assertIn("合成", page["content"])
                     if page["path"].endswith((
+                        "02_math_statistics.md", "03_time_series.md", "04_market_rules.md"
+                    )):
+                        lab = "advanced_foundations_market_rules_lab.py"
+                    elif page["path"].endswith((
                         "12_portfolio_optimization.md", "13_backtest_execution.md",
                         "14_reproducible_capstone.md"
                     )):
@@ -49,6 +53,7 @@ class AdvancedFrameworkTests(unittest.TestCase):
                         lab = "advanced_protocol_pit_lab.py"
                     self.assertIn("python examples/" + lab, page["content"])
                 else:
+                    self.assertTrue(page["path"].startswith("advanced/volume-3/"))
                     self.assertIn("正文待写", page["content"])
                     self.assertIn("实验未运行", page["content"])
                     for heading in ("本章核心问题", "计划知识模块", "计划动手实验", "本章交付物"):

@@ -157,10 +157,10 @@ class FoundationsAndMarketRulesTests(unittest.TestCase):
             known_before_decision("2026-11-13T16:00:00",china)
 
     def test_exchange_calendar_does_not_guess_holidays(self):
-        calendar=["2026-10-01","2026-10-09","2026-10-12"]
-        self.assertEqual(next_session(calendar,"2026-10-01"),"2026-10-09")
+        calendar=["2026-09-30","2026-10-09","2026-10-12"]
+        self.assertEqual(next_session(calendar,"2026-09-30"),"2026-10-09")
         with self.assertRaisesRegex(ValueError,"sorted"):
-            next_session(calendar[::-1],"2026-10-01")
+            next_session(calendar[::-1],"2026-09-30")
         with self.assertRaisesRegex(ValueError,"later"):
             next_session(calendar,"2026-10-12")
 

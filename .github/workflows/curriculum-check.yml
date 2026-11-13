@@ -88,6 +88,11 @@ jobs:
           python -m unittest discover -s tests -p "test_advanced_portfolio_execution_lab.py" -v
           python examples/advanced_portfolio_execution_lab.py --json > /tmp/advanced_portfolio_audit.json
           python -c 'import json; d=json.load(open("/tmp/advanced_portfolio_audit.json",encoding="utf-8")); assert d["source_kind"].startswith("SYNTHETIC_ONLY") and len(d["cases"])==3 and all(a["nav_reconciles"] for a in d["audit"].values()); print("Synthetic portfolio audit passed")'
+      - name: Verify math, time-series and date-versioned A-share trading rules
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_foundations_market_rules_lab.py" -v
+          python examples/advanced_foundations_market_rules_lab.py --json > /tmp/advanced_foundations_rules.json
+          python -c 'import json; d=json.load(open("/tmp/advanced_foundations_rules.json", encoding="utf-8")); assert d["source_kind"].startswith("SYNTHETIC_") and len(d["market_rules"]["versioned_profiles"])==7; print("Synthetic foundations and official rule-version gate passed")'
       - name: Validate three-volume framework and chapter outlines
         run: python -m unittest discover -s tests -p "test_advanced_framework.py" -v
       - name: Build course with advanced learning track

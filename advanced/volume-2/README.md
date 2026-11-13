@@ -1,6 +1,6 @@
 # 第二卷｜专业量化研究方法
 
-> **状态：01、05–14 共十一章已有教学正文初稿与合成实验；其余三章仍为骨架。尚无真实 A 股严格 OOS、可交易收益或经审校的策略有效性结论。**
+> **状态：14 章均已有教学正文初稿与合成实验，目录骨架阶段完成。尚无完整真实 A 股 PIT、独立市场 OOS、可交易净收益或经审校的策略有效性结论。**
 
 本卷从量化概念转向严谨研究：数据时点、统计推断、样本外、组合交易与可复现性。
 
@@ -9,9 +9,9 @@
 | 章 | 主题 | 要回答的问题 | 状态 |
 |---|---|---|---|
 | 01 | [研究问题与可证伪实验合同](01_research_protocol.md) | 怎样在看结果前规定何时承认假设失败？ | 正文初稿 / 合成实验 |
-| 02 | [数学、概率统计与优化基础](02_math_statistics.md) | 理解因子、回归与组合优化需要什么数学？ | 框架待写 |
-| 03 | [金融时间序列与计量方法](03_time_series.md) | 自相关、异方差和非平稳性怎样改变统计结论？ | 框架待写 |
-| 04 | [A 股制度、时间轴与信息门禁](04_market_rules.md) | 不同证券与历史日期的规则如何影响研究？ | 框架待写 |
+| 02 | [数学、概率统计与优化基础](02_math_statistics.md) | 理解因子、回归与组合优化需要什么数学？ | 正文初稿 / 合成实验 |
+| 03 | [金融时间序列与计量方法](03_time_series.md) | 自相关、异方差和非平稳性怎样改变统计结论？ | 正文初稿 / 合成实验 |
+| 04 | [A 股制度、时间轴与信息门禁](04_market_rules.md) | 不同证券与历史日期的规则如何影响研究？ | 正文初稿 / 合成实验 |
 | 05 | [全市场 PIT 数据工程与动态股票池](05_pit_data.md) | 怎样只使用当时真正存在和可得的数据？ | 正文初稿 / 合成实验 |
 | 06 | [标签、时间切分、Purge 与 Embargo](06_labels_splits.md) | 标签何时形成，训练样本何时必须清除？ | 正文初稿 / 合成实验 |
 | 07 | [因子工程、表达式与中性化](07_factor_engineering.md) | 如何从经济假设得到不泄漏的可复算因子？ | 正文初稿 / 合成实验 |
@@ -26,6 +26,7 @@
 ## 已有章节的实验入口
 
 - [01 研究合同](01_research_protocol.md)：时间合同、严格验证边界及失败标准。
+- [02–04 数学、时间序列与历史交易规则实验](../../examples/advanced_foundations_market_rules_lab.py)：手算 OLS/Ridge/矩阵、AR(1)、HAC、区块 Bootstrap、2026-07-06 沪深风险警示规则版本与跨境时间门禁。[配套测试](../../tests/test_advanced_foundations_market_rules_lab.py)。
 - [05 PIT 数据](05_pit_data.md)：历史成员、财务版本与 as-of 选择。
 - [研究合同 / PIT 实验源码](../../examples/advanced_protocol_pit_lab.py) · [配套测试](../../tests/test_advanced_protocol_pit_lab.py)。
 - [06–08 因子研究实验源码](../../examples/advanced_factor_research_lab.py)：前向 Purge、当期中性化、逐期 IC、HAC、区块 Bootstrap、分组和 Holm 演示。 [配套测试](../../tests/test_advanced_factor_research_lab.py)。
