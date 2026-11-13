@@ -567,17 +567,38 @@
     els.complete.innerHTML = `<span aria-hidden="true">${completed ? "✓" : "○"}</span><span>${completed ? "已读" : "标记已读"}</span>`;
   }
 
+  // Treat a volume boundary as a book transition, never an ordinary chapter jump.
+  // The existing first-volume reading order (including its optional references) is intact.
+  function volumeOf(doc) {
+    if (doc.path.startsWith("advanced/volume-2/")) return "second";
+    if (doc.path.startsWith("advanced/volume-3/")) return "third";
+    return "first";
+  }
+
   function updatePager(index) {
     const previous = documents[index - 1];
     const next = documents[index + 1];
+    const activeVolume = volumeOf(current);
+    const previousIsAnotherVolume = previous && volumeOf(previous) !== activeVolume;
+    const nextIsAnotherVolume = next && volumeOf(next) !== activeVolume;
+
+    // Cross-volume buttons return to the three-volume bookshelf, where the
+    // reader explicitly selects the next book. Never masquerade as "下一篇".
     els.previous.disabled = !previous;
-    els.previous.querySelector("strong").textContent = previous?.title || "已是第一篇";
+    els.previous.querySelector("span").textContent = previousIsAnotherVolume
+      ? "← 本卷起点" : "← 上一篇";
+    els.previous.querySelector("strong").textContent = previousIsAnotherVolume
+      ? "返回书架选择卷别" : previous?.title || "已是第一篇";
+    els.previous.dataset.path = previousIsAnotherVolume ? "__home__" : previous?.path || "";
+
     els.next.disabled = !next;
-    els.next.querySelector("strong").textContent = next?.title || "已到最后一篇";
-    els.next.querySelector("span").textContent = current.group !== "工具与参考" && next?.group === "工具与参考"
-      ? "主线读完了 · 按需查阅 →" : "下一篇 →";
-    els.previous.dataset.path = previous?.path || "";
-    els.next.dataset.path = next?.path || "";
+    els.next.querySelector("span").textContent = nextIsAnotherVolume
+      ? "本卷读完 · 切换下一卷 →"
+      : current.group !== "工具与参考" && next?.group === "工具与参考"
+        ? "主线读完了 · 按需查阅 →" : "下一篇 →";
+    els.next.querySelector("strong").textContent = nextIsAnotherVolume
+      ? "返回书架选择卷别" : next?.title || "已到最后一篇";
+    els.next.dataset.path = nextIsAnotherVolume ? "__home__" : next?.path || "";
   }
 
   function updateReadingProgress() {
@@ -802,8 +823,12 @@
   });
   els.bookmark.addEventListener("click", toggleBookmark);
   els.complete.addEventListener("click", toggleComplete);
-  els.previous.addEventListener("click", () => { if (els.previous.dataset.path) showChapter(els.previous.dataset.path); });
-  els.next.addEventListener("click", () => { if (els.next.dataset.path) showChapter(els.next.dataset.path); });
+  function followPager(path) {
+    if (path === "__home__") showHome();
+    else if (path) showChapter(path);
+  }
+  els.previous.addEventListener("click", () => followPager(els.previous.dataset.path));
+  els.next.addEventListener("click", () => followPager(els.next.dataset.path));
   $("#font-down").addEventListener("click", () => { state.font = Math.max(0.88, +(state.font - 0.06).toFixed(2)); applyAppearance(); saveState(); });
   $("#font-up").addEventListener("click", () => { state.font = Math.min(1.3, +(state.font + 0.06).toFixed(2)); applyAppearance(); saveState(); });
   $("#theme-button").addEventListener("click", () => { state.theme = state.theme === "dark" ? "light" : "dark"; applyAppearance(); saveState(); });
