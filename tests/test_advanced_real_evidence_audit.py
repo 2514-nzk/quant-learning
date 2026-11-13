@@ -5,6 +5,8 @@ import copy
 import csv
 import json
 import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -46,6 +48,17 @@ class RealEvidenceAuditTests(unittest.TestCase):
         self.assertEqual(stats["method"]["split_status"],
                          "already explored by authors/readers; no untouched OOS")
         self.assertEqual(len(stats["rank_ic"]["observations"]), 18)
+
+    def test_command_line_invocation_matches_test_imports(self):
+        process = subprocess.run(
+            [sys.executable, "examples/advanced_real_evidence_audit.py",
+             "--json", "--resamples", "150"],
+            cwd=DATA.parents[1], capture_output=True, text=True, check=True,
+        )
+        report = json.loads(process.stdout)
+        self.assertEqual(report["timeline"]["round_count"], 18)
+        self.assertEqual(report["gates"]["L3_2024_historical_PIT_availability"],
+                         "NOT_PROVEN")
 
     def test_fingerprint_tampering_is_caught_before_analysis(self):
         with tempfile.TemporaryDirectory() as d:
