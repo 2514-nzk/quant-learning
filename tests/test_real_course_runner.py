@@ -65,7 +65,7 @@ class RealStockCourseTests(unittest.TestCase):
             self.assertIn(path, LABS)
             self.assertEqual(LABS[path]["files"], RUNNABLE_DATA)
         docs = collect_documents()
-        self.assertEqual(len(docs), 23)
+        self.assertEqual(len(docs), 22)
         self.assertTrue(all(d["path"].startswith("教程/真实_") for d in docs))
 
     def test_main_course_images_are_checked_in(self):

@@ -12,10 +12,10 @@ from examples.cointegration_pair_lab import (
     TRAIN_DAYS, EXPECTED_DAYS,
     paired_closes, fit_training, spread_z, describe,
 )
-from reader.build_reader import collect_documents
+from reader.build_reader import collect_documents, collect_framework_documents
 
 ROOT = Path(__file__).resolve().parents[1]
-CHAPTER = ROOT / "教程" / "真实_专题A_协整与配对交易.md"
+CHAPTER = ROOT / "advanced" / "volume-3" / "08_stat_arb.md"
 CHART = ROOT / "reader" / "assets" / "real-a-share" / "catl-byd-spread.svg"
 
 
@@ -48,16 +48,18 @@ class CointegrationLessonTests(unittest.TestCase):
         self.assertNotAlmostEqual(spread_z(changed[-1], self.model),
                                   spread_z(self.rows[-1], self.model), places=2)
 
-    def test_course_places_topic_after_capstone_before_reference(self):
-        docs = collect_documents()
-        paths = [x["path"] for x in docs]
-        advanced = "教程/真实_专题A_协整与配对交易.md"
-        self.assertEqual(len(docs), 23)
-        self.assertEqual(paths[-2], advanced)
-        self.assertEqual(paths[-1], "教程/真实_研究边界.md")
-        self.assertLess(paths.index("教程/真实_16_综合练习.md"), paths.index(advanced))
-        self.assertEqual(docs[-2]["group"], "进阶专题 · 统计套利入门")
-        self.assertNotIn(advanced, [doc["path"] for doc in docs[:20]])
+    def test_case_is_in_volume_three_after_methods_not_first_volume(self):
+        first = collect_documents()
+        self.assertEqual(len(first), 22)
+        self.assertNotIn("教程/真实_专题A_协整与配对交易.md",
+                         [doc["path"] for doc in first])
+        volumes = collect_framework_documents()
+        chapter = next(doc for doc in volumes
+                       if doc["path"] == "advanced/volume-3/08_stat_arb.md")
+        self.assertEqual(len(volumes), 29)
+        self.assertIn("第三卷", chapter["group"])
+        self.assertIn("协整、价差与统计套利", chapter["title"])
+        self.assertIn("从相关性到协整", chapter["content"])
 
     def test_reading_order_and_caveats(self):
         text = CHAPTER.read_text("utf-8")
@@ -80,7 +82,7 @@ class CointegrationLessonTests(unittest.TestCase):
                     "100 万元模拟资金", "原假设是“不存在协整”"):
             with self.subTest(key=key):
                 self.assertIn(key, text)
-        self.assertIn("../reader/assets/real-a-share/catl-byd-spread.svg", text)
+        self.assertIn("../../reader/assets/real-a-share/catl-byd-spread.svg", text)
         self.assertTrue(CHART.is_file())
         graphic = CHART.read_text("utf-8")
         self.assertIn("最后一天 Z ≈ -6.38", graphic)

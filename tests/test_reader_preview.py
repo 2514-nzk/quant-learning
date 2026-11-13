@@ -10,8 +10,10 @@ class ReaderPreviewTests(unittest.TestCase):
     def test_first_volume_and_advanced_payload_are_separate(self):
         first = collect_documents()
         advanced = collect_framework_documents()
-        self.assertEqual(len(first), 23)
+        self.assertEqual(len(first), 22)
         self.assertEqual(len(advanced), 29)
+        self.assertNotIn("教程/真实_专题A_协整与配对交易.md", [x["path"] for x in first])
+        self.assertIn("advanced/volume-3/08_stat_arb.md", [x["path"] for x in advanced])
         self.assertEqual(sum(p["path"].startswith("advanced/volume-2/") for p in advanced), 15)
         self.assertEqual(sum(p["path"].startswith("advanced/volume-3/") for p in advanced), 14)
         self.assertEqual(sum(p["path"].endswith(".md") and not p["path"].endswith("README.md") for p in advanced

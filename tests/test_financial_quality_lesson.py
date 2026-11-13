@@ -30,7 +30,7 @@ class FinancialQualityTests(unittest.TestCase):
     def test_lesson_is_after_financial_basics_before_time_split(self):
         docs=collect_documents()
         paths=[d["path"] for d in docs]
-        self.assertEqual(len(docs),23)
+        self.assertEqual(len(docs),22)
         self.assertEqual(paths.index("教程/真实_06a_合并报表与财务质量.md"),
                          paths.index("教程/真实_06_财务与预处理.md")+1)
         self.assertLess(paths.index("教程/真实_06a_合并报表与财务质量.md"),

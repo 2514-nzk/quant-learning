@@ -83,7 +83,7 @@ class NaturalConceptTransitionsTests(unittest.TestCase):
         self.assertIn("从前期高点回撤 = 90万 ÷ 120万 − 1 = -25%", chapter)
 
     def test_spread_chart_appears_after_price_and_z_score_explanation(self):
-        chapter = read("真实_专题A_协整与配对交易.md")
+        chapter = (ROOT / "advanced/volume-3/08_stat_arb.md").read_text("utf-8")
         graphic = "![宁德时代与比亚迪：真实历史相对价格，以及前段拟合关系在后段的偏离]"
         self.assertEqual(chapter.count(graphic), 1)
         self.assertLess(chapter.index("## 3. 价差与均值回归"),

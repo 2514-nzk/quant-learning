@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class AdvancedFrameworkTests(unittest.TestCase):
     def test_first_volume_is_untouched(self):
         first = collect_documents()
-        self.assertEqual(len(first), 23)
+        self.assertEqual(len(first), 22)
         self.assertTrue(all(x["path"].startswith("教程/真实_") for x in first))
 
     def test_advanced_pages_are_complete_as_outlines(self):
@@ -52,6 +52,10 @@ class AdvancedFrameworkTests(unittest.TestCase):
                     else:
                         lab = "advanced_protocol_pit_lab.py"
                     self.assertIn("python examples/" + lab, page["content"])
+                elif page["path"] == "advanced/volume-3/08_stat_arb.md":
+                    self.assertIn("状态：真实价格入门案例初稿", page["content"])
+                    self.assertIn("python examples/cointegration_pair_lab.py", page["content"])
+                    self.assertIn("融券", page["content"])
                 else:
                     self.assertTrue(page["path"].startswith("advanced/volume-3/"))
                     self.assertIn("正文待写", page["content"])
