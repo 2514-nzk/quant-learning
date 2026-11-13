@@ -110,5 +110,29 @@
     "Frozen stock_basic hit 10000-record upstream cap and excluded some malformed/missing-date/BSE identities.",
     "Source directory catalog financial/industry row counts are historical snapshots, not live direct DuckDB checks.",
     "Dataset aggregates are not a license to redistribute private original source rows."
-  ]
+  ],
+  "followup_cause_audit": {
+    "sh_sz_unjoined_count": 52,
+    "sh_sz_all_equal_delist_date": true,
+    "sh_sz_suspend_record_true": 0,
+    "sh_unjoined_on_delist_date": 16,
+    "sz_unjoined_on_delist_date": 36,
+    "bj_unjoined_count": 60463,
+    "bj_2024_06_21_canonical_no_quote_but_publicly_traded": [
+      "920002.BJ",
+      "920806.BJ",
+      "920001.BJ"
+    ],
+    "public_quote_2024_06_21_source": "https://www.stcn.com/article/detail/1237416.html",
+    "historical_2024_actual_codes": {
+      "920806.BJ": "873806",
+      "920001.BJ": "873001",
+      "920002.BJ": "920002"
+    },
+    "bse_unjoined_explanation": "BOTH_PRIOR_CODE_MAPPING_AND_DAILY_SOURCE_COVERAGE_MUST_BE_CHECKED",
+    "full_daily_relation_content_verified": false,
+    "exact_delist_trading_status_all_52_verified_against_exchange": false,
+    "akshare_live_queried": false,
+    "independent_dated_quote_exists": true
+  }
 }
