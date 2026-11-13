@@ -125,6 +125,11 @@ jobs:
           python -m unittest discover -s tests -p "test_advanced_quote_cause_audit.py" -v
           python examples/advanced_quote_cause_audit.py --json > /tmp/quote_cause_triage.json
           python -c 'import json; d=json.load(open("/tmp/quote_cause_triage.json")); assert d["sh_sz_unjoined_and_equal_delist_day"]==52 and d["bj_unjoined"]==60463 and not d["historical_pit_proven"]; print("Market quotes are not conflated with unjoined source data")'
+      - name: Check read-only source daily join triage and unknown classifications
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_source_join_probe.py" -v
+          python examples/advanced_source_join_probe.py --json > /tmp/source_join_status.json
+          python -c 'import json; r=json.load(open("/tmp/source_join_status.json",encoding="utf-8")); assert r["bj_with_suspend_source_flag"]==19 and r["bj_trading_status_unknown"]==60444 and not r["source_daily_table_directly_inspected"]; print("Source join diagnosis not overclaimed")'
       - name: Validate three-volume framework and chapter outlines
         run: python -m unittest discover -s tests -p "test_advanced_framework.py" -v
       - name: Build course with advanced learning track
