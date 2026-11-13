@@ -163,12 +163,6 @@ python examples/advanced_real_evidence_audit.py --json
 python -m unittest discover -s tests -p "test_advanced_real_evidence_audit.py" -v
 ~~~
 
-### 5B.1 错误归因同样会损坏因子验证
-
-跟进 [附录 C 2024 年报价异常原因核验](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：沪深全部 52 条快照无报价记录都落在摘牌日期边界；北交所 60,463 条则涉及源交易所覆盖和历史代码映射，已有 2024 年实际成交的外部反例。这意味着“数据缺失”并非同一统计机制。
-
-如果先把它们全部归类成普通停牌、全市场数据漏采或零回报，会直接改变样本数、因子分组、收益标签和损失函数。当前应报告**真实失败分类**，而不是在没有修复面板之前开展可交易 Alpha 验证。
-
 ## 5B. 真实全市场候选数据的**失败先行**：为什么这一轮没有输出全市场 IC？
 
 上一节四股 18 期演示有可复算 RankIC，但研究者不应因为又找到 1,453 万条本地历史证券日，就立即批量算全市场 RankIC。
@@ -181,6 +175,12 @@ python -m unittest discover -s tests -p "test_advanced_real_evidence_audit.py" -
 即便修复价格，仍需逐期把标签入场/退出价格、公司行为、历史证券资格、行业/市值 PIT、特征可得时刻、验证与 OOS 冻结逐项审计。**本轮因此只发布数据质量的证据，不发布新的 IC、显著性、策略回报或 Alpha 声明。** 这正是研究级教材应展示的“停止条件”。
 
 可复核的公开聚合和限制说明：[证据 JSON](local_all_a_2024_aggregate.json) · [验证脚本](../../examples/advanced_local_snapshot_audit.py)。
+
+### 5B.1 错误归因同样会损坏因子验证
+
+跟进 [附录 C 2024 年报价异常原因核验](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：沪深全部 52 条快照无报价记录都落在摘牌日期边界；北交所 60,463 条则涉及源交易所覆盖和历史代码映射，已有 2024 年实际成交的外部反例。这意味着“数据缺失”并非同一统计机制。
+
+如果先把它们全部归类成普通停牌、全市场数据漏采或零回报，会直接改变样本数、因子分组、收益标签和损失函数。当前应报告**真实失败分类**，而不是在没有修复面板之前开展可交易 Alpha 验证。
 
 ## 6. 练习与核对
 
