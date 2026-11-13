@@ -94,6 +94,11 @@ jobs:
           python -m unittest discover -s tests -p "test_advanced_foundations_market_rules_lab.py" -v
           python examples/advanced_foundations_market_rules_lab.py --json > /tmp/advanced_foundations_rules.json
           python -c 'import json; d=json.load(open("/tmp/advanced_foundations_rules.json", encoding="utf-8")); assert d["source_kind"].startswith("SYNTHETIC_") and len(d["market_rules"]["versioned_profiles"])==7; print("Synthetic foundations and official rule-version gate passed")'
+      - name: Verify Volume II editorial closure and worked-answer arithmetic
+        run: |
+          python -m unittest discover -s tests -p "test_volume2_quality_gate.py" -v
+          python -m unittest discover -s tests -p "test_teaching_dataset_contract.py" -v
+          python -m unittest discover -s tests -p "test_advanced_framework.py" -v
       - name: Validate three-volume reader preview and math links
         run: |
           python -m unittest discover -s tests -p "test_reader_preview.py" -v
