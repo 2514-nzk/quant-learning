@@ -13,11 +13,13 @@ import json
 import math
 import re
 from datetime import date, datetime, timezone
+from zoneinfo import ZoneInfo
 from pathlib import Path
 from typing import Any
 
 KINDS = {"SYNTHETIC_DEMONSTRATION", "USER_SUPPLIED_UNVERIFIED"}
 SCOPES = {"SELECTED_SAMPLE", "HISTORICAL_UNIVERSE_CANDIDATE"}
+EXCHANGE_TZ = ZoneInfo("Asia/Shanghai")
 STAMP_FIELDS = ("source_published_at", "ingested_at", "available_at")
 SHA_RE = re.compile(r"^[0-9a-f]{64}$")
 MISSING_REASONS = {"NOT_ANNOUNCED", "NOT_COLLECTED", "NOT_APPLICABLE", "SOURCE_CONFLICT"}
@@ -79,7 +81,7 @@ def validate_payload(payload: dict[str, Any]) -> None:
     if not cutoff < first_valid:
         raise ValueError("decision must precede first validation signal")
     signal_day = day(payload["signal_date"])
-    if signal_day > cutoff.date() or signal_day > first_valid.date():
+    if signal_day > cutoff.astimezone(EXCHANGE_TZ).date() or signal_day > first_valid.astimezone(EXCHANGE_TZ).date():
         raise ValueError("signal calendar day cannot lie after cutoff")
     for section in ("membership_events", "facts", "labels"):
         if not isinstance(payload.get(section), list):
@@ -258,6 +260,7 @@ def evaluate(payload: dict) -> dict:
         "historical_full_universe_proven": False,
         "source_evidence_bytes_verified": False,
         "source_timestamps_independently_verified": False,
+        "label_gate_is_time_only_not_universe_eligible": True,
         "is_independent_oos": False,
         "universe_scope": payload["universe_scope"],
         "decision_at": payload["decision_at"],

@@ -87,6 +87,14 @@ class PITIntakeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "timeline"):
             evaluate(payload)
 
+    def test_exchange_local_signal_date_does_not_use_utc_calendar_date(self):
+        payload = demo_payload()
+        payload["signal_date"] = "2024-03-21"
+        payload["decision_at"] = "2024-03-21T00:30:00+08:00"
+        report = evaluate(payload)
+        self.assertEqual(report["membership_asof"]["A"], "ELIGIBLE")
+        self.assertTrue(report["label_gate_is_time_only_not_universe_eligible"])
+
     def test_user_supplied_times_still_not_verified_pit(self):
         payload = demo_payload()
         payload["data_kind"] = "USER_SUPPLIED_UNVERIFIED"
