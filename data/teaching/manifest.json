@@ -61,6 +61,27 @@
         "historical vendor timestamps verified",
         "real universe PIT"
       ]
+    },
+    {
+      "id": "volume3-weekly-synthetic-v1",
+      "evidence_grade": "SYNTHETIC_ONLY",
+      "frozen": true,
+      "source": "version-controlled, self-contained artificial sixteen-week industry and stock classroom scenario",
+      "data_file": "data/teaching/volume3_weekly_v1.json",
+      "expected_weeks": 16,
+      "expected_industries_per_week": 4,
+      "expected_stocks_per_week": 8,
+      "taxonomy_versions": [
+        "TEACH_OLD",
+        "TEACH_NEW"
+      ],
+      "scope": "volume-3:01-04",
+      "not_allowed_claims": [
+        "historical A-share returns",
+        "valid real stock membership",
+        "real OOS or Alpha",
+        "confirmed trade execution"
+      ]
     }
   ]
 }
