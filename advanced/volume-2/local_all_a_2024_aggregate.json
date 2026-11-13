@@ -132,7 +132,45 @@
     "bse_unjoined_explanation": "BOTH_PRIOR_CODE_MAPPING_AND_DAILY_SOURCE_COVERAGE_MUST_BE_CHECKED",
     "full_daily_relation_content_verified": false,
     "exact_delist_trading_status_all_52_verified_against_exchange": false,
-    "akshare_live_queried": false,
-    "independent_dated_quote_exists": true
+    "akshare_live_queried": true,
+    "independent_dated_quote_exists": true,
+    "akshare_verification": {
+      "run_date": "2026-11-13",
+      "workflow_run_id": 43378034226,
+      "workflow_job_id": 131729027410,
+      "workflow_url": "https://github.com/2514-nzk/quant-learning/actions/runs/43378034226",
+      "request": "ak.stock_zh_a_hist(period='daily',start_date='20240621',end_date='20240621',adjust='')",
+      "results": [
+        {
+          "company": "云星宇",
+          "historical_trading_code": "873806",
+          "api_returned_code": "920806",
+          "date": "2024-06-21",
+          "close": 9.44,
+          "matched_dated_public_report": true,
+          "old_code_query": "NOT_RETURNED"
+        },
+        {
+          "company": "纬达光电",
+          "historical_trading_code": "873001",
+          "api_returned_code": "920001",
+          "date": "2024-06-21",
+          "close": 8.18,
+          "matched_dated_public_report": true,
+          "old_code_query": "NOT_RETURNED"
+        },
+        {
+          "company": "万达轴承",
+          "historical_trading_code": "920002",
+          "api_returned_code": "920002",
+          "date": "2024-06-21",
+          "close": 52.01,
+          "matched_dated_public_report": true,
+          "old_code_query": "SAME"
+        }
+      ],
+      "source_stcn": "https://www.stcn.com/article/detail/1237416.html",
+      "interpretation": "AKSHARE_HISTORICAL_PRICES_EXIST_INDEPENDENTLY; PRIVATE_DAILY_TABLE_JOIN_ROOT_CAUSE_NOT_YET_DIRECTLY_AUDITED"
+    }
   }
 }
