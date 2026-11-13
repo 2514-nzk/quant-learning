@@ -57,6 +57,35 @@ jobs:
           python examples/real_kline_lab.py --symbol 000001
       - name: Build reading site
         run: python reader/build_reader.py --output _site
+      - name: Check out second-volume preview branch
+        uses: actions/checkout@v4
+        with:
+          ref: docs/three-volume-research-framework
+          path: preview-source
+          persist-credentials: false
+      - name: Verify and build independent course preview
+        run: |
+          cd preview-source
+          node --check reader/app.js
+          python -m unittest discover -s tests -p "test_reader_preview.py" -v
+          python -m unittest discover -s tests -p "test_advanced_framework.py" -v
+          python reader/build_reader.py --output _site
+          cd ..
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          preview = Path("preview-source/_site")
+          data = json.loads((preview / "content.json").read_text(encoding="utf-8"))
+          first, advanced = data["documents"], data["framework"]
+          assert len(first) == 23, "first-volume route changed"
+          assert len(advanced) == 29, "advanced volume navigation incomplete"
+          assert sum(x["path"].startswith("advanced/volume-2/") for x in advanced) == 15
+          assert sum(x["path"].startswith("advanced/volume-3/") for x in advanced) == 14
+          assert (preview / "index.html").is_file()
+          print("Preview ready: first-volume 23 items, second 15, third 14")
+          PY
+          cp -a preview-source/_site _site/preview
+          test -f _site/preview/content.json
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
