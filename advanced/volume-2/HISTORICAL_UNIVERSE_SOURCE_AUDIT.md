@@ -69,14 +69,24 @@ AND (delist_date IS NULL OR trade_date <= delist_date)
 
 这是包含摘牌日的闭区间规则。在某些交易类退市案例里，**摘牌当天已经不能交易**，于是成员行仍在，而 `daily` 没有同日 K 线。以 ST 星源（000005）为例，[深交所 2024-04-25 公告](https://disc.static.szse.cn/disc/disk03/finalpage/2024-04-25/b8989912-ffa8-42a1-9f29-915e833bbb84.PDF) 确认 2024-04-26 摘牌；[上交所关于华仪的终止上市决定](https://www.sse.com.cn/disclosure/announcement/listing/stock/c/c_20240109_92503416.shtml) 及公告确认 2024-01-16 摘牌、不进入退市整理期。这些例子支持**摘牌日起不再有正常上市股票交易报价**，而不是“日线下载失败”。
 
-**不能简单把全部 52 行删掉**：`delist_date` 的语义需要逐证券核对，尤其对曾进入退市整理期的股票应区分“最后实际交易日”和“正式摘牌日”。专业数据合同建议分别保留 `last_trading_date`、`delist_effective_date`、`security_exists`、`exchange_tradable`，实际回测按后者处理。这次只核实了 52 行均落在快照摘牌日，还没逐个完成交易所公告对照。
+**不能简单把全部 52 行删掉**：`delist_date` 的语义需要逐证券核对，尤其对曾进入退市整理期的股票应区分“最后实际交易日”和“正式摘牌日”。专业数据合同建议分别保留 `last_trading_date`、`delist_effective_date`、`security_exists`、`exchange_tradable`，实际回测按后者处理。这次只核实了 52 行均落在快照摘牌日，并用部分交易所公告做了交叉印证；尚未逐个完成全部 52 条的交易所公告对照。
 
 北交所需要**两项不同的修复**：
 
 1. **2024 年旧代码与后来统一的 920 代码**。构建器强制用 `920xxx.BJ` 规范证券代码创建成员，同时用 `daily.ts_code = member.code` 直接关联，没有按历史生效日转换代码。北交所 2025-10-09 才完成存量公司统一切换，故这对 2024 年使用 `43/83/87` 代码的股票可能联不上。例：云星宇 **2024-06-21 以 `873806`** 交易，但如今规范代码为 `920806`。[北交所代码切换公告](https://dataclouds.cninfo.com.cn/sjother/regulatory/2024/20241213/d7cfc96e816541629e69b0e257d98dbe.pdf)、[新旧代码对应表](https://www.cgws.com/cczq/ggdt/gsgg/202509/t20250929_321701.html)。
 2. **不能只归因于代码映射**。2024-06-21 已经直接使用 `920002` 的万达轴承，在当前冻结 Parquet 仍被标记无价；但是当日 [《证券时报》北交所成交明细](https://www.stcn.com/article/detail/1237416.html) 明确记录 **`920002` 万达轴承收盘 52.01 元**、`873806` 云星宇 9.44 元、`873001` 纬达光电 8.18 元；当日北交所总成交额 **39.90 亿元**。这实证排除了“2024 年北交所没有交易”和“问题完全因为旧代码”两种解释，意味着还需要核对源 `daily` 表究竟有没有覆盖北交所行情、数据接口是否过滤交易所、规范映射是否匹配。
 
-这里引用的是**当年公开的独立行情报道**，不是本次远程 AKShare 运行结果。机器学习 MCP 只提供只读目录、表格过滤和聚合，没有执行 AKShare 的能力。为便于在能访问网络的研究机复核，新增 [AKShare 历史日线核验脚本](../../examples/advanced_quote_cause_audit.py)：
+**AKShare 历史行情复核已经实际执行**：[2026-11-13 GitHub Actions 独立任务](https://github.com/2514-nzk/quant-learning/actions/runs/43378034226) 使用 `stock_zh_a_hist(period="daily",start_date="20240621",end_date="20240621",adjust="")` 查询三个案例，均返回明确的当日价格，且**全部与 2024 年 6 月 21 日《证券时报》的收盘价一致**：
+
+| 2024 年真实交易代码 | AKShare 本次可返回历史价格的代码 | 2024-06-21 不复权收盘 | 旧代码在本次 AKShare 查询中 |
+|---|---|---:|---|
+| 云星宇 `873806` | `920806` | **9.44 元** | 旧码无当日记录 |
+| 纬达光电 `873001` | `920001` | **8.18 元** | 旧码无当日记录 |
+| 万达轴承 `920002` | `920002` | **52.01 元** | 新旧同码 |
+
+这说明 **AKShare 当前接口有能力按规范新代码展示旧代码时期的历史交易价格**，也证明至少三个本地未关联成功的北交所证券-日期存在实际行情。但**尚未直接查询本地源 DuckDB 的 `daily` 表**，所以不能断定这三只的行是被代码映射弄丢、原表没下载、还是组合原因。需要按 `source_code`、`historical_code`、`security_id` 与交易日期逐层做 anti-join 查明。
+
+为便于在任意有网络的研究机复核，提供 [AKShare 历史日线核验脚本](../../examples/advanced_quote_cause_audit.py)：
 
 ~~~bash
 python examples/advanced_quote_cause_audit.py --json
@@ -87,7 +97,7 @@ python -m pip install akshare
 python examples/advanced_quote_cause_audit.py --akshare --json
 ~~~
 
-脚本严格按日期查询 2024-06-21，并分别尝试历史代码和规范代码，只有返回当天明确的行情才算外部样本对照；**API 空返回不证明停牌、退市或没有交易**。AKShare 的 `stock_zh_a_hist` 是沪深京 A 股历史行情接口，数据由第三方行情提供方提供，也不是权威历史 PIT 证明。文档见 [AKShare 历史行情接口说明](https://akshare-hh.readthedocs.io/en/latest/data/stock/stock.html)。
+脚本严格按日期查询 2024-06-21，并分别尝试历史代码和规范代码，只有返回当天明确的行情才算外部样本对照；本次已使用云端运行器实际复验三个报价，但未把这个结论推广到全市场；**API 空返回不证明停牌、退市或没有交易**。AKShare 的 `stock_zh_a_hist` 是沪深京 A 股历史行情接口，数据由第三方行情提供方提供，也不是权威历史 PIT 证明。文档见 [AKShare 历史行情接口说明](https://akshare-hh.readthedocs.io/en/latest/data/stock/stock.html)。
 
 因此目前最准确的结论是：**沪深 52 行属于候选股票池的摘牌日端点问题；北交所 60,463 行是源行情覆盖/历史代码映射/联表口径尚未修复的标记，绝不等于真实市场缺价。**
 
