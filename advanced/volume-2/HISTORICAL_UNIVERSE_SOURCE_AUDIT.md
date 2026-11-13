@@ -101,6 +101,47 @@ python examples/advanced_quote_cause_audit.py --akshare --json
 
 因此目前最准确的结论是：**沪深 52 行属于候选股票池的摘牌日端点问题；北交所 60,463 行是源行情覆盖/历史代码映射/联表口径尚未修复的标记，绝不等于真实市场缺价。**
 
+## 2B. 第五轮核查：停牌记录也不是天然可信的交易状态
+
+继续直接审查本地 2024 年 `all_a_membership` Parquet，可把北交所 **60,463 条未关联报价**进一步拆成：
+
+| 数据源中的状态 | 记录数 | 合理的研究解释 |
+|---|---:|---|
+| `has_suspend_record=true`、`is_trading=false` | **19** | **源表存在停牌标记**；还需同交易所公告与真实成交对账 |
+| `has_suspend_record=false`、`is_trading=NULL` | **60,444** | **没有匹配报价，状态未知**；不能当作停牌或零收益 |
+| 合计 | **60,463** | 当前候选数据集的北交所行情联表失败 |
+
+**反证案例：万达轴承 2024-05-30 上市首日。** 冻结快照对 `920002.BJ` 记录 `has_suspend_record=true`、`is_trading=false`、`has_daily_quote=false`；但 [第一财经当天的真实交易报道](https://www.yicai.com/news/102131570.html) 记载它开盘 **57 元**、收盘 **67.98 元**、成交额约 **3 亿元**，并且盘中曾触发临时停牌。**盘中临停不等于整个交易日无交易**，更不能把上市当日当作整日停牌。这个例子足以否定“源 `suspend` 标记就代表当天完全不能交易”的自动推断。
+
+还要注意：**股票身份与真实历史交易代码不同**。2025-10-09 北交所存量股票才全面切换为 `920` 代码；在此之前的旧代码行情必须依据可靠的公司/证券身份与历史生效区间关联。[央视报道](https://jingji.cctv.cn/2025/10/09/ARTIJRGLKzoESfSNzYtQFnEL251009.shtml)确认代码切换事实；但**仅有同一 `comp_code` 也不足以证明整个历史有效期都可以无条件连接**。
+
+### 只读根因诊断：在原始 `daily` 表上做反向对账
+
+新增 [源表诊断程序](../../examples/advanced_source_join_probe.py) 与 [单元测试](../../tests/test_advanced_source_join_probe.py)。在公开 GitHub 仓库中，默认只能复核已冻结的聚合状态：
+
+~~~bash
+python examples/advanced_source_join_probe.py --json
+python -m unittest discover -s tests -p "test_advanced_source_join_probe.py" -v
+~~~
+
+当且仅当研究电脑上可以合法访问本地**原始** `xc_tushare_data.duckdb` 和本地冻结的 2024 年 Parquet，才运行只读源诊断：
+
+~~~bash
+python examples/advanced_source_join_probe.py --source-db "/本地/xc_tushare_data.duckdb" --parquet "/本地/all_a_membership/year=2024/part-2024.parquet" --json
+~~~
+
+上面的 Parquet 名称只是**路径位置的占位示例**，必须指向实际 SHA-256 为 `11eb9645ef8f6e9b420f24c464e9fd9511503e593a6bc17cafcd179b7e386c34` 的冻结分区，脚本在读取源数据库之前核对 SHA；不会修改 DuckDB、Parquet，也不会发送本地行情到公开仓库。需要安装本地 `duckdb` Python 包，且源数据库必须允许只读连接。
+
+程序分层比较：
+
+1. **源日线按 SH/SZ/BJ 代码后缀的实际记录量**：判断 `daily` 是否包含北京证券交易所日线，不以股票池关联结果替代；
+2. **严格 `daily.ts_code = member.code` 直接匹配**：源确实有行却冻快照未关联，则要核实源版本/冻结时间与构建过程；
+3. **按 `comp_code` 的历史代码别名候选**：同一公司旧代码有日线，标为 `COMP_CODE_ALIAS_CANDIDATE`；多种别名冲突需拒绝无条件合并；
+4. **摘牌日端点、来源停牌标记、完全无源行**：分别报告不同状态，不能把这些统称停牌或数据缺失；
+5. **原始源数据库覆盖与日期证据**：哪怕直接匹配了也不代表当时的 PIT/独立 OOS 已被证明。
+
+这轮**还没有对私有原始 `daily` DuckDB 执行上述 SQL**：当前机器学习 MCP 只允许读取文本和 Parquet/CSV 表，不提供任意数据库查询或执行。程序已经准备好，但仍需在本地能打开数据库的环境实际跑出**来源/代码映射分类计数**，才能把问题从“候选归因”升级为“根因已证实”。严禁仅根据当前历史股票池空值批量补 0 或重写源数据。
+
 ## 3. 历史母表有了，源审计仍为何不能全部通过？
 
 冻结快照内置的构建审计明确记录了下列风险：

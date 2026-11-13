@@ -59,6 +59,12 @@
 - [可选 AKShare 样本复核工具](../../examples/advanced_quote_cause_audit.py) · [离线失败测试](../../tests/test_advanced_quote_cause_audit.py)：默认无网络；可在有 AKShare 的环境按历史代码和规范代码分别查询真实日线。
 - 当年公开成交报道与 **2026-11-13 实际运行的 AKShare 历史日线查询**已独立交叉确认三只北交所样本的 2024-06-21 收盘价；**但本地源 `daily` 表与跨时点代码映射尚未直接核验和修复**，不可据此宣布全市场量价面板完整。
 
+## 第五轮研究级深化：追查真正的 `daily` 联表失败
+
+- [附录 C 第 2B 节](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)：北交所 60,463 条中 19 条存在源 `suspend` 标记，60,444 条交易状态未知；万达轴承上市首日真实成交却被本地标成停牌，是必须保留的反证。
+- [私有原始源只读诊断程序](../../examples/advanced_source_join_probe.py) · [分类与合成 DuckDB 测试](../../tests/test_advanced_source_join_probe.py)：核对 `daily` 是否真正包含 BJ 行情、源直接同码、同公司历史代码别名、摘牌日期和来源停牌状态。
+- 由于机器学习 MCP 不开放任意数据库查询，**尚未实际运行本地 `xc_tushare_data.duckdb` 的直接/别名归因 SQL**；不能把已编写对账代码说成真实源修复完成。
+
 ## 已有章节的实验入口
 
 - [01 研究合同](01_research_protocol.md)：时间合同、严格验证边界及失败标准。

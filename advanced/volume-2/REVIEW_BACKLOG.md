@@ -61,6 +61,13 @@
 
 可核验：[附录 C](HISTORICAL_UNIVERSE_SOURCE_AUDIT.md) · [不含私有数据的聚合 JSON](local_all_a_2024_aggregate.json) · [复算工具](../../examples/advanced_local_snapshot_audit.py)。**本轮没有对大截面跑 Alpha、真实 IC、净收益或独立 OOS。**
 
+## 第五轮：历史交易状态与实际报价的冲突审计
+
+- 本地冻结 2024 年北交所 `has_daily_quote=false` **60,463** 条，其中 `has_suspend_record=true` **19** 条、无交易状态证据 **60,444** 条。这些是来源分类，不代表交易所直接判定的全天停牌次数。
+- 万达轴承 2024-05-30 被源标记为停牌/无日报价，但当年上市首日公开成交收盘 **67.98 元**、金额约 3 亿元，构成明确的源数据状态矛盾。
+- 已制作 [只读 DuckDB 源表反向诊断](../../examples/advanced_source_join_probe.py) 及 [分类、合成 SQL 回归测试](../../tests/test_advanced_source_join_probe.py)，**不修改本地源数据库**。本轮仍需真正查询源 `daily` 与 `stock_basic` 才能在全体 60,515 条上输出根因分布，不能凭推测宣称已修复。
+- **停止条件**：未认证历史公司身份和代码生效期、源 `suspend` 与市场成交相冲突、未核证原始 `daily` 覆盖，不生成自称严格 PIT 的交易标签或收益评估。
+
 ## 本轮能验收的具体交付
 
 1. 固定历史 CSV 采集清单、每份文件 SHA-256 和日期数量核对。

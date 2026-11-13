@@ -59,3 +59,10 @@
 - 2024 年 **1,296,795** 条候选成员日中，**60,515** 条 `has_daily_quote=false`（BJ **60,463**、SH **16**、SZ **36**）；这不代表交易所实际无报价、真实停牌或零收益。
 - [公开聚合 JSON](volume-2/local_all_a_2024_aggregate.json) · [可运行复核脚本](../examples/advanced_local_snapshot_audit.py) · [单元测试](../tests/test_advanced_local_snapshot_audit.py)。私有行情和本地数据库均未上传。
 - 来源快照保留单次 10,000 行采集上限、部分缺上市日期、BSE 规范代码及 `daily_basic` 重复冲突。SW 历史成员、官方事件和 QMT PIT 表只是待逐行认证的候选来源，**还不等于完整历史 PIT 或可交易 Alpha**。
+
+## 第二卷来源根因诊断第五轮：只读源表对账入口
+
+- 北交所 2024 年快照 60,463 条无价中有 **19** 条源 `suspend` 标记、**60,444** 条状态未知；万达轴承 IPO 当天实际成交却被标为停牌，是信息源错配的反例。
+- [诊断程序](../examples/advanced_source_join_probe.py) 会在有私有源 DB 的本地环境对 `daily.ts_code`、`stock_basic.comp_code` 和冻结 Parquet 做只读对账。GitHub CI 仅运行合成 SQL 及公开聚合合同，**不会读取或上传私有数据库**。
+- [证据记录](volume-2/local_all_a_2024_aggregate.json) · [附录 C](volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)。原始源核对尚未实跑，不能把 “19 条源停牌标记” 称作“19 条确证整日停牌”。
+
