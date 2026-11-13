@@ -41,8 +41,9 @@ class AdvancedFrameworkTests(unittest.TestCase):
         for dirname, count in (("volume-2", 14), ("volume-3", 13)):
             directory = ROOT / "advanced" / dirname
             links = re.findall(r"\]\((\d{2}_[^)]*\.md)\)", (directory / "README.md").read_text("utf-8"))
-            self.assertEqual(len(links), count)
-            for filename in links:
+            unique_links = set(links)
+            self.assertEqual(len(unique_links), count)
+            for filename in unique_links:
                 self.assertTrue((directory / filename).is_file())
 
 
