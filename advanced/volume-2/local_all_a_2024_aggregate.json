@@ -171,6 +171,22 @@
       ],
       "source_stcn": "https://www.stcn.com/article/detail/1237416.html",
       "interpretation": "AKSHARE_HISTORICAL_PRICES_EXIST_INDEPENDENTLY; PRIVATE_DAILY_TABLE_JOIN_ROOT_CAUSE_NOT_YET_DIRECTLY_AUDITED"
-    }
+    },
+    "bj_2024_suspend_record_rows": 19,
+    "bj_2024_unknown_trading_rows": 60444,
+    "bj_2024_source_suspend_listing_day_public_contradiction": {
+      "code": "920002.BJ",
+      "trade_date": "2024-05-30",
+      "member_list_date": "2024-05-30",
+      "snapshot_has_suspend_record": true,
+      "snapshot_has_daily_quote": false,
+      "public_actual_ipo_day_close": 67.98,
+      "public_actual_ipo_day_turnover_rmb_approx": 300000000,
+      "source": "https://www.yicai.com/news/102131570.html",
+      "status": "SUSPEND_SOURCE_FLAG_CONFLICT_WITH_DATED_TRADING_EVIDENCE",
+      "resolved_in_local_source": false
+    },
+    "source_daily_table_directly_inspected": false,
+    "source_db_join_provenance_report_available": false
   }
 }
