@@ -104,12 +104,12 @@ jobs:
           assert all(doc["group"].startswith("第一卷｜") for doc in first)
           assert sum(doc["title"].startswith("第 ") and doc["group"].startswith("第二卷｜第 ") for doc in advanced) == 14
           assert sum(doc["title"].startswith("第 ") and doc["group"].startswith("第三卷｜第 ") for doc in advanced) == 13
-          assert len(advanced) == 32, "14 chapters and 3 evidence appendices plus third volume expected"
+          assert len(advanced) == 33, "14 chapters and 4 appendices plus third volume expected"
           assert not (Path("advanced/volume-2/local_all_a_2024_aggregate.json")).exists()
           assert any(doc["path"] == "advanced/volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md"
                      and "教材独立数据集" in doc["content"] for doc in advanced)
           assert "PTradePolicy" not in json.dumps(advanced, ensure_ascii=False)
-          assert sum(doc["path"].startswith("advanced/volume-2/") for doc in advanced) == 18
+          assert sum(doc["path"].startswith("advanced/volume-2/") for doc in advanced) == 19
           assert sum(doc["path"].startswith("advanced/volume-3/") for doc in advanced) == 14
           homepage = (site / "index.html").read_text(encoding="utf-8")
           assert "三卷量化研究教材" in homepage
@@ -122,7 +122,7 @@ jobs:
               '<title>正在打开新版阅读器</title>'
               '<script>location.replace("../"+location.search+location.hash)</script>'
               '<a href="../">进入三卷阅读器</a></html>', encoding="utf-8")
-          print("Canonical reader: first 22 items, volume two 14 chapters + 3 evidence appendices, volume three 13 slots")
+          print("Canonical reader: first 22 items, volume two 14 chapters + 4 appendices, volume three 13 slots")
           PY
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
