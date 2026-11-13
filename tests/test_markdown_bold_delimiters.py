@@ -9,12 +9,13 @@ import re
 import unicodedata
 import unittest
 
-from reader.build_reader import collect_documents
+from reader.build_reader import collect_documents, collect_framework_documents
 
 
 class MarkdownBoldDelimiterTests(unittest.TestCase):
     def test_emphasis_ending_with_punctuation_has_safe_following_boundary(self):
-        for doc in collect_documents():
+        case = [d for d in collect_framework_documents() if d["path"] == "advanced/volume-3/08_stat_arb.md"]
+        for doc in collect_documents() + case:
             content = doc["content"]
             for match in re.finditer(r"\*\*([^*\n]+)\*\*", content):
                 end_char = match.group(1)[-1]
@@ -29,12 +30,12 @@ class MarkdownBoldDelimiterTests(unittest.TestCase):
                     )
 
     def test_affected_emphasis_is_preserved_in_published_book(self):
-        docs = {doc["path"]: doc["content"] for doc in collect_documents()}
+        docs = {doc["path"]: doc["content"] for doc in collect_documents() + collect_framework_documents()}
         samples = {
             "教程/真实_11_线性模型.md": "**Ridge（岭回归）**：它是在普通线性模型",
             "教程/真实_10_多因子.md": "**归一化（这里指 Min-Max 缩放）**：",
             "教程/真实_16_综合练习.md": "**RankIC（当时按指标排的名次，与后来按收益排的名次有多一致）** 怎样",
-            "教程/真实_专题A_协整与配对交易.md": "**协整（Cointegration）** 研究的是",
+            "advanced/volume-3/08_stat_arb.md": "**协整（Cointegration）** 研究的是",
         }
         for path, snippet in samples.items():
             with self.subTest(path=path):
