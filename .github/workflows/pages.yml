@@ -18,8 +18,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Check out three-volume reader source
         uses: actions/checkout@v4
+        with:
+          ref: docs/three-volume-research-framework
+          persist-credentials: false
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Set up Python
@@ -57,35 +60,33 @@ jobs:
           python examples/real_kline_lab.py --symbol 000001
       - name: Build reading site
         run: python reader/build_reader.py --output _site
-      - name: Check out second-volume preview branch
-        uses: actions/checkout@v4
-        with:
-          ref: docs/three-volume-research-framework
-          path: preview-source
-          persist-credentials: false
-      - name: Verify and build independent course preview
+      - name: Validate all three volumes on canonical homepage
         run: |
-          cd preview-source
-          node --check reader/app.js
           python -m unittest discover -s tests -p "test_reader_preview.py" -v
           python -m unittest discover -s tests -p "test_advanced_framework.py" -v
-          python reader/build_reader.py --output _site
-          cd ..
           python - <<'PY'
           import json
           from pathlib import Path
-          preview = Path("preview-source/_site")
-          data = json.loads((preview / "content.json").read_text(encoding="utf-8"))
+          site = Path("_site")
+          data = json.loads((site / "content.json").read_text(encoding="utf-8"))
           first, advanced = data["documents"], data["framework"]
-          assert len(first) == 23, "first-volume route changed"
-          assert len(advanced) == 29, "advanced volume navigation incomplete"
-          assert sum(x["path"].startswith("advanced/volume-2/") for x in advanced) == 15
-          assert sum(x["path"].startswith("advanced/volume-3/") for x in advanced) == 14
-          assert (preview / "index.html").is_file()
-          print("Preview ready: first-volume 23 items, second 15, third 14")
+          assert len(first) == 23, "first-volume reading track changed"
+          assert len(advanced) == 29, "advanced navigation incomplete"
+          assert sum(doc["path"].startswith("advanced/volume-2/") for doc in advanced) == 15
+          assert sum(doc["path"].startswith("advanced/volume-3/") for doc in advanced) == 14
+          homepage = (site / "index.html").read_text(encoding="utf-8")
+          assert "三卷量化研究教材" in homepage
+          assert "第一卷" in homepage and "第二卷" in homepage
+          # Keep earlier /preview/?chapter=... URLs working after the move to /.
+          legacy = site / "preview"
+          legacy.mkdir(exist_ok=True)
+          (legacy / "index.html").write_text(
+              '<!doctype html><html lang="zh-CN"><meta charset="utf-8">'
+              '<title>正在打开新版阅读器</title>'
+              '<script>location.replace("../"+location.search+location.hash)</script>'
+              '<a href="../">进入三卷阅读器</a></html>', encoding="utf-8")
+          print("Canonical reader: first 23, volume 2 has 14 chapters, volume 3 has 13 outlines")
           PY
-          cp -a preview-source/_site _site/preview
-          test -f _site/preview/content.json
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
