@@ -75,6 +75,11 @@ jobs:
           python -m unittest discover -s tests -p "test_advanced_universe_coverage_lab.py" -v
           python examples/advanced_universe_coverage_lab.py --real-teaching --json > /tmp/real_universe_coverage.json
           python -c 'import json; r=json.load(open("/tmp/real_universe_coverage.json",encoding="utf-8")); assert r["observed_security_sessions"]==468 and r["full_market_coverage_percent"] is None and not r["historical_pit_verified"]; print("Real source coverage audited without false denominator")'
+      - name: Verify local 2024 history aggregate evidence before site publication
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_local_snapshot_audit.py" -v
+          python examples/advanced_local_snapshot_audit.py --json > /tmp/volume2_local_real_evidence.json
+          python -c 'import json; d=json.load(open("/tmp/volume2_local_real_evidence.json",encoding="utf-8")); assert d["year_2024_rows"] == 1296795 and d["missing_quotes"] == 60515 and not d["historical_pit_verified"] and d["full_market_coverage"] is None; print("Real-source limits reconciled")'
       - name: Build reading site
         run: python reader/build_reader.py --output _site
       - name: Validate all three volumes on canonical homepage
