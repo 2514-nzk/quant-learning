@@ -168,8 +168,8 @@
       },
       {
         number: "03", title: "第三卷 · A 股策略与交易系统",
-        description: "行业轮动、反转、微盘、L2 和交易系统，共 13 章，目前只有目录骨架。",
-        path: thirdVolume[0]?.path, status: "13 章待写", action: "查看规划",
+        description: "行业轮动、反转、微盘与 L2 交易系统，共 13 章；第 08 章已有真实价格配对交易入门案例。",
+        path: thirdVolume[0]?.path, status: "1 章案例初稿 · 12 章待写", action: "查看第三卷",
       },
     ];
     els.pathGrid.innerHTML = volumes.filter((volume) => volume.path).map((volume) =>
