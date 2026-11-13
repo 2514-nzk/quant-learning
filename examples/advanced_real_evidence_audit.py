@@ -14,15 +14,21 @@ import csv
 import hashlib
 import json
 import math
+import sys
 from datetime import date, datetime
 from pathlib import Path
 from statistics import mean, stdev
+
+# Running 'python examples/...' starts with examples/ on sys.path.
+# Add the repository root so the same imports work in CLI and in unittest.
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from examples.advanced_factor_research_lab import hac_mean_se, moving_block_ci
 from examples.real_stock_learner import rank_ic
 from scripts.build_real_teaching_case import calculate_case, load_bars
 
-ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "real_a_share"
 SOURCE_KIND = "REAL_OHLC_RETROSPECTIVE_FOUR_PRESELECTED_STOCKS"
 EVIDENCE_GRADE = "DESCRIPTIVE_ONLY_NOT_HISTORICAL_PIT_NOT_INDEPENDENT_OOS"
