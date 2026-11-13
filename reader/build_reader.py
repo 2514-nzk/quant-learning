@@ -14,15 +14,34 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "教程" / "README.md"
 GROUPS = {
-    "入门准备｜认识量化研究": "入门准备 · 认识量化研究",
-    "入门准备｜基础工具箱（随学随查）": "入门准备 · 认识量化研究",
-    "第一篇｜收益计算与策略评价（第 1–2 章）": "第一篇 · 收益计算与策略评价",
-    "第二篇｜数据处理与因子研究（第 3–8 章）": "第二篇 · 数据处理与因子研究",
-    "第三篇｜交易执行与策略组合（第 9–10 章）": "第三篇 · 交易执行与策略组合",
-    "第四篇｜机器学习与模型评价（第 11–14 章）": "第四篇 · 机器学习与模型评价",
-    "第五篇｜研究复现与综合实践（第 15–16 章）": "第五篇 · 研究复现与综合实践",
-    "延伸阅读｜工具与参考": "延伸阅读 · 工具与参考",
+    "入门准备｜认识量化研究": "第一卷｜导读与准备",
+    "入门准备｜基础工具箱（随学随查）": "第一卷｜导读与准备",
+    "第一篇｜收益计算与策略评价（第 1–2 章）": "第一卷｜第 01–02 章 · 收益评价",
+    "第二篇｜数据处理与因子研究（第 3–8 章）": "第一卷｜第 03–08 章 · 因子研究",
+    "第三篇｜交易执行与策略组合（第 9–10 章）": "第一卷｜第 09–10 章 · 交易组合",
+    "第四篇｜机器学习与模型评价（第 11–14 章）": "第一卷｜第 11–14 章 · 机器学习",
+    "第五篇｜研究复现与综合实践（第 15–16 章）": "第一卷｜第 15–16 章 · 研究复现",
+    "延伸阅读｜工具与参考": "第一卷｜附录与参考",
 }
+CHAPTER_PATH = re.compile(r"^(?:教程/真实_|advanced/volume-[23]/)(\d{2})_[^/]+\.md$")
+
+
+def sidebar_title(path: str, label: str) -> str:
+    """Canonical UI title; preserve Markdown titles and stable file paths."""
+    label = re.sub(r"\s+", " ", label.strip())
+    match = CHAPTER_PATH.match(path)
+    if match:
+        label = re.sub(r"^第\s*\d{1,2}\s*章\s*[｜|:：·—-]?\s*", "", label)
+        return f"第 {int(match.group(1)):02d} 章｜{label}"
+    if path.endswith("/README.md"):
+        volume = "第二卷" if "volume-2/" in path else "第三卷"
+        return f"导读｜{volume}课程目录"
+    if path.endswith("/REAL_DATA_EVIDENCE_REVIEW.md"):
+        return "附录 A｜真实价格证据审计"
+    if path.endswith("/REVIEW_BACKLOG.md"):
+        return "附录 B｜研究级审校台账"
+    return label
+
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+\.md)(?:#[^)]*)?\)")
 
 RUNNABLE_SCRIPTS = [
@@ -87,7 +106,7 @@ def collect_documents() -> list[dict[str, str | int]]:
                 continue
             seen.add(relative)
             markdown = source.read_text(encoding="utf-8")
-            title = re.sub(r"\s+", " ", label.strip())
+            title = sidebar_title(relative, label)
             documents.append({
                 "path": relative,
                 "title": title,
@@ -104,8 +123,8 @@ def collect_documents() -> list[dict[str, str | int]]:
 # Advanced volumes are separate from the already verified first-volume route.
 # Do not change collect_documents(): first-volume ordering is a published contract.
 FRAMEWORK_VOLUMES = (
-    ("advanced/volume-2/README.md", "第二卷 · 专业研究方法（14章初稿）", "第二卷｜专业研究方法总览"),
-    ("advanced/volume-3/README.md", "第三卷 · A 股策略实战（待写）", "第三卷｜策略与交易系统总览"),
+    ("advanced/volume-2/README.md", "第二卷｜导读与目录", "第二卷课程目录"),
+    ("advanced/volume-3/README.md", "第三卷｜导读与目录", "第三卷课程目录"),
 )
 
 
@@ -117,7 +136,7 @@ def collect_framework_documents() -> list[dict[str, str | int]]:
         index_content = index.read_text(encoding="utf-8")
         documents.append({
             "path": index_path,
-            "title": title,
+            "title": sidebar_title(index_path, title),
             "group": group,
             "minutes": estimate_minutes(index_content),
             "content": index_content,
@@ -132,10 +151,15 @@ def collect_framework_documents() -> list[dict[str, str | int]]:
                 continue
             seen.add(path)
             content = chapter.read_text(encoding="utf-8")
+            volume = "第二卷" if "volume-2/" in path else "第三卷"
+            page_group = (
+                f"{volume}｜正文（第 01–{'14' if volume == '第二卷' else '13'} 章）"
+                if CHAPTER_PATH.match(path) else f"{volume}｜附录与审计"
+            )
             documents.append({
                 "path": path,
-                "title": re.sub(r"\s+", " ", label.strip()),
-                "group": group,
+                "title": sidebar_title(path, label),
+                "group": page_group,
                 "minutes": estimate_minutes(content),
                 "content": content,
             })
