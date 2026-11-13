@@ -27,7 +27,7 @@ class SidebarTaxonomyTests(unittest.TestCase):
         appendix = [p for p in advanced if "｜附录与审计" in p["group"]]
         self.assertEqual([p["title"] for p in appendix],
                          ["附录 A｜真实价格证据审计", "附录 B｜研究级审校台账",
-                          "附录 C｜历史股票池与来源覆盖审计"])
+                          "附录 C｜教材数据集与复现规范"])
         self.assertEqual(len({p["path"] for p in advanced}), 32)
 
     def test_titles_are_normalized_idempotently_and_paths_not_renamed(self):
