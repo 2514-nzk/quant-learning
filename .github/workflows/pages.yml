@@ -85,6 +85,11 @@ jobs:
           python -m unittest discover -s tests -p "test_advanced_quote_cause_audit.py" -v
           python examples/advanced_quote_cause_audit.py --json > /tmp/quote_cause_offline.json
           python -c 'import json; x=json.load(open("/tmp/quote_cause_offline.json")); assert x["sh_sz_unjoined_and_equal_delist_day"]==52 and x["bj_unjoined"]==60463 and x["historical_pit_proven"] is False; print("Source joins distinguished from missing market trades")'
+      - name: Validate source daily join labels with offline evidence
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_source_join_probe.py" -v
+          python examples/advanced_source_join_probe.py --json > /tmp/source_join_offline.json
+          python -c 'import json; d=json.load(open("/tmp/source_join_offline.json")); assert d["bj_with_suspend_source_flag"]==19 and d["bj_trading_status_unknown"]==60444 and d["source_daily_table_directly_inspected"] is False; print("Unverified source joins not promoted")'
       - name: Build reading site
         run: python reader/build_reader.py --output _site
       - name: Validate all three volumes on canonical homepage
@@ -154,12 +159,35 @@ jobs:
               print("INCONCLUSIVE: vendor returned no matching historical quote; market absence NOT inferred")
           PY
 
+  source_probe_sql_smoke:
+    # Executes only SYNTHETIC DuckDB source/member relations.
+    # User's private local database and Parquet are never available to CI.
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout research scripts and public aggregates
+        uses: actions/checkout@v4
+        with:
+          ref: docs/three-volume-research-framework
+          persist-credentials: false
+      - name: Python 3.11 for reproducible DuckDB SQL test
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install DuckDB for synthetic SQL replay
+        run: python -m pip install -q duckdb
+      - name: Assert real SQL joins on synthetic delist and BJ alias fixtures
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_source_join_probe.py" -v
+          python examples/advanced_source_join_probe.py --json > /tmp/source_join_public_status.json
+          python -c 'import json; j=json.load(open("/tmp/source_join_public_status.json")); assert not j["source_daily_table_directly_inspected"]; print("Private source not accessed by CI")'
+
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build, source_probe_sql_smoke]
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
