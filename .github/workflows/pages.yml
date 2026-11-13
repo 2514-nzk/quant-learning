@@ -65,7 +65,7 @@ jobs:
           python -c 'import json; d=json.load(open("/tmp/real_ohlc_evidence.json", encoding="utf-8")); assert d["evidence_grade"].startswith("DESCRIPTIVE_ONLY") and d["gates"]["L4_historical_full_universe"].startswith("FAIL_"); print("Real-price limitations preserved")'
       - name: Verify canonical chapter numbering and volume sidebar taxonomy
         run: python -m unittest discover -s tests -p "test_sidebar_taxonomy.py" -v
-      - name: Verify versioned PIT source intake and label-availability gate
+      - name: Verify A-share-local PIT event timestamps and label-availability gate
         run: |
           python -m unittest discover -s tests -p "test_advanced_pit_intake_lab.py" -v
           python examples/advanced_pit_intake_lab.py --json > /tmp/pit_intake_contract.json
