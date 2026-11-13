@@ -54,6 +54,21 @@ class QuoteCauseAuditTests(unittest.TestCase):
         self.assertEqual(CASES[2]["canonical_code"], CASES[2]["historical_code"])
         self.assertEqual(CASES[2]["public_close"], 52.01)
 
+    def test_live_akshare_results_are_recorded_with_public_crosscheck(self):
+        evidence = json.loads(EVIDENCE.read_text("utf-8"))
+        actual = evidence["followup_cause_audit"]["akshare_verification"]
+        self.assertEqual(actual["workflow_run_id"], 43378034226)
+        self.assertEqual(len(actual["results"]), 3)
+        self.assertEqual(
+            [(r["company"], r["close"]) for r in actual["results"]],
+            [("云星宇", 9.44), ("纬达光电", 8.18), ("万达轴承", 52.01)]
+        )
+        self.assertTrue(all(r["matched_dated_public_report"]
+                            for r in actual["results"]))
+        self.assertFalse(
+            evidence["followup_cause_audit"]["full_daily_relation_content_verified"]
+        )
+
     def test_no_network_by_default(self):
         result = subprocess.run(
             [sys.executable, "examples/advanced_quote_cause_audit.py", "--json"],
