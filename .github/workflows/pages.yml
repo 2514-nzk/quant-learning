@@ -58,7 +58,7 @@ jobs:
           python -m unittest discover -s tests -p "test_standalone_book.py" -v
           python examples/real_stock_learner.py
           python examples/real_kline_lab.py --symbol 000001
-      - name: Verify real historical OHLC evidence gates for volume two
+      - name: Verify real historical OHLC evidence gates (unittest and direct CLI)
         run: |
           python -m unittest discover -s tests -p "test_advanced_real_evidence_audit.py" -v
           python examples/advanced_real_evidence_audit.py --json > /tmp/real_ohlc_evidence.json
