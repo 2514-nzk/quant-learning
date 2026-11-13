@@ -98,6 +98,11 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_reader_preview.py" -v
           node --check reader/app.js
+      - name: Audit real OHLC integrity, dates, IC and evidence limitations
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_real_evidence_audit.py" -v
+          python examples/advanced_real_evidence_audit.py --json > /tmp/real_a_share_evidence.json
+          python -c 'import json; r=json.load(open("/tmp/real_a_share_evidence.json",encoding="utf-8")); assert r["timeline"]["round_count"]==18 and r["gates"]["L6_independent_OOS"].startswith("FAIL_"); print("Real OHLC evidence audit passed")'
       - name: Validate three-volume framework and chapter outlines
         run: python -m unittest discover -s tests -p "test_advanced_framework.py" -v
       - name: Build course with advanced learning track

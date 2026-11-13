@@ -136,6 +136,33 @@ python -m unittest discover -s tests -p "test_advanced_factor_research_lab.py" -
 
 **代码不是市场绩效回测**：它没有真实股票池、历史行业、财务版本、订单或费用，也没有进行真正的模型选择与独立 OOS。因此报告中所有数字必须带 `SYNTHETIC_ONLY` 标签，不得用于买卖判断。
 
+## 5A. 深度实践：真实四股 18 期 RankIC 的证据等级
+
+[审计报告](REAL_DATA_EVIDENCE_REVIEW.md) · [复算脚本](../../examples/advanced_real_evidence_audit.py) · [负例测试](../../tests/test_advanced_real_evidence_audit.py)。
+
+本节从已有四只真实 A 股 2024 年的固定不复权 OHLC 计算 RankIC。每期四只构成一个横截面，Top2 与四股等权的**毛观察收益差**记为：
+
+\[
+d_t=R^{gross}_{top2,t}-R^{gross}_{equal4,t}.
+\]
+
+| 真实历史教学数据 | 描述性结果 |
+|---|---:|
+| 观察期数 / 每期股票数 | 18 / 4 |
+| 平均 RankIC | **−0.1222** |
+| 正 RankIC 期数 | **7/18** |
+| Top2−四股等权平均单期毛观察收益差 | **+0.1239 个百分点** |
+| Top2 单期跑赢等权期数 | **10/18** |
+
+**为什么完整排序 IC 为负而 Top2 价差略正？** IC 看四股整体排序，Top2 差看两种权重方案的收益**幅度**。定义不同，不要求同号。
+
+程序输出 HAC(2)、循环移动区块 Bootstrap（块长 2/3/4）、逐期剔除和前 10/中 4/后 4 期回顾性结果。18 期不能被算作 72 个独立观测；四股事后挑选、2026 才采集固定历史数据、无 2024 源接收时点、无公司行为与实际委托记录；所有 18 期在教材中早已公开。因此**这些区间只能描述小样本敏感性，不能作为真实全市场 Alpha、未触碰 OOS 或可成交净收益的确认性证据**。
+
+~~~bash
+python examples/advanced_real_evidence_audit.py --json
+python -m unittest discover -s tests -p "test_advanced_real_evidence_audit.py" -v
+~~~
+
 ## 6. 练习与核对
 
 **题 A：** 因子在某段样本里 IC 均值为 0.06，可以直接说“策略赚了 6%”吗？

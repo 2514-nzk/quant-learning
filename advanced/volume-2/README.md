@@ -23,6 +23,14 @@
 | 13 | [成交仿真、交易成本与回测状态机](13_backtest_execution.md) | 研究信号如何变成真实可持有的仓位？ | 正文初稿 / 合成实验 |
 | 14 | [可复现研究工程与综合项目](14_reproducible_capstone.md) | 第三方怎样独立复算并判定一个研究结果？ | 正文初稿 / 合成实验 |
 
+## 研究级深化：真实价格证据审计与逐章任务
+
+- [真实历史价格证据审计](REAL_DATA_EVIDENCE_REVIEW.md)：第 05–08 章共用，四只 A 股 18 期，包含来源哈希、数据重建、时间门禁、RankIC/不确定性与失败证据。
+- [研究级逐章审校台账](REVIEW_BACKLOG.md)：14 章各自仍缺什么，如何验收。
+- [Python 审计](../../examples/advanced_real_evidence_audit.py) · [回归测试](../../tests/test_advanced_real_evidence_audit.py)。
+
+**新实证只达到“真实价格回顾性审计”，不是历史全市场 PIT、独立 OOS 或可交易 Alpha。**
+
 ## 已有章节的实验入口
 
 - [01 研究合同](01_research_protocol.md)：时间合同、严格验证边界及失败标准。
@@ -33,7 +41,7 @@
 - [09–11 模型选择和时间验证实验](../../examples/advanced_model_validation_lab.py)：六候选基线、Ridge/成对排序、开发期消融、冻结选择、逐期可用标签重训及事后漂移。[配套测试](../../tests/test_advanced_model_validation_lab.py)。
 - [12–14 组合、执行和审计实验](../../examples/advanced_portfolio_execution_lab.py)：合成风险协方差、离散权重、整手/T+1、拒单与部分成交、现金/NAV 审计和版本指纹。[配套测试](../../tests/test_advanced_portfolio_execution_lab.py)。
 
-**所有新增实验均使用人工数据，不构成真实市场证据。**
+**基础实验多数使用人工数据；新增四股审计使用真实历史 OHLC，但只是回顾性描述，不能作为完整 PIT、独立 OOS 或可交易 Alpha 证据。**
 
 ## 统一交付标准
 

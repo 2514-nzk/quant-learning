@@ -161,6 +161,12 @@ python -m unittest discover -s tests -p "test_advanced_protocol_pit_lab.py" -v
 
 上述代码**没有核验源披露真实性、完整退市历史与真实订单回放**。它只验证给定可信事件表后的 as-of 算法边界。
 
+### 7.1 将真实价格的完整性与历史 PIT 分开验证
+
+新增 [真实四股来源与证据审计](REAL_DATA_EVIDENCE_REVIEW.md) 和代码 `python examples/advanced_real_evidence_audit.py --json`。程序校验四份真实 CSV 的 SHA-256、OHLC、采集时刻与 18 期缓存收益，并从原始价格重建特征和标签。
+
+它和本章的合成 `facts_asof()` 实验**验证不同的命题**：固定文件完整不代表 2024 年实际已知。历史价格发生在 2024 年，AKShare 快照采集于 **2026-11-11**。没有供应商当时发布/接收/入库证据，`L3_2024_historical_PIT_availability` 仍为 `NOT_PROVEN`；四股事后固定选择，历史母体门禁为 `FAIL_SELECTED_SURVIVORS`。不要把这些失败状态隐藏在“真实数据已接入”后面。
+
 ## 8. 研究级数据表最低设计
 
 | 表名 | 最小关键字段 | 用途 |
