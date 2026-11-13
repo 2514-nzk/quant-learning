@@ -27,6 +27,13 @@ class ReaderPreviewTests(unittest.TestCase):
             self.assertIn(token, js)
         self.assertIn('readingRoute = firstVolume.filter', js)
 
+    def test_volume_boundary_requires_explicit_bookshelf_switch(self):
+        js = (ROOT / "reader/app.js").read_text(encoding="utf-8")
+        self.assertIn("function volumeOf(doc)", js)
+        self.assertIn('nextIsAnotherVolume ? "__home__"', js)
+        self.assertIn('previousIsAnotherVolume ? "__home__"', js)
+        self.assertIn('if (path === "__home__") showHome()', js)
+
     def test_chapter_links_use_preview_source_and_math_has_readable_fallback(self):
         html = (ROOT / "reader/index.html").read_text(encoding="utf-8")
         js = (ROOT / "reader/app.js").read_text(encoding="utf-8")

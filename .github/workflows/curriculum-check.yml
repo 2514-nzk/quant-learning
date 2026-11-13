@@ -56,6 +56,7 @@ jobs:
       - name: Verify browser real-data calculator without Pyodide
         run: |
           node --check reader/app.js
+          node tests/test_reader_volume_pager.js
           node --check reader/real-case.js
           node tests/real_browser_lab.test.js
       - name: Verify plain-language terminology and real RankIC examples
