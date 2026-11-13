@@ -115,6 +115,11 @@ jobs:
           python -m unittest discover -s tests -p "test_advanced_universe_coverage_lab.py" -v
           python examples/advanced_universe_coverage_lab.py --real-teaching --json > /tmp/real_universe_coverage.json
           python -c 'import json; d=json.load(open("/tmp/real_universe_coverage.json",encoding="utf-8")); assert d["observed_security_sessions"]==468 and d["full_market_coverage_percent"] is None and not d["historical_pit_verified"]; print("Full-market denominator gate preserved")'
+      - name: Validate published local all-A snapshot aggregates without private source files
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_local_snapshot_audit.py" -v
+          python examples/advanced_local_snapshot_audit.py --json > /tmp/volume2_local_evidence.json
+          python -c 'import json; d=json.load(open("/tmp/volume2_local_evidence.json",encoding="utf-8")); assert d["year_2024_rows"]==1296795 and d["missing_quotes"]==60515 and d["full_market_coverage"] is None; print("Local source aggregates reconciled without PIT promotion")'
       - name: Validate three-volume framework and chapter outlines
         run: python -m unittest discover -s tests -p "test_advanced_framework.py" -v
       - name: Build course with advanced learning track
