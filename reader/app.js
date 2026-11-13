@@ -608,7 +608,8 @@
     const chapter = current.content.match(/^#\s*第\s*(\d+)\s*章/m);
     let position = current.group === "工具与参考" ? "参考资料" : "导读与准备";
     const volumeTwoChapter = current.path.match(/^advanced\/volume-2\/(\d{2})_/);
-    if (current.path.startsWith("advanced/volume-3/")) position = "第三卷 · 目录框架待写";
+    if (current.path === "advanced/volume-3/08_stat_arb.md") position = "第三卷 第 8 / 13 章 · 入门案例";
+    else if (current.path.startsWith("advanced/volume-3/")) position = "第三卷 · 目录框架待写";
     else if (volumeTwoChapter) position = `第二卷 第 ${Number(volumeTwoChapter[1])} / 14 章`;
     else if (current.path === "advanced/volume-2/README.md") position = "第二卷 · 课程目录";
     else if (chapter) position = `第 ${chapter[1]} / ${mainChapterCount} 章`;
@@ -617,7 +618,7 @@
     els.readingProgress.setAttribute("aria-valuenow", String(percent));
     els.backToTop.hidden = els.reader.scrollTop < 380;
     state.positions[current.path] = els.reader.scrollTop;
-    if (!current.path.startsWith("advanced/volume-3/") && maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
+    if ((!current.path.startsWith("advanced/volume-3/") || current.path === "advanced/volume-3/08_stat_arb.md") && maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
       state.completed.push(current.path);
       updateChapterActions();
       renderNavigation();
@@ -767,6 +768,18 @@
       byPath = new Map(documents.map((doc) => [doc.path, doc]));
       mainChapterCount = firstVolume.filter((doc) => /^#\s*第\s*\d+\s*章/m.test(doc.content)).length;
       state.bookmarks = state.bookmarks.filter((path) => byPath.has(path));
+      // Preserve reading positions and bookmarks when the pair-trading case
+      // moves from the first-volume optional section into volume three.
+      const oldPairPath = "教程/真实_专题A_协整与配对交易.md";
+      const newPairPath = "advanced/volume-3/08_stat_arb.md";
+      const migratePairPath = (path) => path === oldPairPath ? newPairPath : path;
+      if (state.lastPath === oldPairPath) state.lastPath = newPairPath;
+      state.bookmarks = [...new Set(state.bookmarks.map(migratePairPath))];
+      state.completed = [...new Set(state.completed.map(migratePairPath))];
+      if (Object.prototype.hasOwnProperty.call(state.positions, oldPairPath)) {
+        if (!(newPairPath in state.positions)) state.positions[newPairPath] = state.positions[oldPairPath];
+        delete state.positions[oldPairPath];
+      }
       state.completed = state.completed.filter((path) => byPath.has(path));
       $("#home-chapter-count").textContent = documents.length;
       renderHome();
@@ -774,7 +787,8 @@
       applyAppearance();
       els.loading.hidden = true;
       const queryPath = new URLSearchParams(location.search).get("chapter");
-      if (queryPath && byPath.has(queryPath)) showChapter(queryPath, { route: false, restore: true, section: decodeURIComponent(location.hash.slice(1)) });
+      const resolvedPath = queryPath === oldPairPath ? newPairPath : queryPath;
+      if (resolvedPath && byPath.has(resolvedPath)) showChapter(resolvedPath, { route: queryPath === oldPairPath, replace: true, restore: true, section: decodeURIComponent(location.hash.slice(1)) });
       else showHome({ route: false });
     } catch (error) {
       els.loading.innerHTML = `<span class="loading-error">${escapeHTML(error.message || "加载失败")}</span><button class="retry-button" onclick="location.reload()">重新加载</button>`;

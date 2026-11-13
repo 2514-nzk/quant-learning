@@ -36,6 +36,15 @@ class ReaderPreviewTests(unittest.TestCase):
         self.assertIn('previousIsAnotherVolume ? "__home__"', js)
         self.assertIn('if (path === "__home__") showHome()', js)
 
+    def test_moved_pair_trading_case_retains_old_bookmarks_and_progress(self):
+        js = (ROOT / "reader/app.js").read_text(encoding="utf-8")
+        self.assertIn('const oldPairPath = "教程/真实_专题A_协整与配对交易.md"', js)
+        self.assertIn('const newPairPath = "advanced/volume-3/08_stat_arb.md"', js)
+        self.assertIn("state.bookmarks.map(migratePairPath)", js)
+        self.assertIn("state.completed.map(migratePairPath)", js)
+        self.assertIn("state.positions[newPairPath]", js)
+        self.assertIn('第三卷 第 8 / 13 章 · 入门案例', js)
+
     def test_chapter_links_use_preview_source_and_math_has_readable_fallback(self):
         html = (ROOT / "reader/index.html").read_text(encoding="utf-8")
         js = (ROOT / "reader/app.js").read_text(encoding="utf-8")
