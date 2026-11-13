@@ -153,7 +153,8 @@ def collect_framework_documents() -> list[dict[str, str | int]]:
             content = chapter.read_text(encoding="utf-8")
             volume = "第二卷" if "volume-2/" in path else "第三卷"
             page_group = (
-                f"{volume}｜正文（第 01–{'14' if volume == '第二卷' else '13'} 章）"
+                f"{volume}｜第 01–{'14' if volume == '第二卷' else '13'} 章 · "
+                f"{'研究方法' if volume == '第二卷' else '策略实战'}"
                 if CHAPTER_PATH.match(path) else f"{volume}｜附录与审计"
             )
             documents.append({

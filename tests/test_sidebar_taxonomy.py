@@ -23,7 +23,7 @@ class SidebarTaxonomyTests(unittest.TestCase):
         for entries in (second, third):
             for n, item in enumerate(entries, 1):
                 self.assertTrue(item["title"].startswith(f"第 {n:02d} 章｜"), item)
-                self.assertIn("｜正文（", item["group"])
+                self.assertRegex(item["group"], r"｜第 01–(?:14|13) 章 · ")
         appendix = [p for p in advanced if "｜附录与审计" in p["group"]]
         self.assertEqual([p["title"] for p in appendix],
                          ["附录 A｜真实价格证据审计", "附录 B｜研究级审校台账"])

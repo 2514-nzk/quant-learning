@@ -83,7 +83,7 @@ class PITIntakeTests(unittest.TestCase):
         report = evaluate(payload)
         self.assertEqual(report["train_labels_purged"], 2)
         payload = demo_payload()
-        payload["labels"][0]["exit_at"] = "2024-03-18T09:00:00+08:00"
+        payload["labels"][0]["exit_at"] = "2024-03-04T09:00:00+08:00"
         with self.assertRaisesRegex(ValueError, "timeline"):
             evaluate(payload)
 
