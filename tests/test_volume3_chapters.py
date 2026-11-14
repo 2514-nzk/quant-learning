@@ -69,7 +69,7 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
         self.assertEqual(payload["week_count"], 16)
         self.assertEqual(payload["industries_per_week"], 4)
         self.assertEqual(payload["stocks_per_week"], 8)
-        self.assertEqual(payload["calendar"], "ARTIFICIAL_FRIDAY_MON_NO_EXCHANGE_HOLIDAYS")
+        self.assertEqual(payload["calendar"], "ARTIFICIAL_PERIOD_SEQUENCE_NO_EXCHANGE_CALENDAR")
         self.assertEqual({w["taxonomy_version"] for w in payload["weeks"]},
                          {"TEACH_OLD", "TEACH_NEW"})
 
