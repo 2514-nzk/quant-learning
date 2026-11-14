@@ -120,7 +120,7 @@
     {
       "date": "2026-01-09",
       "security_id": "S09",
-      "size_rank": 9,
+      "size_rank": 8,
       "listing_days": 480,
       "avg_amount_20d": 24000000,
       "financial_available_at": "2026-01-09T16:30:00+08:00",
@@ -264,11 +264,11 @@
     {
       "date": "2026-01-16",
       "security_id": "S09",
-      "size_rank": 9,
+      "size_rank": 8,
       "listing_days": 480,
       "avg_amount_20d": 24000000,
       "financial_available_at": "2026-01-16T16:30:00+08:00",
-      "accrual": 0.21,
+      "accrual": 0.005,
       "resi5": -0.05,
       "suspended": true,
       "limit_down": false
@@ -408,7 +408,7 @@
     {
       "date": "2026-01-23",
       "security_id": "S09",
-      "size_rank": 9,
+      "size_rank": 8,
       "listing_days": 480,
       "avg_amount_20d": 24000000,
       "financial_available_at": "2026-01-23T16:30:00+08:00",
