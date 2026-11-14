@@ -1,4 +1,4 @@
-"""Editorial and data-boundary checks for Volume III 01–04.
+"""Editorial and data-boundary checks for Volume III written chapters 01–05.
 
 Proves textbook structure and consistency, NOT independent real-market performance.
 """
@@ -41,7 +41,7 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
                 self.assertIn("SYNTHETIC_ONLY" if n == 4 else "人工", page)
 
     def test_local_links_exist_without_external_private_dependencies(self):
-        docs = [V3 / (slug + ".md") for slug in NEW] + [V3 / "README.md"]
+        docs = [V3 / (slug + ".md") for slug in NEW] + [V3 / "05_microcap_quality.md", V3 / "README.md"]
         checked = 0
         for doc in docs:
             body = doc.read_text("utf-8")
@@ -59,7 +59,7 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
                 checked += 1
         self.assertGreaterEqual(checked, 15)
 
-    def test_textbook_dataset_is_fourth_and_synthetic_not_source_backtest(self):
+    def test_textbook_datasets_include_fifth_synthetic_microcap_fixture(self):
         manifest = json.loads((ROOT / "data/teaching/manifest.json").read_text("utf-8"))
         self.assertEqual(len(manifest["datasets"]), 5)
         names = [x["id"] for x in manifest["datasets"]]
