@@ -93,7 +93,7 @@ def regime(week: dict) -> str:
         raise ValueError("Future market data")
     m = week["market"]
     return ("RISK_ON" if m["trend_score"] > 0 and
-            m["breadth"] >= 0.55 and m["risk_score"] < 0.035
+            m["breadth"] >= 0.5 and m["risk_score"] < 0.5
             else "RISK_OFF")
 
 
