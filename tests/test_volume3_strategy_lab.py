@@ -5,7 +5,7 @@ import unittest
 
 from examples.volume3_strategy_lab import (
     DATASET_ID, asof_members, eligible_training_weeks, evaluate, load_fixture,
-    ranked_industries, regime, run_strategy, score_reversal, spearman, target_weights,
+    ranked_industries, regime, run_strategy, score_momentum, score_reversal, spearman, target_weights,
     turnover_l1, validate_fixture,
 )
 
@@ -47,9 +47,9 @@ class VolumeThreeStrategyLabTests(unittest.TestCase):
         original = self.fixture["weeks"][0]
         changed = copy.deepcopy(original)
         for industry in changed["industries"]:
-            industry["following_week_return"] = -99
+            industry["following_period_return"] = -99
         for stock in changed["stocks"]:
-            stock["following_week_return"] = 99
+            stock["following_period_return"] = 99
         self.assertEqual(regime(original), regime(changed))
         self.assertEqual(ranked_industries(original), ranked_industries(changed))
         for strategy in ("always_top", "regime_gated_top", "equal_four", "cash"):
@@ -73,7 +73,7 @@ class VolumeThreeStrategyLabTests(unittest.TestCase):
 
     def test_reject_naive_timestamp_duplicate_member_and_false_taxonomy(self):
         bad = copy.deepcopy(self.fixture)
-        bad["weeks"][0]["decision_at"] = "2024-07-05T18:00:00"
+        bad["weeks"][0]["decision_at"] = "2024-07-02T10:20:00"
         with self.assertRaises(ValueError):
             validate_fixture(bad)
         bad = copy.deepcopy(self.fixture)
@@ -88,6 +88,7 @@ class VolumeThreeStrategyLabTests(unittest.TestCase):
     def test_score_definitions_and_ties(self):
         item = {"price_t": 95, "price_reference_reversal": 100, "price_reference_momentum": 90}
         self.assertAlmostEqual(score_reversal(item), .05)
+        self.assertAlmostEqual(score_momentum(item), 95 / 90 - 1)
         self.assertAlmostEqual(spearman([1, 2, 3], [3, 2, 1]), -1)
         self.assertIsNone(spearman([1, 1, 1], [1, 2, 3]))
         self.assertIsNone(spearman([1, 2], [1, 2]))
@@ -97,9 +98,9 @@ class VolumeThreeStrategyLabTests(unittest.TestCase):
         self.assertAlmostEqual(turnover_l1({}, {"A": 1}), 1)
         self.assertAlmostEqual(turnover_l1({"A": 1}, {"B": 1}), 2)
         self.assertAlmostEqual(turnover_l1({"A": .25}, {"A": .25}), 0)
-        rows = run_strategy(self.fixture["weeks"], "cash", .001)
+        rows = run_strategy(self.fixture["weeks"], "cash", .0017)
         self.assertTrue(all(p["synthetic_net_observation"] == 0 for p in rows))
-        top = run_strategy(self.fixture["weeks"], "always_top", .001)
+        top = run_strategy(self.fixture["weeks"], "always_top", .0017)
         for p in top:
             self.assertAlmostEqual(p["synthetic_net_observation"],
                                    p["gross_observation"] - p["synthetic_cost_proxy"])
