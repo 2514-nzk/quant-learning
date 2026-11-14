@@ -45,7 +45,7 @@ python -m unittest discover -s tests -p "test_volume3_chapters.py" -v
 
 - [第 05 章正文](05_microcap_quality.md)：历史股票池门禁、财务数据可得时间、通用主/候补评分与受约束权重。
 - 数据集 [volume3-microcap-synthetic-v1](../../data/teaching/volume3_microcap_synthetic_v1.json) 为人工教学情景，不代表真实证券历史。
-- 运行：\`python examples/volume3_microcap_lab.py --json\`；测试：\`python -m unittest discover -s tests -p "test_volume3_microcap_lab.py" -v\`。
+- 运行：`python examples/volume3_microcap_lab.py --json`；测试：`python -m unittest discover -s tests -p "test_volume3_microcap_lab.py" -v`。
 
 ## 第 08 章：真实价格入门案例
 
