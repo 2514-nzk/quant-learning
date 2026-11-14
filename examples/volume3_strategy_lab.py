@@ -68,7 +68,7 @@ def validate_fixture(payload: dict) -> None:
         for item in week["industries"]:
             if item["taxonomy_version"] != version or moment(item["feature_known_at"]) > cutoff:
                 raise ValueError("Industry feature from the future or wrong taxonomy")
-            if not all(math.isfinite(item[key]) for key in ("past_4w_return", "following_week_return")):
+            if not all(math.isfinite(item[key]) for key in ("strength_score", "following_period_return")):
                 raise ValueError("Non-finite industry value")
         stocks = week["stocks"]
         ids = [x["security_id"] for x in stocks]
@@ -79,11 +79,11 @@ def validate_fixture(payload: dict) -> None:
             if stock["industry_code"] not in industry_codes:
                 raise ValueError("Security references an unknown industry version")
             if not all(math.isfinite(stock[key]) for key in
-                       ("price_t", "price_t_minus_5", "price_t_minus_20",
-                        "following_week_return")):
+                       ("price_t", "price_reference_momentum", "price_reference_reversal",
+                        "following_period_return")):
                 raise ValueError("Non-finite stock data")
-            if min(stock["price_t"], stock["price_t_minus_5"],
-                   stock["price_t_minus_20"]) <= 0:
+            if min(stock["price_t"], stock["price_reference_momentum"],
+                   stock["price_reference_reversal"]) <= 0:
                 raise ValueError("Prices must be positive")
 
 
@@ -92,8 +92,8 @@ def regime(week: dict) -> str:
     if moment(week["market"]["known_at"]) > moment(week["feature_cutoff_at"]):
         raise ValueError("Future market data")
     m = week["market"]
-    return ("RISK_ON" if m["trend20"] > 0 and
-            m["breadth"] >= 0.55 and m["vol20"] < 0.035
+    return ("RISK_ON" if m["trend_score"] > 0 and
+            m["breadth"] >= 0.55 and m["risk_score"] < 0.035
             else "RISK_OFF")
 
 
@@ -102,7 +102,7 @@ def ranked_industries(week: dict) -> list[str]:
     if any(moment(i["feature_known_at"]) > cutoff for i in week["industries"]):
         raise ValueError("A future industry feature reached the ranking")
     return [i["industry_code"] for i in sorted(
-        week["industries"], key=lambda v: (-v["past_4w_return"], v["industry_code"]))]
+        week["industries"], key=lambda v: (-v["strength_score"], v["industry_code"]))]
 
 
 def asof_members(week: dict) -> list[dict]:
@@ -112,13 +112,13 @@ def asof_members(week: dict) -> list[dict]:
             if moment(v["membership_known_at"]) <= cutoff]
 
 
-def score_rev20(stock: dict) -> float:
-    """Reverse past 20-bar raw price change; it is NOT a realized return label."""
-    return -(stock["price_t"] / stock["price_t_minus_20"] - 1.0)
+def score_reversal(stock: dict) -> float:
+    """Reverse past declared-window raw price change; it is NOT a realized return label."""
+    return -(stock["price_t"] / stock["price_reference_reversal"] - 1.0)
 
 
-def score_mom5(stock: dict) -> float:
-    return stock["price_t"] / stock["price_t_minus_5"] - 1.0
+def score_momentum(stock: dict) -> float:
+    return stock["price_t"] / stock["price_reference_momentum"] - 1.0
 
 
 def ranks(values: list[float]) -> list[float]:
@@ -185,7 +185,7 @@ def run_strategy(weeks: list[dict], strategy: str, fee_per_turnover: float) -> l
         if any(v < 0 for v in weights.values()) or sum(weights.values()) > 1.0000001:
             raise AssertionError("Invalid target weights")
         # The next-period return is used ONLY in the hindsight evaluation, not selection.
-        return_by_industry = {v["industry_code"]: v["following_week_return"]
+        return_by_industry = {v["industry_code"]: v["following_period_return"]
                               for v in w["industries"]}
         gross = sum(weight * return_by_industry[code]
                     for code, weight in weights.items())
@@ -212,12 +212,12 @@ def reversal_diagnostic(weeks: list[dict]) -> dict:
         for bucket, group in ((strong, [v for v in stocks if v["industry_code"] in top2]),
                               (weak, [v for v in stocks if v["industry_code"] not in top2]),
                               (overall, stocks)):
-            ic = spearman([score_rev20(x) for x in group],
-                          [x["following_week_return"] for x in group])
+            ic = spearman([score_reversal(x) for x in group],
+                          [x["following_period_return"] for x in group])
             if ic is not None:
                 bucket.append(ic)
     return {
-        "factor": "REV20_RAW_UNADJUSTED_SYNTHETIC_ONLY",
+        "factor": "reversal score_RAW_UNADJUSTED_SYNTHETIC_ONLY",
         "strong_industry_mean_rankic": round(sum(strong) / len(strong), 6) if strong else None,
         "weak_industry_mean_rankic": round(sum(weak) / len(weak), 6) if weak else None,
         "all_stocks_mean_rankic": round(sum(overall) / len(overall), 6) if overall else None,
