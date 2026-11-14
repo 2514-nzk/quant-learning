@@ -124,13 +124,18 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_teaching_dataset_contract.py" -v
           python scripts/verify_teaching_datasets.py --json > /tmp/course_datasets_contract.json
-          python -c 'import json; x=json.load(open("/tmp/course_datasets_contract.json",encoding="utf-8")); assert x["verified"] and not x["real_market_PIT_proven"] and len(x["datasets"])==4; print("Textbook data independent of private research")'
+          python -c 'import json; x=json.load(open("/tmp/course_datasets_contract.json",encoding="utf-8")); assert x["verified"] and not x["real_market_PIT_proven"] and len(x["datasets"])==5; print("Textbook data independent of private research")'
       - name: Verify third-volume standalone strategy data, chapters and lookahead gates
         run: |
           python -m unittest discover -s tests -p "test_volume3_strategy_lab.py" -v
           python -m unittest discover -s tests -p "test_volume3_chapters.py" -v
           python examples/volume3_strategy_lab.py --json > /tmp/volume3_strategy.json
           python -c 'import json; x=json.load(open("/tmp/volume3_strategy.json",encoding="utf-8")); assert x["source_kind"]=="SYNTHETIC_ONLY" and x["weeks"]==16 and x["unknown_members"]==1 and not x["real_market_OOS_proven"] and not x["execution_proven"]; print("Third-volume teaching-only gates passed")'
+      - name: Verify Volume III Chapter 05 microcap teaching lab
+        run: |
+          python -m unittest discover -s tests -p "test_volume3_microcap_lab.py" -v
+          python examples/volume3_microcap_lab.py --json > /tmp/volume3_microcap.json
+          python -c 'import json; d=json.load(open("/tmp/volume3_microcap.json",encoding="utf-8")); assert d["evidence_grade"]=="SYNTHETIC_ONLY" and not d["market_pit_proven"] and not d["execution_proven"]; print("Microcap teaching-only gates passed")'
       - name: Validate three-volume framework and chapter outlines
         run: python -m unittest discover -s tests -p "test_advanced_framework.py" -v
       - name: Build course with advanced learning track
