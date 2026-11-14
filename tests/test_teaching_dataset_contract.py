@@ -21,7 +21,8 @@ class TeachingDatasetContractTests(unittest.TestCase):
         self.assertFalse(c["requires_external_local_db"])
         self.assertEqual([x["id"] for x in c["datasets"]],
                          ["a-share-real-four-v1", "story-synthetic-v1",
-                          "pit-events-synthetic-v1", "volume3-weekly-synthetic-v1"])
+                          "pit-events-synthetic-v1", "volume3-weekly-synthetic-v1",
+                          "volume3-microcap-synthetic-v1"])
         for entry in c["datasets"]:
             self.assertTrue(entry["evidence_grade"])
             self.assertTrue(entry["frozen"])

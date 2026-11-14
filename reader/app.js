@@ -168,8 +168,8 @@
       },
       {
         number: "03", title: "第三卷 · A 股策略与交易系统",
-        description: "共 13 章；01–04 为策略实战教学正文，第 08 章为真实价格配对交易入门，其余 8 章待写。",
-        path: thirdVolume[0]?.path, status: "4 章教学正文 · 1 章入门案例 · 8 章待写", action: "查看第三卷",
+        description: "共 13 章；01–05 为策略实战教学正文，第 08 章为真实价格配对交易入门，其余 7 章待写。",
+        path: thirdVolume[0]?.path, status: "5 章教学正文 · 1 章入门案例 · 7 章待写", action: "查看第三卷",
       },
     ];
     els.pathGrid.innerHTML = volumes.filter((volume) => volume.path).map((volume) =>

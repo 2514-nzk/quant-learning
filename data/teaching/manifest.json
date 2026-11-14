@@ -66,7 +66,7 @@
       "id": "volume3-weekly-synthetic-v1",
       "evidence_grade": "SYNTHETIC_ONLY",
       "frozen": true,
-      "source": "version-controlled, self-contained artificial sixteen-week industry and stock classroom scenario",
+      "source": "version-controlled artificial sixteen-period industry and security classroom scenario",
       "data_file": "data/teaching/volume3_weekly_v1.json",
       "expected_weeks": 16,
       "expected_industries_per_week": 4,
@@ -81,6 +81,21 @@
         "valid real stock membership",
         "real OOS or Alpha",
         "confirmed trade execution"
+      ]
+    },
+    {
+      "id": "volume3-microcap-synthetic-v1",
+      "evidence_grade": "SYNTHETIC_ONLY",
+      "frozen": true,
+      "source": "version-controlled artificial microcap eligibility, scoring, fallback and holding-state classroom scenario",
+      "data_file": "data/teaching/volume3_microcap_synthetic_v1.json",
+      "expected_rebalance_dates": 3,
+      "scope": "volume-3:05",
+      "not_allowed_claims": [
+        "historical A-share microcap returns",
+        "verified PIT financial data",
+        "real factor alpha",
+        "confirmed execution or net returns"
       ]
     }
   ]
