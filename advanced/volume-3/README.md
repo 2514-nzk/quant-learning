@@ -1,6 +1,6 @@
 # 第三卷｜A 股策略与交易系统
 
-> **状态：第 01–04 章已完成可复算的教学正文 v1；第 08 章已有真实价格入门案例；其余 8 章为待写框架。** 本卷尚没有通过真实市场独立 OOS、完整 PIT、真实成交验证的策略结论。
+> **状态：第 01–05 章已完成可复算的教学正文 v1；第 08 章已有真实价格入门案例；其余 7 章为待写框架。** 本卷尚没有通过真实市场独立 OOS、完整 PIT、真实成交验证的策略结论。
 
 本卷基于严谨研究方法研究 A 股策略：必须明确交易时间、制度与成交、成本、容量及失败边界。
 
@@ -12,7 +12,7 @@
 | 02 | [第 02 章｜市场状态识别与择时](02_market_regime.md) | 市场状态的条件增量能否在样本外维持？ | 教学正文 v1 / 合成实验 |
 | 03 | [第 03 章｜周频行业轮动](03_industry_rotation.md) | 行业版次、历史成分与强弱标签如何定义？ | 教学正文 v1 / 合成实验 |
 | 04 | [第 04 章｜反转、动量与风格条件](04_reversal_momentum.md) | 反转因子的统计排序能力何时能转成组合超额？ | 教学正文 v1 / 合成实验 |
-| 05 | [第 05 章｜微盘、价值、质量与持仓更新](05_microcap_quality.md) | 微盘风格与财务质量如何处理容量和交易约束？ | 框架待写 |
+| 05 | [第 05 章｜微盘、价值、质量与持仓更新](05_microcap_quality.md) | 微盘风格与财务质量如何处理容量和交易约束？ | 教学正文 v1 / 合成实验 |
 | 06 | [第 06 章｜公告、股东与事件驱动](06_corporate_events.md) | 历史主体映射与披露时间能否满足研究门槛？ | 框架待写 |
 | 07 | [第 07 章｜题材网络与行业条件基线](07_theme_network.md) | 题材重合比行业基线提供了什么新信息？ | 框架待写 |
 | 08 | [第 08 章｜协整、价差与统计套利](08_stat_arb.md) | 从宁德时代与比亚迪的历史价格认识配对交易及执行限制 | 入门案例初稿 / 实证待补 |
@@ -38,6 +38,12 @@ python examples/volume3_strategy_lab.py --json
 python -m unittest discover -s tests -p "test_volume3_strategy_lab.py" -v
 python -m unittest discover -s tests -p "test_volume3_chapters.py" -v
 ~~~
+
+## 第 05 章微盘策略教学实验
+
+- [第 05 章正文](05_microcap_quality.md)：低应计主排序、RESI5 候补、财务可得时间、五只主选、状态过滤与目标/实际持仓。
+- 数据集 [volume3-microcap-synthetic-v1](../../data/teaching/volume3_microcap_synthetic_v1.json) 为三期人工情景，不代表真实微盘股历史。
+- 运行：`python examples/volume3_microcap_lab.py --json`；测试：`python -m unittest discover -s tests -p "test_volume3_microcap_lab.py" -v`。
 
 ## 第 08 章已收录入门案例
 
