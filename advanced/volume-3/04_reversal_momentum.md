@@ -26,7 +26,7 @@ F^{mom}_{i,t}=
 
 例如，人工价格 \(P_t=95\)、反转参考端点价格为 100，则 \(F^{rev}=+0.05\)；若动量参考端点价格为 90，则 \(F^{mom}\approx+0.05556\)。**两个评分方向不同，不是哪个更“正确”**；应事先冻结研究方向，不能事后取负号迎合收益。
 
-真实研究必须定义观察窗口、交易日历、停牌期间的处理、公司行为与复权版本。这里的 \`price_reference_reversal\` 和 \`price_reference_momentum\` 是教材直接生成的人工端点，**没有**随仓库提供真实连续行情，不能称为已证实的可交易特征。
+真实研究必须定义观察窗口、交易日历、停牌期间的处理、公司行为与复权版本。这里的 `price_reference_reversal` 和 `price_reference_momentum` 是教材直接生成的人工端点，**没有**随仓库提供真实连续行情，不能称为已证实的可交易特征。
 
 ### 1.1 模型输入、收益标签与成交时点分开
 
@@ -106,7 +106,7 @@ python -m unittest discover -s tests -p "test_volume3_strategy_lab.py" -v
 
 查看 reversal_diagnostic：它给出 artificial strong_industry_mean_rankic、weak_industry_mean_rankic、all_stocks_mean_rankic 及有效期数。任何数字前都必须保留 **SYNTHETIC_ONLY** 标签。
 
-代码的主要函数包括 \`score_reversal\`、\`score_momentum\`、\`asof_members\`、\`ranked_industries\`、\`spearman\` 和 \`reversal_diagnostic\`。测试覆盖：人工价格端点的手算、完全反序排名的 Spearman、恒定评分时返回未定义、成员信息晚到不能混入当期截面，以及改变未来收益不改变当期评分、行业强弱与市场门禁。
+代码的主要函数包括 `score_reversal`、`score_momentum`、`asof_members`、`ranked_industries`、`spearman` 和 `reversal_diagnostic`。测试覆盖：人工价格端点的手算、完全反序排名的 Spearman、恒定评分时返回未定义、成员信息晚到不能混入当期截面，以及改变未来收益不改变当期评分、行业强弱与市场门禁。
 
 ### 6.1 真实研究需要怎样的严格复核？
 
