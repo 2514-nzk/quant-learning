@@ -66,7 +66,7 @@
       "id": "volume3-weekly-synthetic-v1",
       "evidence_grade": "SYNTHETIC_ONLY",
       "frozen": true,
-      "source": "version-controlled, self-contained artificial sixteen-week industry and stock classroom scenario",
+      "source": "version-controlled artificial sixteen-period industry and security classroom scenario",
       "data_file": "data/teaching/volume3_weekly_v1.json",
       "expected_weeks": 16,
       "expected_industries_per_week": 4,
