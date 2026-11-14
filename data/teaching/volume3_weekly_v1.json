@@ -2,7 +2,7 @@
   "dataset_id": "volume3-weekly-synthetic-v1",
   "evidence_grade": "SYNTHETIC_ONLY",
   "generated_for": "THIRD_VOLUME_TEACHING_ONLY",
-  "calendar": "ARTIFICIAL_WEEKLY_EVENT_SEQUENCE_NO_EXCHANGE_CALENDAR",
+  "calendar": "ARTIFICIAL_PERIOD_SEQUENCE_NO_EXCHANGE_CALENDAR",
   "timezone": "+08:00",
   "notes": "All securities, classifications, scores, dates, timestamps and subsequent labels are invented for method teaching. The event sequence is not an official exchange calendar, not real A-share history, not a backtest and not evidence of alpha or execution.",
   "development_weeks": 8,
@@ -32,32 +32,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-02T09:30:00+08:00",
-          "following_week_return": 0.01478,
-          "strength_score": 0.01996
+          "strength_score": 0.01996,
+          "following_period_return": 0.01478
         },
         {
           "industry_code": "O_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-02T09:30:00+08:00",
-          "following_week_return": 0.00234,
-          "strength_score": -0.0015
+          "strength_score": -0.0015,
+          "following_period_return": 0.00234
         },
         {
           "industry_code": "O_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-02T09:30:00+08:00",
-          "following_week_return": -0.01586,
-          "strength_score": -0.02596
+          "strength_score": -0.02596,
+          "following_period_return": -0.01586
         },
         {
           "industry_code": "O_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-02T09:30:00+08:00",
-          "following_week_return": -0.00256,
-          "strength_score": 0.00746
+          "strength_score": 0.00746,
+          "following_period_return": -0.00256
         }
       ],
       "stocks": [
@@ -156,32 +156,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-09T09:30:00+08:00",
-          "following_week_return": 0.00803,
-          "strength_score": 0.01301
+          "strength_score": 0.01301,
+          "following_period_return": 0.00803
         },
         {
           "industry_code": "O_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-09T09:30:00+08:00",
-          "following_week_return": -0.01477,
-          "strength_score": -0.02187
+          "strength_score": -0.02187,
+          "following_period_return": -0.01477
         },
         {
           "industry_code": "O_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-09T09:30:00+08:00",
-          "following_week_return": -0.01638,
-          "strength_score": -0.01904
+          "strength_score": -0.01904,
+          "following_period_return": -0.01638
         },
         {
           "industry_code": "O_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-09T09:30:00+08:00",
-          "following_week_return": 0.01139,
-          "strength_score": 0.02783
+          "strength_score": 0.02783,
+          "following_period_return": 0.01139
         }
       ],
       "stocks": [
@@ -280,32 +280,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-16T09:30:00+08:00",
-          "following_week_return": -0.00841,
-          "strength_score": -0.00606
+          "strength_score": -0.00606,
+          "following_period_return": -0.00841
         },
         {
           "industry_code": "O_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-16T09:30:00+08:00",
-          "following_week_return": -0.02391,
-          "strength_score": -0.03185
+          "strength_score": -0.03185,
+          "following_period_return": -0.02391
         },
         {
           "industry_code": "O_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-16T09:30:00+08:00",
-          "following_week_return": -0.00417,
-          "strength_score": 0.00001
+          "strength_score": 0.00001,
+          "following_period_return": -0.00417
         },
         {
           "industry_code": "O_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-16T09:30:00+08:00",
-          "following_week_return": 0.02395,
-          "strength_score": 0.03784
+          "strength_score": 0.03784,
+          "following_period_return": 0.02395
         }
       ],
       "stocks": [
@@ -404,32 +404,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-23T09:30:00+08:00",
-          "following_week_return": -0.0233,
-          "strength_score": -0.02674
+          "strength_score": -0.02674,
+          "following_period_return": -0.0233
         },
         {
           "industry_code": "O_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-23T09:30:00+08:00",
-          "following_week_return": -0.01876,
-          "strength_score": -0.02595
+          "strength_score": -0.02595,
+          "following_period_return": -0.01876
         },
         {
           "industry_code": "O_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-23T09:30:00+08:00",
-          "following_week_return": 0.01301,
-          "strength_score": 0.02071
+          "strength_score": 0.02071,
+          "following_period_return": 0.01301
         },
         {
           "industry_code": "O_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-23T09:30:00+08:00",
-          "following_week_return": 0.02599,
-          "strength_score": 0.03198
+          "strength_score": 0.03198,
+          "following_period_return": 0.02599
         }
       ],
       "stocks": [
@@ -528,32 +528,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-30T09:30:00+08:00",
-          "following_week_return": -0.0269,
-          "strength_score": -0.03766
+          "strength_score": -0.03766,
+          "following_period_return": -0.0269
         },
         {
           "industry_code": "O_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-30T09:30:00+08:00",
-          "following_week_return": -0.00286,
-          "strength_score": -0.00743
+          "strength_score": -0.00743,
+          "following_period_return": -0.00286
         },
         {
           "industry_code": "O_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-30T09:30:00+08:00",
-          "following_week_return": 0.02352,
-          "strength_score": 0.03166
+          "strength_score": 0.03166,
+          "following_period_return": 0.02352
         },
         {
           "industry_code": "O_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-07-30T09:30:00+08:00",
-          "following_week_return": 0.01515,
-          "strength_score": 0.01347
+          "strength_score": 0.01347,
+          "following_period_return": 0.01515
         }
       ],
       "stocks": [
@@ -652,32 +652,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-08-06T09:30:00+08:00",
-          "following_week_return": -0.01755,
-          "strength_score": -0.03281
+          "strength_score": -0.03281,
+          "following_period_return": -0.01755
         },
         {
           "industry_code": "O_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-08-06T09:30:00+08:00",
-          "following_week_return": 0.01297,
-          "strength_score": 0.01354
+          "strength_score": 0.01354,
+          "following_period_return": 0.01297
         },
         {
           "industry_code": "O_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-08-06T09:30:00+08:00",
-          "following_week_return": 0.02005,
-          "strength_score": 0.02684
+          "strength_score": 0.02684,
+          "following_period_return": 0.02005
         },
         {
           "industry_code": "O_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-08-06T09:30:00+08:00",
-          "following_week_return": -0.00188,
-          "strength_score": -0.0075
+          "strength_score": -0.0075,
+          "following_period_return": -0.00188
         }
       ],
       "stocks": [
@@ -776,32 +776,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-08-13T09:30:00+08:00",
-          "following_week_return": -0.00233,
-          "strength_score": -0.01485
+          "strength_score": -0.01485,
+          "following_period_return": -0.00233
         },
         {
           "industry_code": "O_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-08-13T09:30:00+08:00",
-          "following_week_return": 0.01821,
-          "strength_score": 0.0254
+          "strength_score": 0.0254,
+          "following_period_return": 0.01821
         },
         {
           "industry_code": "O_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-08-13T09:30:00+08:00",
-          "following_week_return": 0.00486,
-          "strength_score": 0.0089
+          "strength_score": 0.0089,
+          "following_period_return": 0.00486
         },
         {
           "industry_code": "O_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-08-13T09:30:00+08:00",
-          "following_week_return": -0.01362,
-          "strength_score": -0.01939
+          "strength_score": -0.01939,
+          "following_period_return": -0.01362
         }
       ],
       "stocks": [
@@ -900,32 +900,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-08-20T09:30:00+08:00",
-          "following_week_return": 0.00839,
-          "strength_score": 0.00633
+          "strength_score": 0.00633,
+          "following_period_return": 0.00839
         },
         {
           "industry_code": "O_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-08-20T09:30:00+08:00",
-          "following_week_return": 0.00999,
-          "strength_score": 0.02163
+          "strength_score": 0.02163,
+          "following_period_return": 0.00999
         },
         {
           "industry_code": "O_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-08-20T09:30:00+08:00",
-          "following_week_return": -0.01171,
-          "strength_score": -0.01229
+          "strength_score": -0.01229,
+          "following_period_return": -0.01171
         },
         {
           "industry_code": "O_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_OLD",
           "feature_known_at": "2024-08-20T09:30:00+08:00",
-          "following_week_return": -0.01185,
-          "strength_score": -0.01566
+          "strength_score": -0.01566,
+          "following_period_return": -0.01185
         }
       ],
       "stocks": [
@@ -1024,32 +1024,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-08-27T09:30:00+08:00",
-          "following_week_return": 0.00834,
-          "strength_score": 0.01907
+          "strength_score": 0.01907,
+          "following_period_return": 0.00834
         },
         {
           "industry_code": "N_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-08-27T09:30:00+08:00",
-          "following_week_return": -0.00541,
-          "strength_score": 0.00431
+          "strength_score": 0.00431,
+          "following_period_return": -0.00541
         },
         {
           "industry_code": "N_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-08-27T09:30:00+08:00",
-          "following_week_return": -0.01858,
-          "strength_score": -0.02506
+          "strength_score": -0.02506,
+          "following_period_return": -0.01858
         },
         {
           "industry_code": "N_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-08-27T09:30:00+08:00",
-          "following_week_return": 0.00242,
-          "strength_score": 0.00165
+          "strength_score": 0.00165,
+          "following_period_return": 0.00242
         }
       ],
       "stocks": [
@@ -1148,32 +1148,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-03T09:30:00+08:00",
-          "following_week_return": -0.00092,
-          "strength_score": 0.01637
+          "strength_score": 0.01637,
+          "following_period_return": -0.00092
         },
         {
           "industry_code": "N_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-03T09:30:00+08:00",
-          "following_week_return": -0.0174,
-          "strength_score": -0.01704
+          "strength_score": -0.01704,
+          "following_period_return": -0.0174
         },
         {
           "industry_code": "N_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-03T09:30:00+08:00",
-          "following_week_return": -0.01164,
-          "strength_score": -0.02239
+          "strength_score": -0.02239,
+          "following_period_return": -0.01164
         },
         {
           "industry_code": "N_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-03T09:30:00+08:00",
-          "following_week_return": 0.01954,
-          "strength_score": 0.023
+          "strength_score": 0.023,
+          "following_period_return": 0.01954
         }
       ],
       "stocks": [
@@ -1272,32 +1272,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-10T09:30:00+08:00",
-          "following_week_return": -0.01189,
-          "strength_score": -0.0003
+          "strength_score": -0.0003,
+          "following_period_return": -0.01189
         },
         {
           "industry_code": "N_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-10T09:30:00+08:00",
-          "following_week_return": 0.00584,
-          "strength_score": -0.03066
+          "strength_score": -0.03066,
+          "following_period_return": 0.00584
         },
         {
           "industry_code": "N_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-10T09:30:00+08:00",
-          "following_week_return": 0.00833,
-          "strength_score": -0.00575
+          "strength_score": -0.00575,
+          "following_period_return": 0.00833
         },
         {
           "industry_code": "N_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-10T09:30:00+08:00",
-          "following_week_return": -0.00131,
-          "strength_score": 0.03664
+          "strength_score": 0.03664,
+          "following_period_return": -0.00131
         }
       ],
       "stocks": [
@@ -1396,32 +1396,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-17T09:30:00+08:00",
-          "following_week_return": -0.00066,
-          "strength_score": -0.02175
+          "strength_score": -0.02175,
+          "following_period_return": -0.00066
         },
         {
           "industry_code": "N_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-17T09:30:00+08:00",
-          "following_week_return": 0.01341,
-          "strength_score": -0.02906
+          "strength_score": -0.02906,
+          "following_period_return": 0.01341
         },
         {
           "industry_code": "N_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-17T09:30:00+08:00",
-          "following_week_return": 0.00434,
-          "strength_score": 0.01571
+          "strength_score": 0.01571,
+          "following_period_return": 0.00434
         },
         {
           "industry_code": "N_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-17T09:30:00+08:00",
-          "following_week_return": -0.00558,
-          "strength_score": 0.03508
+          "strength_score": 0.03508,
+          "following_period_return": -0.00558
         }
       ],
       "stocks": [
@@ -1520,32 +1520,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-24T09:30:00+08:00",
-          "following_week_return": 0.01255,
-          "strength_score": -0.03619
+          "strength_score": -0.03619,
+          "following_period_return": 0.01255
         },
         {
           "industry_code": "N_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-24T09:30:00+08:00",
-          "following_week_return": 0.01258,
-          "strength_score": -0.01312
+          "strength_score": -0.01312,
+          "following_period_return": 0.01258
         },
         {
           "industry_code": "N_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-24T09:30:00+08:00",
-          "following_week_return": -0.00451,
-          "strength_score": 0.03017
+          "strength_score": 0.03017,
+          "following_period_return": -0.00451
         },
         {
           "industry_code": "N_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-09-24T09:30:00+08:00",
-          "following_week_return": -0.008,
-          "strength_score": 0.01916
+          "strength_score": 0.01916,
+          "following_period_return": -0.008
         }
       ],
       "stocks": [
@@ -1644,32 +1644,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-10-01T09:30:00+08:00",
-          "following_week_return": 0.0183,
-          "strength_score": -0.03566
+          "strength_score": -0.03566,
+          "following_period_return": 0.0183
         },
         {
           "industry_code": "N_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-10-01T09:30:00+08:00",
-          "following_week_return": 0.00248,
-          "strength_score": 0.00839
+          "strength_score": 0.00839,
+          "following_period_return": 0.00248
         },
         {
           "industry_code": "N_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-10-01T09:30:00+08:00",
-          "following_week_return": -0.01237,
-          "strength_score": 0.02968
+          "strength_score": 0.02968,
+          "following_period_return": -0.01237
         },
         {
           "industry_code": "N_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-10-01T09:30:00+08:00",
-          "following_week_return": -0.00504,
-          "strength_score": -0.00235
+          "strength_score": -0.00235,
+          "following_period_return": -0.00504
         }
       ],
       "stocks": [
@@ -1768,32 +1768,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-10-08T09:30:00+08:00",
-          "following_week_return": 0.01183,
-          "strength_score": -0.02046
+          "strength_score": -0.02046,
+          "following_period_return": 0.01183
         },
         {
           "industry_code": "N_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-10-08T09:30:00+08:00",
-          "following_week_return": -0.0107,
-          "strength_score": 0.02363
+          "strength_score": 0.02363,
+          "following_period_return": -0.0107
         },
         {
           "industry_code": "N_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-10-08T09:30:00+08:00",
-          "following_week_return": -0.01274,
-          "strength_score": 0.01451
+          "strength_score": 0.01451,
+          "following_period_return": -0.01274
         },
         {
           "industry_code": "N_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-10-08T09:30:00+08:00",
-          "following_week_return": 0.00295,
-          "strength_score": -0.01761
+          "strength_score": -0.01761,
+          "following_period_return": 0.00295
         }
       ],
       "stocks": [
@@ -1892,32 +1892,32 @@
           "industry_name": "教材A行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-10-15T09:30:00+08:00",
-          "following_week_return": -0.00304,
-          "strength_score": 0.00104
+          "strength_score": 0.00104,
+          "following_period_return": -0.00304
         },
         {
           "industry_code": "N_B",
           "industry_name": "教材B行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-10-15T09:30:00+08:00",
-          "following_week_return": -0.01762,
-          "strength_score": 0.02421
+          "strength_score": 0.02421,
+          "following_period_return": -0.01762
         },
         {
           "industry_code": "N_C",
           "industry_name": "教材C行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-10-15T09:30:00+08:00",
-          "following_week_return": -0.00385,
-          "strength_score": -0.007
+          "strength_score": -0.007,
+          "following_period_return": -0.00385
         },
         {
           "industry_code": "N_D",
           "industry_name": "教材D行业",
           "taxonomy_version": "TEACH_NEW",
           "feature_known_at": "2024-10-15T09:30:00+08:00",
-          "following_week_return": 0.01092,
-          "strength_score": -0.01823
+          "strength_score": -0.01823,
+          "following_period_return": 0.01092
         }
       ],
       "stocks": [
