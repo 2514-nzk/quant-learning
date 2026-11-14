@@ -61,7 +61,7 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
 
     def test_textbook_dataset_is_fourth_and_synthetic_not_source_backtest(self):
         manifest = json.loads((ROOT / "data/teaching/manifest.json").read_text("utf-8"))
-        self.assertEqual(len(manifest["datasets"]), 4)
+        self.assertEqual(len(manifest["datasets"]), 5)
         names = [x["id"] for x in manifest["datasets"]]
         self.assertIn("volume3-weekly-synthetic-v1", names)
         payload = load_fixture()
@@ -98,12 +98,12 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
             self.assertIn("状态：教学正文 v1", item["content"])
         self.assertTrue("状态：真实价格入门案例初稿" in
                         third_chapters[7]["content"])
-        self.assertIn("正文待写", third_chapters[4]["content"])
+        self.assertIn("状态：教学正文 v1", third_chapters[4]["content"])
 
     def test_reader_completion_respects_existing_storage_and_new_written_chapters(self):
         app = (ROOT / "reader/app.js").read_text("utf-8")
         self.assertIn('const STORAGE_KEY = "quant-learning-reader-v1"', app)
-        self.assertIn('4 章教学正文 · 1 章入门案例 · 8 章待写', app)
+        self.assertIn('5 章教学正文 · 1 章入门案例 · 7 章待写', app)
         self.assertIn("0[1-4]|08", app)
         self.assertIn("readingRoute = firstVolume.filter", app)
         self.assertNotIn('status: "1 章案例初稿 · 12 章待写"', app)
