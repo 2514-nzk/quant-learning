@@ -5,7 +5,7 @@ import unittest
 
 from examples.volume3_strategy_lab import (
     DATASET_ID, asof_members, eligible_training_weeks, evaluate, load_fixture,
-    ranked_industries, regime, run_strategy, score_rev20, spearman, target_weights,
+    ranked_industries, regime, run_strategy, score_reversal, spearman, target_weights,
     turnover_l1, validate_fixture,
 )
 
@@ -86,8 +86,8 @@ class VolumeThreeStrategyLabTests(unittest.TestCase):
             validate_fixture(bad)
 
     def test_score_definitions_and_ties(self):
-        item = {"price_t": 95, "price_t_minus_20": 100, "price_t_minus_5": 90}
-        self.assertAlmostEqual(score_rev20(item), .05)
+        item = {"price_t": 95, "price_reference_reversal": 100, "price_reference_momentum": 90}
+        self.assertAlmostEqual(score_reversal(item), .05)
         self.assertAlmostEqual(spearman([1, 2, 3], [3, 2, 1]), -1)
         self.assertIsNone(spearman([1, 1, 1], [1, 2, 3]))
         self.assertIsNone(spearman([1, 2], [1, 2]))
