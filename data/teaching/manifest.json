@@ -82,6 +82,21 @@
         "real OOS or Alpha",
         "confirmed trade execution"
       ]
+    },
+    {
+      "id": "volume3-microcap-synthetic-v1",
+      "evidence_grade": "SYNTHETIC_ONLY",
+      "frozen": true,
+      "source": "version-controlled artificial three-rebalance microcap selection and holding-state classroom scenario",
+      "data_file": "data/teaching/volume3_microcap_synthetic_v1.json",
+      "expected_rebalance_dates": 3,
+      "scope": "volume-3:05",
+      "not_allowed_claims": [
+        "historical A-share microcap returns",
+        "verified PIT financial data",
+        "real RESI5 alpha",
+        "confirmed execution or net returns"
+      ]
     }
   ]
 }
