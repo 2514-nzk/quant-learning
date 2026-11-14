@@ -24,7 +24,7 @@
 - **流动性条件**：成交额、换手率或其他指标的观察窗口、单位、缺失语义和最低要求。
 - **历史成员**：成分身份必须使用当时有效的版本，不能用今天的股票池回填历史。
 
-教学数据中的 \`size_rank\`、\`listing_days\` 和 \`liquidity_ok\` 都是人工字段，只用于说明资格门禁，不代表真实证券的历史属性。
+教学数据中的 `size_rank`、`listing_days` 和 `liquidity_ok` 都是人工字段，只用于说明资格门禁，不代表真实证券的历史属性。
 
 ## 2. 应计与财务质量：定义不等于方向
 
@@ -90,7 +90,7 @@ available\_at_i < d_t
 
 ## 6. 可运行实验：资格门禁、候补与现金核对
 
-数据文件：\`data/teaching/volume3_microcap_synthetic_v1.json\`。证券标识、日期、财务评分、规模排序、流动性状态和交易受阻状态均为人工构造，证据等级为 \`SYNTHETIC_ONLY\`。
+数据文件：`data/teaching/volume3_microcap_synthetic_v1.json`。证券标识、日期、财务评分、规模排序、流动性状态和交易受阻状态均为人工构造，证据等级为 `SYNTHETIC_ONLY`。
 
 在仓库根目录运行：
 
