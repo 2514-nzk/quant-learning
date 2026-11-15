@@ -170,6 +170,10 @@ def evaluate(data):
             nonshared_mean = sum(returns[x] for x in nonshared) / len(nonshared)
             industry_mean = sum(returns[x] for x in peers) / len(peers)
             similarities = [jaccard(anchor_themes, theme_sets[x]) for x in shared]
+            weighted_similarities = [
+                weighted_jaccard(anchor_themes, theme_sets[x], breadth, len(securities))
+                for x in shared
+            ]
             anchor_rows.append({
                 "period_id": period["period_id"], "anchor": anchor,
                 "industry_id": industry, "shared_peer_ids": shared,
@@ -179,7 +183,9 @@ def evaluate(data):
                 "industry_peer_mean_return": round(industry_mean, 8),
                 "shared_minus_nonshared": round(shared_mean - nonshared_mean, 8),
                 "shared_minus_industry": round(shared_mean - industry_mean, 8),
-                "mean_shared_jaccard": round(sum(similarities) / len(similarities), 8)
+                "mean_shared_jaccard": round(sum(similarities) / len(similarities), 8),
+                "mean_shared_weighted_jaccard": round(
+                    sum(weighted_similarities) / len(weighted_similarities), 8)
             })
         selected = [x for x in anchor_rows if x["period_id"] == period["period_id"]]
         if not selected:
@@ -192,7 +198,9 @@ def evaluate(data):
             "mean_shared_minus_industry": round(
                 sum(x["shared_minus_industry"] for x in selected) / len(selected), 8),
             "mean_shared_jaccard": round(
-                sum(x["mean_shared_jaccard"] for x in selected) / len(selected), 8)
+                sum(x["mean_shared_jaccard"] for x in selected) / len(selected), 8),
+            "mean_shared_weighted_jaccard": round(
+                sum(x["mean_shared_weighted_jaccard"] for x in selected) / len(selected), 8)
         })
         degrees = {security: len(theme_sets[security]) for security in securities}
         network_rows.append({

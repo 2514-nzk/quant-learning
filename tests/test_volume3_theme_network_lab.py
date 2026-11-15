@@ -52,6 +52,12 @@ class ThemeNetworkLabTests(unittest.TestCase):
         self.assertGreaterEqual(a, 0)
         self.assertLessEqual(a, 1)
 
+    def test_weighted_similarity_is_reported_for_shared_peers(self):
+        result = evaluate(self.data)
+        for period in result["periods"]:
+            self.assertGreaterEqual(period["mean_shared_weighted_jaccard"], 0)
+            self.assertLessEqual(period["mean_shared_weighted_jaccard"], 1)
+
     def test_future_return_mutation_does_not_change_network_snapshot(self):
         changed = copy.deepcopy(self.data)
         before = snapshot_for_period(changed["periods"][0], changed)

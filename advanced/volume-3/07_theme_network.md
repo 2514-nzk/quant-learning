@@ -1,6 +1,6 @@
 # 第三卷 · 07｜题材网络与行业条件基线
 
-> **状态：教学正文 v1；独立合成题材关系、PIT 网络快照、同行业对照实验与边界测试已建立。** 本章不使用真实题材供应商数据、真实证券关系或个人研究结果。
+> **状态：教学正文 v1；证据等级：SYNTHETIC_ONLY；独立合成题材关系、PIT 网络快照、同行业对照实验与边界测试已建立。** 本章不使用真实题材供应商数据、真实证券关系或个人研究结果。
 
 ## 本章核心问题
 
@@ -39,7 +39,7 @@ G_t=(S_t,T_t,E_t).
 \[
 A_{i,k,t}=
 \begin{cases}
-1,& \text{股票 }i\text{ 在时点 }t\text{ 有一条可用的题材 }k\text{ 关系}\\
+1,& \text{股票 }i\text{ 在时点 }t\text{ 有一条可用的题材 }k\text{ 关系}\
 0,& \text{当前 PIT 快照中没有这条已知关系}
 \end{cases}
 \]
@@ -223,7 +223,7 @@ python examples/volume3_theme_network_lab.py --json
 python -m unittest discover -s tests -p "test_volume3_theme_network_lab.py" -v
 ~~~
 
-程序输出每期的网络边数、题材广度、股票度数、Jaccard、同行业锚定差值、日期区块汇总与教学用区块 bootstrap 区间。它不会报告真实市场 alpha、因果效应或可执行收益。
+程序输出每期的网络边数、题材广度、股票度数、Jaccard、加权 Jaccard、同行业锚定差值、日期区块汇总与教学用区块 bootstrap 区间。它不会报告真实市场 alpha、因果效应或可执行收益。
 
 ## 10. 习题与参考答案
 
