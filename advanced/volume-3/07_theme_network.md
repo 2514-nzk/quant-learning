@@ -39,7 +39,7 @@ G_t=(S_t,T_t,E_t).
 \[
 A_{i,k,t}=
 \begin{cases}
-1,& \text{股票 }i\text{ 在时点 }t\text{ 有一条可用的题材 }k\text{ 关系}\
+1,& \text{股票 }i\text{ 在时点 }t\text{ 有一条可用的题材 }k\text{ 关系}\\
 0,& \text{当前 PIT 快照中没有这条已知关系}
 \end{cases}
 \]
