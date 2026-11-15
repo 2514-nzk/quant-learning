@@ -62,7 +62,7 @@ class StandaloneBookTests(unittest.TestCase):
 
     def test_main_book_has_only_real_stock_lessons(self):
         docs = self.documents
-        self.assertEqual(len(docs), 23)
+        self.assertEqual(len(docs), 22)
         self.assertTrue(all(doc["path"].startswith("教程/真实_") for doc in docs))
         self.assertEqual(docs[0]["path"], "教程/真实_阅读指南.md")
         self.assertEqual(docs[1]["path"], "教程/真实_起步一课.md")
