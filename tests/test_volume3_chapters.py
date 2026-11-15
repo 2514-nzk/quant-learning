@@ -1,4 +1,4 @@
-"""Editorial and data-boundary checks for Volume III written chapters 01–05.
+"""Editorial and data-boundary checks for Volume III written chapters 01–06.
 
 Proves textbook structure and consistency, NOT independent real-market performance.
 """
@@ -59,11 +59,12 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
                 checked += 1
         self.assertGreaterEqual(checked, 15)
 
-    def test_textbook_datasets_include_fifth_synthetic_microcap_fixture(self):
+    def test_textbook_datasets_include_sixth_synthetic_event_fixture(self):
         manifest = json.loads((ROOT / "data/teaching/manifest.json").read_text("utf-8"))
-        self.assertEqual(len(manifest["datasets"]), 5)
+        self.assertEqual(len(manifest["datasets"]), 6)
         names = [x["id"] for x in manifest["datasets"]]
         self.assertIn("volume3-weekly-synthetic-v1", names)
+        self.assertIn("volume3-events-synthetic-v1", names)
         payload = load_fixture()
         self.assertEqual(payload["evidence_grade"], "SYNTHETIC_ONLY")
         self.assertEqual(payload["week_count"], 16)
@@ -99,11 +100,12 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
         self.assertTrue("状态：真实价格入门案例初稿" in
                         third_chapters[7]["content"])
         self.assertIn("状态：教学正文 v1", third_chapters[4]["content"])
+        self.assertIn("状态：教学正文 v1", third_chapters[5]["content"])
 
     def test_reader_completion_respects_existing_storage_and_new_written_chapters(self):
         app = (ROOT / "reader/app.js").read_text("utf-8")
         self.assertIn('const STORAGE_KEY = "quant-learning-reader-v1"', app)
-        self.assertIn('5 章教学正文 · 1 章入门案例 · 7 章待写', app)
+        self.assertIn('6 章教学正文 · 1 章入门案例 · 6 章待写', app)
         self.assertIn("0[1-4]|08", app)
         self.assertIn("readingRoute = firstVolume.filter", app)
         self.assertNotIn('status: "1 章案例初稿 · 12 章待写"', app)

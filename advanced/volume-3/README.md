@@ -1,6 +1,6 @@
 # 第三卷｜A 股策略与交易系统
 
-> **状态：第 01–05 章已完成可复算的教学正文 v1；第 08 章为真实价格入门案例；其余 7 章为待写框架。** 本卷尚无通过真实市场独立 OOS、完整 PIT 和真实成交验证的策略结论。
+> **状态：第 01–06 章已完成可复算的教学正文 v1；第 08 章为真实价格入门案例；其余 6 章为待写框架。** 本卷尚无通过真实市场独立 OOS、完整 PIT 和真实成交验证的策略结论。
 
 本卷研究 A 股策略与交易系统的通用方法：研究合同、历史证券与行业定义、因子评价、事件研究、订单执行、组合风险和研究治理。教材示例不复现任何内部生产策略。
 
@@ -13,7 +13,7 @@
 | 03 | [第 03 章｜行业轮动与历史分类版本](03_industry_rotation.md) | 历史行业版本与成员资格如何定义？ | 教学正文 v1 / 合成实验 |
 | 04 | [第 04 章｜反转、动量与风格条件](04_reversal_momentum.md) | 排序信息何时可能转化为组合收益？ | 教学正文 v1 / 合成实验 |
 | 05 | [第 05 章｜微盘、价值、质量与持仓更新](05_microcap_quality.md) | 如何处理历史股票池、财务质量和持仓约束？ | 教学正文 v1 / 合成实验 |
-| 06 | [第 06 章｜公告、股东与事件驱动](06_corporate_events.md) | 历史主体映射与披露时间能否满足研究门槛？ | 框架待写 |
+| 06 | [第 06 章｜公告、股东与事件驱动](06_corporate_events.md) | 历史主体映射与披露时间能否满足研究门槛？ | 教学正文 v1 / 合成实验 |
 | 07 | [第 07 章｜题材网络与行业条件基线](07_theme_network.md) | 题材关系比行业基线提供了什么增量信息？ | 框架待写 |
 | 08 | [第 08 章｜协整、价差与统计套利](08_stat_arb.md) | 如何从真实价格学习配对交易及执行限制？ | 入门案例初稿 / 实证待补 |
 | 09 | [第 09 章｜集合竞价、L2 数据与订单流](09_l2_auction.md) | L2 与普通行情的可观测边界在哪里？ | 框架待写 |
@@ -46,6 +46,12 @@ python -m unittest discover -s tests -p "test_volume3_chapters.py" -v
 - [第 05 章正文](05_microcap_quality.md)：历史股票池门禁、财务数据可得时间、通用主/候补评分与受约束权重。
 - 数据集 [volume3-microcap-synthetic-v1](../../data/teaching/volume3_microcap_synthetic_v1.json) 为人工教学情景，不代表真实证券历史。
 - 运行：`python examples/volume3_microcap_lab.py --json`；测试：`python -m unittest discover -s tests -p "test_volume3_microcap_lab.py" -v`。
+
+## 第 06 章：公告与事件研究教学实验
+
+- [第 06 章正文](06_corporate_events.md)：公告/接收时间门禁、历史主体映射、事件窗口、重叠事件、匹配控制和负对照。
+- 数据集 [volume3-events-synthetic-v1](../../data/teaching/volume3_events_synthetic_v1.json) 为人工情景，不代表真实公告或历史主体关系。
+- 运行：`python examples/volume3_corporate_events_lab.py --json`；测试：`python -m unittest discover -s tests -p "test_volume3_corporate_events_lab.py" -v`。
 
 ## 第 08 章：真实价格入门案例
 

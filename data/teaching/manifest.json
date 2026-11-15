@@ -97,6 +97,21 @@
         "real factor alpha",
         "confirmed execution or net returns"
       ]
+    },
+    {
+      "id": "volume3-events-synthetic-v1",
+      "evidence_grade": "SYNTHETIC_ONLY",
+      "frozen": true,
+      "source": "version-controlled artificial corporate-event, historical-alias, vendor-receipt, return-window and matched-control classroom scenarios",
+      "data_file": "data/teaching/volume3_events_synthetic_v1.json",
+      "expected_events": 7,
+      "scope": "volume-3:06",
+      "not_allowed_claims": [
+        "real issuer identity history",
+        "verified vendor disclosure PIT",
+        "causal event effect",
+        "real event alpha or execution"
+      ]
     }
   ]
 }
