@@ -1,0 +1,57 @@
+name: One-time stale branch cleanup
+
+on:
+  push:
+    paths:
+      - ".github/cleanup-branches.trigger"
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete every non-default branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          default_branch="$(gh api "repos/${REPO}" --jq '.default_branch')"
+          if [[ "${default_branch}" != "master" ]]; then
+            echo "Unexpected default branch: ${default_branch}"
+            exit 1
+          fi
+
+          open_prs="$(gh api "repos/${REPO}/pulls?state=open&per_page=100" --jq 'length')"
+          if [[ "${open_prs}" != "0" ]]; then
+            echo "Refusing to delete branches while open PRs exist: ${open_prs}"
+            exit 1
+          fi
+
+          mapfile -t branches < <(gh api --paginate "repos/${REPO}/branches?per_page=100" --jq '.[].name')
+          deleted=0
+          failed=0
+
+          for branch in "${branches[@]}"; do
+            [[ "${branch}" == "${default_branch}" ]] && continue
+            if gh api --method DELETE "repos/${REPO}/git/refs/heads/${branch}" >/dev/null; then
+              echo "Deleted: ${branch}"
+              ((deleted+=1))
+            else
+              echo "Could not delete: ${branch}"
+              ((failed+=1))
+            fi
+          done
+
+          remaining="$(gh api --paginate "repos/${REPO}/branches?per_page=100" --jq '.[].name')"
+          echo "Deleted branches: ${deleted}"
+          echo "Remaining branches:"
+          printf '%s\n' "${remaining}"
+
+          if [[ "${failed}" -ne 0 || "${remaining}" != "${default_branch}" ]]; then
+            exit 1
+          fi
