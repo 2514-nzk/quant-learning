@@ -42,7 +42,7 @@ python examples/advanced_universe_coverage_lab.py --json
 python examples/advanced_real_evidence_audit.py --json
 ~~~
 
-如果仓库在构建中的分支，选择 `docs/three-volume-research-framework`。基础校验只依赖 Python 标准库，无需外部网络/私人数据库；真实行情采集是可选的独立维护操作，不属于 CI 的隐式步骤。
+默认克隆仓库的 `master` 主分支即可。基础校验只依赖 Python 标准库，无需外部网络或私人数据库；真实行情采集是可选的独立维护操作，不属于 CI 的隐式步骤。
 
 ## 5. 若将来需要更大的真实 A 股教学样本
 

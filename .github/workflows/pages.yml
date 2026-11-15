@@ -18,16 +18,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Check out three-volume reader source
         uses: actions/checkout@v4
+        with:
+          ref: master
+          persist-credentials: false
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.x"
+          python-version: "3.11"
       - name: Check reader JavaScript syntax
-        run: node --check reader/app.js && node --check reader/pyodide-worker.js && node --check reader/real-case.js && node tests/real_browser_lab.test.js
+        run: node --check reader/app.js && node --check reader/pyodide-worker.js && node --check reader/real-case.js && node tests/real_browser_lab.test.js && node tests/test_reader_volume_pager.js
       - name: Verify research-audit lab
         run: |
           python -m unittest discover -s tests -p "test_research_audit_lab.py" -v
@@ -55,8 +58,82 @@ jobs:
           python -m unittest discover -s tests -p "test_standalone_book.py" -v
           python examples/real_stock_learner.py
           python examples/real_kline_lab.py --symbol 000001
+      - name: Verify real historical OHLC evidence gates (unittest and direct CLI)
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_real_evidence_audit.py" -v
+          python examples/advanced_real_evidence_audit.py --json > /tmp/real_ohlc_evidence.json
+          python -c 'import json; d=json.load(open("/tmp/real_ohlc_evidence.json", encoding="utf-8")); assert d["evidence_grade"].startswith("DESCRIPTIVE_ONLY") and d["gates"]["L4_historical_full_universe"].startswith("FAIL_"); print("Real-price limitations preserved")'
+      - name: Verify canonical chapter numbering and volume sidebar taxonomy
+        run: python -m unittest discover -s tests -p "test_sidebar_taxonomy.py" -v
+      - name: Verify A-share-local PIT event timestamps and label-availability gate
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_pit_intake_lab.py" -v
+          python examples/advanced_pit_intake_lab.py --json > /tmp/pit_intake_contract.json
+          python -c 'import json; d=json.load(open("/tmp/pit_intake_contract.json", encoding="utf-8")); assert d["train_labels_purged"] == 1 and not d["historical_pit_proven"] and d["membership_asof"]["B"].startswith("UNKNOWN"); print("PIT demonstration gates passed")'
+      - name: Verify historical universe reference and real OHLC coverage
+        run: |
+          python -m unittest discover -s tests -p "test_advanced_universe_coverage_lab.py" -v
+          python examples/advanced_universe_coverage_lab.py --real-teaching --json > /tmp/real_universe_coverage.json
+          python -c 'import json; r=json.load(open("/tmp/real_universe_coverage.json",encoding="utf-8")); assert r["observed_security_sessions"]==468 and r["full_market_coverage_percent"] is None and not r["historical_pit_verified"]; print("Real source coverage audited without false denominator")'
+      - name: Verify textbook dataset catalog, PIT fixture and reader source boundaries
+        run: |
+          python -m unittest discover -s tests -p "test_teaching_dataset_contract.py" -v
+          python scripts/verify_teaching_datasets.py --json > /tmp/course_data.json
+          python -c 'import json; d=json.load(open("/tmp/course_data.json",encoding="utf-8")); assert d["verified"] and len(d["datasets"])==5 and not d["real_market_PIT_proven"]; print("Course data is self-contained")'
+      - name: Verify Volume II v1, Appendix D and fourteen numerical exercises
+        run: |
+          python -m unittest discover -s tests -p "test_volume2_quality_gate.py" -v
+          python -m unittest discover -s tests -p "test_advanced_framework.py" -v
+          python -m unittest discover -s tests -p "test_advanced_foundations_market_rules_lab.py" -v
+          python -m unittest discover -s tests -p "test_advanced_factor_research_lab.py" -v
+          python -m unittest discover -s tests -p "test_advanced_model_validation_lab.py" -v
+          python -m unittest discover -s tests -p "test_advanced_portfolio_execution_lab.py" -v
+      - name: Verify five strategy chapters, microcap teaching lab and no market-OOS overclaim
+        run: |
+          python -m unittest discover -s tests -p "test_volume3_strategy_lab.py" -v
+          python -m unittest discover -s tests -p "test_volume3_chapters.py" -v
+          python examples/volume3_strategy_lab.py --json > /tmp/v3_strategy.json
+          python -c 'import json; x=json.load(open("/tmp/v3_strategy.json",encoding="utf-8")); assert x["weeks"]==16 and x["unknown_members"]==1 and x["source_kind"]=="SYNTHETIC_ONLY" and not x["real_market_OOS_proven"] and not x["execution_proven"]; print("Teaching strategy boundary verified")'
+      - name: Verify Volume III Chapter 05 microcap teaching lab
+        run: |
+          python -m unittest discover -s tests -p "test_volume3_microcap_lab.py" -v
+          python examples/volume3_microcap_lab.py --json > /tmp/v3_microcap.json
+          python -c 'import json; d=json.load(open("/tmp/v3_microcap.json",encoding="utf-8")); assert d["evidence_grade"]=="SYNTHETIC_ONLY" and not d["market_pit_proven"] and not d["execution_proven"]; print("Microcap teaching-only boundary verified")'
       - name: Build reading site
         run: python reader/build_reader.py --output _site
+      - name: Validate all three volumes on canonical homepage
+        run: |
+          python -m unittest discover -s tests -p "test_reader_preview.py" -v
+          python -m unittest discover -s tests -p "test_advanced_framework.py" -v
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          site = Path("_site")
+          data = json.loads((site / "content.json").read_text(encoding="utf-8"))
+          first, advanced = data["documents"], data["framework"]
+          assert len(first) == 22, "first-volume reading track changed (optional pair case moved to volume 3)"
+          assert all(doc["group"].startswith("第一卷｜") for doc in first)
+          assert sum(doc["title"].startswith("第 ") and doc["group"].startswith("第二卷｜第 ") for doc in advanced) == 14
+          assert sum(doc["title"].startswith("第 ") and doc["group"].startswith("第三卷｜第 ") for doc in advanced) == 13
+          assert len(advanced) == 33, "14 chapters and 4 appendices plus third volume expected"
+          assert all(any(p["path"].startswith(f"advanced/volume-3/0{k}_") and "状态：教学正文 v1" in p["content"] for p in advanced) for k in range(1,6))
+          assert any(doc["path"] == "advanced/volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md"
+                     and "教材独立数据集" in doc["content"] for doc in advanced)
+          assert sum(doc["path"].startswith("advanced/volume-2/") for doc in advanced) == 19
+          assert sum(doc["path"].startswith("advanced/volume-3/") for doc in advanced) == 14
+          homepage = (site / "index.html").read_text(encoding="utf-8")
+          assert "三卷量化研究教材" in homepage
+          assert "第一卷" in homepage and "第二卷" in homepage
+          # Keep earlier /preview/?chapter=... URLs working after the move to /.
+          legacy = site / "preview"
+          legacy.mkdir(exist_ok=True)
+          (legacy / "index.html").write_text(
+              '<!doctype html><html lang="zh-CN"><meta charset="utf-8">'
+              '<title>正在打开新版阅读器</title>'
+              '<script>location.replace("../"+location.search+location.hash)</script>'
+              '<a href="../">进入三卷阅读器</a></html>', encoding="utf-8")
+          print("Canonical reader: first 22 items, volume two 14 chapters + 4 appendices, volume three 13 slots")
+          PY
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
