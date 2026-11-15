@@ -30,13 +30,13 @@ class FinancialQualityTests(unittest.TestCase):
     def test_lesson_is_after_financial_basics_before_time_split(self):
         docs=collect_documents()
         paths=[d["path"] for d in docs]
-        self.assertEqual(len(docs),23)
+        self.assertEqual(len(docs),22)
         self.assertEqual(paths.index("教程/真实_06a_合并报表与财务质量.md"),
                          paths.index("教程/真实_06_财务与预处理.md")+1)
         self.assertLess(paths.index("教程/真实_06a_合并报表与财务质量.md"),
                         paths.index("教程/真实_07_时间切分与泄漏.md"))
         lesson=next(d for d in docs if d["path"].endswith("真实_06a_合并报表与财务质量.md"))
-        self.assertEqual(lesson["group"],"第二篇 · 数据处理与因子研究")
+        self.assertEqual(lesson["group"],"第一卷｜第 03–08 章 · 因子研究")
 
     def test_intro_defines_terms_and_fake_hypotheticals_are_separate(self):
         text=LESSON.read_text(encoding="utf-8")

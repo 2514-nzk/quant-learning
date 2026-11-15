@@ -76,7 +76,7 @@ class ConceptFirstSequenceTests(unittest.TestCase):
 
     def test_book_navigation_places_pit_in_chapter_seven(self):
         docs = collect_documents()
-        self.assertEqual(len(docs), 23)
+        self.assertEqual(len(docs), 22)
         paths = [doc["path"] for doc in docs]
         self.assertLess(paths.index("教程/真实_06a_合并报表与财务质量.md"),
                         paths.index("教程/真实_07_时间切分与泄漏.md"))
