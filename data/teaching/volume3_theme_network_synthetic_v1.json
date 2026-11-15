@@ -1,0 +1,791 @@
+{
+  "dataset_id": "volume3-theme-network-synthetic-v1",
+  "evidence_grade": "SYNTHETIC_ONLY",
+  "frozen": true,
+  "generated_for": "THIRD_VOLUME_CHAPTER_07_TEACHING_ONLY",
+  "calendar": "ARTIFICIAL_PERIOD_SEQUENCE_NO_EXCHANGE_CALENDAR",
+  "timezone": "+08:00",
+  "notes": "All securities, industries, themes, relationship records, timestamps and returns are artificial. Forward returns are generated independently of theme links. No real A-share issuer, vendor theme history, predictive alpha, causal effect or execution is represented.",
+  "expected_periods": 6,
+  "expected_securities": 12,
+  "securities": [
+    {
+      "security_id": "S01",
+      "industry_id": "IND_A"
+    },
+    {
+      "security_id": "S02",
+      "industry_id": "IND_A"
+    },
+    {
+      "security_id": "S03",
+      "industry_id": "IND_A"
+    },
+    {
+      "security_id": "S04",
+      "industry_id": "IND_A"
+    },
+    {
+      "security_id": "S05",
+      "industry_id": "IND_B"
+    },
+    {
+      "security_id": "S06",
+      "industry_id": "IND_B"
+    },
+    {
+      "security_id": "S07",
+      "industry_id": "IND_B"
+    },
+    {
+      "security_id": "S08",
+      "industry_id": "IND_B"
+    },
+    {
+      "security_id": "S09",
+      "industry_id": "IND_C"
+    },
+    {
+      "security_id": "S10",
+      "industry_id": "IND_C"
+    },
+    {
+      "security_id": "S11",
+      "industry_id": "IND_C"
+    },
+    {
+      "security_id": "S12",
+      "industry_id": "IND_C"
+    }
+  ],
+  "periods": [
+    {
+      "period_id": "P01",
+      "signal_at": "2025-01-07T09:30:00+08:00",
+      "snapshot_complete_at": "2025-01-07T10:00:00+08:00",
+      "decision_at": "2025-01-07T10:15:00+08:00",
+      "entry_at": "2025-01-08T09:30:00+08:00",
+      "exit_at": "2025-01-13T14:30:00+08:00",
+      "label_available_at": "2025-01-13T15:00:00+08:00",
+      "snapshot_source_version": "SYN_THEME_SNAPSHOT_V1",
+      "returns": [
+        {
+          "security_id": "S01",
+          "forward_return": 0.0003
+        },
+        {
+          "security_id": "S02",
+          "forward_return": 0.0124
+        },
+        {
+          "security_id": "S03",
+          "forward_return": -0.0008
+        },
+        {
+          "security_id": "S04",
+          "forward_return": 0.0113
+        },
+        {
+          "security_id": "S05",
+          "forward_return": -0.0024
+        },
+        {
+          "security_id": "S06",
+          "forward_return": 0.0097
+        },
+        {
+          "security_id": "S07",
+          "forward_return": -0.0035
+        },
+        {
+          "security_id": "S08",
+          "forward_return": 0.0086
+        },
+        {
+          "security_id": "S09",
+          "forward_return": -0.0043
+        },
+        {
+          "security_id": "S10",
+          "forward_return": 0.0078
+        },
+        {
+          "security_id": "S11",
+          "forward_return": -0.0054
+        },
+        {
+          "security_id": "S12",
+          "forward_return": 0.0067
+        }
+      ]
+    },
+    {
+      "period_id": "P02",
+      "signal_at": "2025-01-14T09:30:00+08:00",
+      "snapshot_complete_at": "2025-01-14T10:00:00+08:00",
+      "decision_at": "2025-01-14T10:15:00+08:00",
+      "entry_at": "2025-01-15T09:30:00+08:00",
+      "exit_at": "2025-01-20T14:30:00+08:00",
+      "label_available_at": "2025-01-20T15:00:00+08:00",
+      "snapshot_source_version": "SYN_THEME_SNAPSHOT_V1",
+      "returns": [
+        {
+          "security_id": "S01",
+          "forward_return": 0.008
+        },
+        {
+          "security_id": "S02",
+          "forward_return": -0.0052
+        },
+        {
+          "security_id": "S03",
+          "forward_return": 0.0069
+        },
+        {
+          "security_id": "S04",
+          "forward_return": -0.0063
+        },
+        {
+          "security_id": "S05",
+          "forward_return": 0.0053
+        },
+        {
+          "security_id": "S06",
+          "forward_return": -0.0079
+        },
+        {
+          "security_id": "S07",
+          "forward_return": 0.0042
+        },
+        {
+          "security_id": "S08",
+          "forward_return": -0.009
+        },
+        {
+          "security_id": "S09",
+          "forward_return": 0.0034
+        },
+        {
+          "security_id": "S10",
+          "forward_return": -0.0098
+        },
+        {
+          "security_id": "S11",
+          "forward_return": 0.0023
+        },
+        {
+          "security_id": "S12",
+          "forward_return": -0.0109
+        }
+      ]
+    },
+    {
+      "period_id": "P03",
+      "signal_at": "2025-01-21T09:30:00+08:00",
+      "snapshot_complete_at": "2025-01-21T10:00:00+08:00",
+      "decision_at": "2025-01-21T10:15:00+08:00",
+      "entry_at": "2025-01-22T09:30:00+08:00",
+      "exit_at": "2025-01-27T14:30:00+08:00",
+      "label_available_at": "2025-01-27T15:00:00+08:00",
+      "snapshot_source_version": "SYN_THEME_SNAPSHOT_V1",
+      "returns": [
+        {
+          "security_id": "S01",
+          "forward_return": -0.0096
+        },
+        {
+          "security_id": "S02",
+          "forward_return": 0.0025
+        },
+        {
+          "security_id": "S03",
+          "forward_return": -0.0107
+        },
+        {
+          "security_id": "S04",
+          "forward_return": 0.0014
+        },
+        {
+          "security_id": "S05",
+          "forward_return": -0.0123
+        },
+        {
+          "security_id": "S06",
+          "forward_return": -0.0002
+        },
+        {
+          "security_id": "S07",
+          "forward_return": 0.0119
+        },
+        {
+          "security_id": "S08",
+          "forward_return": -0.0013
+        },
+        {
+          "security_id": "S09",
+          "forward_return": 0.0111
+        },
+        {
+          "security_id": "S10",
+          "forward_return": -0.0021
+        },
+        {
+          "security_id": "S11",
+          "forward_return": 0.01
+        },
+        {
+          "security_id": "S12",
+          "forward_return": -0.0032
+        }
+      ]
+    },
+    {
+      "period_id": "P04",
+      "signal_at": "2025-01-28T09:30:00+08:00",
+      "snapshot_complete_at": "2025-01-28T10:00:00+08:00",
+      "decision_at": "2025-01-28T10:15:00+08:00",
+      "entry_at": "2025-01-29T09:30:00+08:00",
+      "exit_at": "2025-02-03T14:30:00+08:00",
+      "label_available_at": "2025-02-03T15:00:00+08:00",
+      "snapshot_source_version": "SYN_THEME_SNAPSHOT_V1",
+      "returns": [
+        {
+          "security_id": "S01",
+          "forward_return": -0.0019
+        },
+        {
+          "security_id": "S02",
+          "forward_return": 0.0102
+        },
+        {
+          "security_id": "S03",
+          "forward_return": -0.003
+        },
+        {
+          "security_id": "S04",
+          "forward_return": 0.0091
+        },
+        {
+          "security_id": "S05",
+          "forward_return": -0.0046
+        },
+        {
+          "security_id": "S06",
+          "forward_return": 0.0075
+        },
+        {
+          "security_id": "S07",
+          "forward_return": -0.0057
+        },
+        {
+          "security_id": "S08",
+          "forward_return": 0.0064
+        },
+        {
+          "security_id": "S09",
+          "forward_return": -0.0065
+        },
+        {
+          "security_id": "S10",
+          "forward_return": 0.0056
+        },
+        {
+          "security_id": "S11",
+          "forward_return": -0.0076
+        },
+        {
+          "security_id": "S12",
+          "forward_return": 0.0045
+        }
+      ]
+    },
+    {
+      "period_id": "P05",
+      "signal_at": "2025-02-04T09:30:00+08:00",
+      "snapshot_complete_at": "2025-02-04T10:00:00+08:00",
+      "decision_at": "2025-02-04T10:15:00+08:00",
+      "entry_at": "2025-02-05T09:30:00+08:00",
+      "exit_at": "2025-02-10T14:30:00+08:00",
+      "label_available_at": "2025-02-10T15:00:00+08:00",
+      "snapshot_source_version": "SYN_THEME_SNAPSHOT_V1",
+      "returns": [
+        {
+          "security_id": "S01",
+          "forward_return": 0.0058
+        },
+        {
+          "security_id": "S02",
+          "forward_return": -0.0074
+        },
+        {
+          "security_id": "S03",
+          "forward_return": 0.0047
+        },
+        {
+          "security_id": "S04",
+          "forward_return": -0.0085
+        },
+        {
+          "security_id": "S05",
+          "forward_return": 0.0031
+        },
+        {
+          "security_id": "S06",
+          "forward_return": -0.0101
+        },
+        {
+          "security_id": "S07",
+          "forward_return": 0.002
+        },
+        {
+          "security_id": "S08",
+          "forward_return": -0.0112
+        },
+        {
+          "security_id": "S09",
+          "forward_return": 0.0012
+        },
+        {
+          "security_id": "S10",
+          "forward_return": -0.012
+        },
+        {
+          "security_id": "S11",
+          "forward_return": 0.0001
+        },
+        {
+          "security_id": "S12",
+          "forward_return": 0.0122
+        }
+      ]
+    },
+    {
+      "period_id": "P06",
+      "signal_at": "2025-02-11T09:30:00+08:00",
+      "snapshot_complete_at": "2025-02-11T10:00:00+08:00",
+      "decision_at": "2025-02-11T10:15:00+08:00",
+      "entry_at": "2025-02-12T09:30:00+08:00",
+      "exit_at": "2025-02-17T14:30:00+08:00",
+      "label_available_at": "2025-02-17T15:00:00+08:00",
+      "snapshot_source_version": "SYN_THEME_SNAPSHOT_V1",
+      "returns": [
+        {
+          "security_id": "S01",
+          "forward_return": -0.0118
+        },
+        {
+          "security_id": "S02",
+          "forward_return": 0.0003
+        },
+        {
+          "security_id": "S03",
+          "forward_return": 0.0124
+        },
+        {
+          "security_id": "S04",
+          "forward_return": -0.0008
+        },
+        {
+          "security_id": "S05",
+          "forward_return": 0.0108
+        },
+        {
+          "security_id": "S06",
+          "forward_return": -0.0024
+        },
+        {
+          "security_id": "S07",
+          "forward_return": 0.0097
+        },
+        {
+          "security_id": "S08",
+          "forward_return": -0.0035
+        },
+        {
+          "security_id": "S09",
+          "forward_return": 0.0089
+        },
+        {
+          "security_id": "S10",
+          "forward_return": -0.0043
+        },
+        {
+          "security_id": "S11",
+          "forward_return": 0.0078
+        },
+        {
+          "security_id": "S12",
+          "forward_return": -0.0054
+        }
+      ]
+    }
+  ],
+  "industry_memberships": [
+    {
+      "record_id": "IM01",
+      "security_id": "S01",
+      "industry_id": "IND_A",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2024-12-19T09:00:00+08:00",
+      "available_at": "2024-12-19T09:05:00+08:00",
+      "source": "SYNTHETIC_CLASSIFICATION",
+      "source_version": "INDUSTRY_V1",
+      "confidence": 1,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "IM02",
+      "security_id": "S02",
+      "industry_id": "IND_A",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2024-12-19T09:00:00+08:00",
+      "available_at": "2024-12-19T09:05:00+08:00",
+      "source": "SYNTHETIC_CLASSIFICATION",
+      "source_version": "INDUSTRY_V1",
+      "confidence": 1,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "IM03",
+      "security_id": "S03",
+      "industry_id": "IND_A",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2024-12-19T09:00:00+08:00",
+      "available_at": "2024-12-19T09:05:00+08:00",
+      "source": "SYNTHETIC_CLASSIFICATION",
+      "source_version": "INDUSTRY_V1",
+      "confidence": 1,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "IM04",
+      "security_id": "S04",
+      "industry_id": "IND_A",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2024-12-19T09:00:00+08:00",
+      "available_at": "2024-12-19T09:05:00+08:00",
+      "source": "SYNTHETIC_CLASSIFICATION",
+      "source_version": "INDUSTRY_V1",
+      "confidence": 1,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "IM05",
+      "security_id": "S05",
+      "industry_id": "IND_B",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2024-12-19T09:00:00+08:00",
+      "available_at": "2024-12-19T09:05:00+08:00",
+      "source": "SYNTHETIC_CLASSIFICATION",
+      "source_version": "INDUSTRY_V1",
+      "confidence": 1,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "IM06",
+      "security_id": "S06",
+      "industry_id": "IND_B",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2024-12-19T09:00:00+08:00",
+      "available_at": "2024-12-19T09:05:00+08:00",
+      "source": "SYNTHETIC_CLASSIFICATION",
+      "source_version": "INDUSTRY_V1",
+      "confidence": 1,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "IM07",
+      "security_id": "S07",
+      "industry_id": "IND_B",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2024-12-19T09:00:00+08:00",
+      "available_at": "2024-12-19T09:05:00+08:00",
+      "source": "SYNTHETIC_CLASSIFICATION",
+      "source_version": "INDUSTRY_V1",
+      "confidence": 1,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "IM08",
+      "security_id": "S08",
+      "industry_id": "IND_B",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2024-12-19T09:00:00+08:00",
+      "available_at": "2024-12-19T09:05:00+08:00",
+      "source": "SYNTHETIC_CLASSIFICATION",
+      "source_version": "INDUSTRY_V1",
+      "confidence": 1,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "IM09",
+      "security_id": "S09",
+      "industry_id": "IND_C",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2024-12-19T09:00:00+08:00",
+      "available_at": "2024-12-19T09:05:00+08:00",
+      "source": "SYNTHETIC_CLASSIFICATION",
+      "source_version": "INDUSTRY_V1",
+      "confidence": 1,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "IM10",
+      "security_id": "S10",
+      "industry_id": "IND_C",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2024-12-19T09:00:00+08:00",
+      "available_at": "2024-12-19T09:05:00+08:00",
+      "source": "SYNTHETIC_CLASSIFICATION",
+      "source_version": "INDUSTRY_V1",
+      "confidence": 1,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "IM11",
+      "security_id": "S11",
+      "industry_id": "IND_C",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2024-12-19T09:00:00+08:00",
+      "available_at": "2024-12-19T09:05:00+08:00",
+      "source": "SYNTHETIC_CLASSIFICATION",
+      "source_version": "INDUSTRY_V1",
+      "confidence": 1,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "IM12",
+      "security_id": "S12",
+      "industry_id": "IND_C",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2024-12-19T09:00:00+08:00",
+      "available_at": "2024-12-19T09:05:00+08:00",
+      "source": "SYNTHETIC_CLASSIFICATION",
+      "source_version": "INDUSTRY_V1",
+      "confidence": 1,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    }
+  ],
+  "theme_memberships": [
+    {
+      "record_id": "TM01",
+      "security_id": "S01",
+      "theme_id": "T01",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM02",
+      "security_id": "S01",
+      "theme_id": "T02",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM03",
+      "security_id": "S02",
+      "theme_id": "T01",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM04",
+      "security_id": "S03",
+      "theme_id": "T02",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM05",
+      "security_id": "S04",
+      "theme_id": "T03",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-24T10:20:00+08:00",
+      "available_at": "2025-01-24T10:30:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM06",
+      "security_id": "S05",
+      "theme_id": "T04",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM07",
+      "security_id": "S05",
+      "theme_id": "T05",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM08",
+      "security_id": "S06",
+      "theme_id": "T04",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM09",
+      "security_id": "S07",
+      "theme_id": "T05",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM10",
+      "security_id": "S08",
+      "theme_id": "T06",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-02-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM11",
+      "security_id": "S08",
+      "theme_id": "T04",
+      "effective_from": "2025-02-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-30T15:00:00+08:00",
+      "available_at": "2025-01-30T15:10:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM12",
+      "security_id": "S09",
+      "theme_id": "T07",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM13",
+      "security_id": "S09",
+      "theme_id": "T08",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM14",
+      "security_id": "S10",
+      "theme_id": "T07",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM15",
+      "security_id": "S11",
+      "theme_id": "T08",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    },
+    {
+      "record_id": "TM16",
+      "security_id": "S12",
+      "theme_id": "T09",
+      "effective_from": "2025-01-01",
+      "effective_to": "2025-03-01",
+      "published_at": "2025-01-02T08:00:00+08:00",
+      "available_at": "2025-01-02T08:05:00+08:00",
+      "source": "SYNTHETIC_THEME_PROVIDER",
+      "source_version": "THEME_V1",
+      "confidence": 0.95,
+      "review_status": "SYNTHETIC_CONFIRMED"
+    }
+  ]
+}

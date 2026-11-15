@@ -135,6 +135,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_volume3_microcap_lab.py" -v
           python -m unittest discover -s tests -p "test_volume3_corporate_events_lab.py" -v
+          python -m unittest discover -s tests -p "test_volume3_theme_network_lab.py" -v
           python examples/volume3_microcap_lab.py --json > /tmp/volume3_microcap.json
           python -c 'import json; d=json.load(open("/tmp/volume3_microcap.json",encoding="utf-8")); assert d["evidence_grade"]=="SYNTHETIC_ONLY" and not d["market_pit_proven"] and not d["execution_proven"]; print("Microcap teaching-only gates passed")'
       - name: Validate three-volume framework and chapter outlines

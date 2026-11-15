@@ -168,8 +168,8 @@
       },
       {
         number: "03", title: "第三卷 · A 股策略与交易系统",
-        description: "共 13 章；01–06 为策略实战教学正文，第 08 章为真实价格配对交易入门，其余 7 章待写。",
-        path: thirdVolume[0]?.path, status: "6 章教学正文 · 1 章入门案例 · 6 章待写", action: "查看第三卷",
+        description: "共 13 章；01–07 为策略实战教学正文，第 08 章为真实价格配对交易入门，其余 7 章待写。",
+        path: thirdVolume[0]?.path, status: "7 章教学正文 · 1 章入门案例 · 5 章待写", action: "查看第三卷",
       },
     ];
     els.pathGrid.innerHTML = volumes.filter((volume) => volume.path).map((volume) =>
@@ -619,7 +619,7 @@
     els.readingProgress.setAttribute("aria-valuenow", String(percent));
     els.backToTop.hidden = els.reader.scrollTop < 380;
     state.positions[current.path] = els.reader.scrollTop;
-    if ((!current.path.startsWith("advanced/volume-3/") || /^advanced\/volume-3\/(0[1-4]|08)_/.test(current.path)) && maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
+    if ((!current.path.startsWith("advanced/volume-3/") || /^advanced\/volume-3\/(0[1-7]|08)_/.test(current.path)) && maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
       state.completed.push(current.path);
       updateChapterActions();
       renderNavigation();

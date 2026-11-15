@@ -112,6 +112,22 @@
         "causal event effect",
         "real event alpha or execution"
       ]
+    },
+    {
+      "id": "volume3-theme-network-synthetic-v1",
+      "evidence_grade": "SYNTHETIC_ONLY",
+      "frozen": true,
+      "source": "version-controlled artificial time-varying stock-theme bipartite graph, historical industry membership and forward-return classroom scenarios",
+      "data_file": "data/teaching/volume3_theme_network_synthetic_v1.json",
+      "expected_periods": 6,
+      "expected_securities": 12,
+      "scope": "volume-3:07",
+      "not_allowed_claims": [
+        "real issuer-theme history",
+        "verified vendor PIT coverage",
+        "incremental predictive alpha",
+        "causal effect or executable return"
+      ]
     }
   ]
 }
