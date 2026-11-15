@@ -74,6 +74,11 @@ class AdvancedFrameworkTests(unittest.TestCase):
                     self.assertIn("python examples/volume3_microcap_lab.py --json", page["content"])
                     self.assertIn("SYNTHETIC_ONLY", page["content"])
                     self.assertNotIn("正文待写", page["content"])
+                elif page["path"] == "advanced/volume-3/06_corporate_events.md":
+                    self.assertIn("状态：教学正文 v1", page["content"])
+                    self.assertIn("python examples/volume3_corporate_events_lab.py --json", page["content"])
+                    self.assertIn("SYNTHETIC_ONLY", page["content"])
+                    self.assertNotIn("正文待写", page["content"])
                 elif page["path"] == "advanced/volume-3/08_stat_arb.md":
                     self.assertIn("状态：真实价格入门案例初稿", page["content"])
                     self.assertIn("python examples/cointegration_pair_lab.py", page["content"])
