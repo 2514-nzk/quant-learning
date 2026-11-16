@@ -82,7 +82,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_teaching_dataset_contract.py" -v
           python scripts/verify_teaching_datasets.py --json > /tmp/course_data.json
-          python -c 'import json; d=json.load(open("/tmp/course_data.json",encoding="utf-8")); assert d["verified"] and len(d["datasets"])==7 and not d["real_market_PIT_proven"]; print("Course data is self-contained")'
+          python -c 'import json; d=json.load(open("/tmp/course_data.json",encoding="utf-8")); assert d["verified"] and len(d["datasets"])==8 and not d["real_market_PIT_proven"]; print("Course data is self-contained")'
       - name: Verify Volume II v1, Appendix D and fourteen numerical exercises
         run: |
           python -m unittest discover -s tests -p "test_volume2_quality_gate.py" -v
