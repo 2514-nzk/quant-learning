@@ -86,7 +86,8 @@ class AdvancedFrameworkTests(unittest.TestCase):
                     self.assertIn("同行业", page["content"])
                     self.assertNotIn("正文待写", page["content"])
                 elif page["path"] == "advanced/volume-3/08_stat_arb.md":
-                    self.assertIn("状态：真实价格入门案例初稿", page["content"])
+                    self.assertIn("状态：真实价格教学案例 v1", page["content"])
+                    self.assertIn("python examples/cointegration_synthetic_lab.py --json", page["content"])
                     self.assertIn("python examples/cointegration_pair_lab.py", page["content"])
                     self.assertIn("融券", page["content"])
                 else:
