@@ -17,8 +17,9 @@ class SyntheticCointegrationLabTests(unittest.TestCase):
 
     def test_known_stationary_spread_is_distinguished_from_random_walk_control(self):
         result=evaluate()
-        self.assertTrue(result["train_spread"]["stationary_ar1_parameter_region"])
-        self.assertFalse(result["independent_random_walk_control"]["train_spread"]["stationary_ar1_parameter_region"])
+        self.assertTrue(result["train_spread"]["phi_inside_stationary_region"])
+        self.assertGreater(result["independent_random_walk_control"]["train_spread"]["ar1_phi"],
+                           result["train_spread"]["ar1_phi"])
 
     def test_future_holdout_changes_do_not_reestimate_training_hedge_ratio(self):
         data=generate()

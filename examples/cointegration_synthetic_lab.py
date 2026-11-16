@@ -57,7 +57,7 @@ def ar1_diagnostic(values):
     intercept, phi = fit_ols(x, y)
     half_life = math.log(0.5) / math.log(phi) if 0 < phi < 1 else None
     return {"ar1_phi": phi, "half_life_observations": half_life,
-            "stationary_ar1_parameter_region": bool(abs(phi) < 1)}
+            "phi_inside_stationary_region": bool(abs(phi) < 1)}
 
 def evaluate(payload=None):
     data = generate() if payload is None else payload
@@ -94,7 +94,7 @@ def evaluate(payload=None):
         "market_cointegration_proven":False,
         "market_alpha_proven":False,
         "execution_proven":False,
-        "interpretation":"A controlled code-path example with a known stationary AR(1) spread; the finite-sample diagnostic is not a formal Engle-Granger test and says nothing about real securities."
+        "interpretation":"A controlled code-path example with a known stationary AR(1) spread; the finite-sample AR(1) coefficient is only descriptive, not a formal Engle-Granger test; even unrelated random walks can yield a fitted coefficient below one in a short sample. It says nothing about real securities."
     }
 
 def main():
