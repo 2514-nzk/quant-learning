@@ -98,7 +98,7 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
         for n, item in enumerate(third_chapters[:4], 1):
             self.assertTrue(item["title"].startswith(f"第 {n:02d} 章｜"))
             self.assertIn("状态：教学正文 v1", item["content"])
-        self.assertTrue("状态：真实价格入门案例初稿" in
+        self.assertTrue("状态：真实价格教学案例 v1" in
                         third_chapters[7]["content"])
         self.assertIn("状态：教学正文 v1", third_chapters[4]["content"])
         self.assertIn("状态：教学正文 v1", third_chapters[5]["content"])

@@ -65,6 +65,9 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_cointegration_lesson.py" -v
           python examples/cointegration_pair_lab.py
+          python -m unittest discover -s tests -p "test_cointegration_synthetic_lab.py" -v
+          python examples/cointegration_synthetic_lab.py --json > /tmp/cointegration_synthetic.json
+          python -c 'import json; d=json.load(open("/tmp/cointegration_synthetic.json",encoding="utf-8")); assert d["evidence_grade"]=="SYNTHETIC_ONLY" and d["train_observations"]==200 and d["holdout_observations"]==100 and not d["market_cointegration_proven"]; print("Synthetic cointegration control gates passed")'
       - name: Verify actual annual-report accounting and financial-quality lesson
         run: |
           python -m unittest discover -s tests -p "test_financial_quality_lesson.py" -v
