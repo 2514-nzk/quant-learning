@@ -168,8 +168,8 @@
       },
       {
         number: "03", title: "第三卷 · A 股策略与交易系统",
-        description: "共 13 章；01–07、09 为策略实战教学正文，第 08 章为真实价格配对交易入门，10–13 为待写框架。",
-        path: thirdVolume[0]?.path, status: "8 章教学正文 · 1 章入门案例 · 4 章待写", action: "查看第三卷",
+        description: "共 13 章；01–07、09–10 为策略实战教学正文，第 08 章为真实价格配对交易入门，11–13 为待写框架。",
+        path: thirdVolume[0]?.path, status: "9 章教学正文 · 1 章入门案例 · 3 章待写", action: "查看第三卷",
       },
     ];
     els.pathGrid.innerHTML = volumes.filter((volume) => volume.path).map((volume) =>
@@ -610,6 +610,7 @@
     const volumeTwoChapter = current.path.match(/^advanced\/volume-2\/(\d{2})_/);
     if (current.path === "advanced/volume-3/08_stat_arb.md") position = "第三卷 第 8 / 13 章 · 入门案例";
     else if (current.path === "advanced/volume-3/09_l2_auction.md") position = "第三卷 第 9 / 13 章 · L2 教学正文";
+    else if (current.path === "advanced/volume-3/10_execution_replay.md") position = "第三卷 第 10 / 13 章 · 执行回放教学正文";
     else if (/^advanced\/volume-3\/0[1-7]_/.test(current.path)) position = `第三卷 第 ${Number(current.path.match(/\/0([1-7])_/)[1])} / 13 章 · 教学正文`;
     else if (current.path.startsWith("advanced/volume-3/")) position = "第三卷 · 目录框架待写";
     else if (volumeTwoChapter) position = `第二卷 第 ${Number(volumeTwoChapter[1])} / 14 章`;
@@ -620,7 +621,7 @@
     els.readingProgress.setAttribute("aria-valuenow", String(percent));
     els.backToTop.hidden = els.reader.scrollTop < 380;
     state.positions[current.path] = els.reader.scrollTop;
-    if ((!current.path.startsWith("advanced/volume-3/") || /^advanced\/volume-3\/(0[1-7]|08|09)_/.test(current.path)) && maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
+    if ((!current.path.startsWith("advanced/volume-3/") || /^advanced\/volume-3\/(0[1-7]|08|09|10)_/.test(current.path)) && maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
       state.completed.push(current.path);
       updateChapterActions();
       renderNavigation();

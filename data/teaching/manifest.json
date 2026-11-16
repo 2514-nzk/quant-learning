@@ -148,6 +148,23 @@
         "real order-flow alpha",
         "confirmed execution or net returns"
       ]
+    },
+    {
+      "id": "volume3-execution-synthetic-v1",
+      "evidence_grade": "SYNTHETIC_ONLY",
+      "frozen": true,
+      "source": "version-controlled artificial order attempts, available-at book snapshots, FIFO queue-ahead orders, cancellation/trade events and post-fill markouts",
+      "data_file": "data/teaching/volume3_execution_synthetic_v1.json",
+      "expected_order_plans": 5,
+      "scope": "volume-3:10",
+      "not_allowed_claims": [
+        "real exchange execution",
+        "real fill-probability calibration",
+        "QMT Tick equivalence",
+        "real queue-position reconstruction",
+        "real fee schedule",
+        "strategy alpha or net profitability"
+      ]
     }
   ]
 }

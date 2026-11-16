@@ -2,7 +2,7 @@
 
 > **课程数据版本：course-datasets-v1。** 本文件夹与仓库的 `data/real_a_share`、`data/story` 一起构成教材独立数据包；不依赖任何私人研究数据库、证券账户或个人策略输出。
 
-## 已随教材提供的八套独立数据
+## 已随教材提供的九套独立数据
 
 | 编号 | 实际数据 | 类型 | 用途 |
 |---|---|---|---|
@@ -14,6 +14,7 @@
 | `volume3-events-synthetic-v1` | 7 条虚构事件、历史别名映射、公告接收时点、事件收益窗口与匹配控制 | **明确标记合成** | 第三卷 06 公告 PIT、主体映射、重叠事件与对照组 |
 | `volume3-theme-network-synthetic-v1` | 12 只虚构证券、3 个行业、6 个时点、动态题材边与人工未来收益 | **明确标记合成** | 第三卷 07 题材二部图、PIT 网络快照与同行业对照 |
 | `volume3-l2-synthetic-v1` | 3 个开盘竞价快照、20 条委托/成交事件、11 笔订单、4 笔成交和 6 个五档盘口快照 | **明确标记合成** | 第三卷 09 竞价时序、订单生命周期、盘口失衡、OFI 和缺失语义 |
+| `volume3-execution-synthetic-v1` | 5 个虚构订单计划、队列前方订单、延迟网格、逐档对手盘和成交后 markout | **明确标记合成** | 第三卷 10 队列感知成交回放、限价扫盘、撤单重报和成本分解 |
 
 完整机器可读元数据在 [manifest.json](manifest.json)，PIT 事件数据在 [pit_events_v1.json](pit_events_v1.json)。数据文件**随课程仓库一起版本化**；阅读与基础测试无需访问任意个人数据库。
 
@@ -28,6 +29,8 @@ python examples/advanced_real_evidence_audit.py --json
 python examples/volume3_strategy_lab.py --json
 python examples/volume3_theme_network_lab.py --json
 python examples/volume3_l2_auction_lab.py --json
+python examples/volume3_execution_replay_lab.py --json
+python -m unittest discover -s tests -p "test_volume3_execution_replay_lab.py" -v
 python -m unittest discover -s tests -p "test_volume3_l2_auction_lab.py" -v
 python -m unittest discover -s tests -p "test_teaching_dataset_contract.py" -v
 ~~~
@@ -45,6 +48,6 @@ python -m unittest discover -s tests -p "test_teaching_dataset_contract.py" -v
 
 ## 分卷使用协议
 
-第一卷使用真实四股价格与单独的合成故事案例。第二卷使用合成 PIT、合成多资产/模型实验和四股描述性统计；**用于解释方法和失败机制，不冒充市场统计优势**。第三卷第 01–04 章使用 volume3-weekly-synthetic-v1，第 05 章使用 volume3-microcap-synthetic-v1，第 06 章使用 volume3-events-synthetic-v1，第 07 章使用 volume3-theme-network-synthetic-v1，第 09 章使用 volume3-l2-synthetic-v1 完成可复算方法教学；该人工时序情景不代表真实交易所日历、实际申万行业或独立市场 OOS。后续策略依然需要各自合法来源、版本和研究合同。
+第一卷使用真实四股价格与单独的合成故事案例。第二卷使用合成 PIT、合成多资产/模型实验和四股描述性统计；**用于解释方法和失败机制，不冒充市场统计优势**。第三卷第 01–04 章使用 volume3-weekly-synthetic-v1，第 05 章使用 volume3-microcap-synthetic-v1，第 06 章使用 volume3-events-synthetic-v1，第 07 章使用 volume3-theme-network-synthetic-v1，第 09 章使用 volume3-l2-synthetic-v1、第 10 章使用 volume3-execution-synthetic-v1 完成可复算方法教学；该人工时序情景不代表真实交易所日历、实际申万行业或独立市场 OOS。后续策略依然需要各自合法来源、版本和研究合同。
 
 [返回教材数据总览](../README.md) · [第二卷数据说明](../../advanced/volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)。

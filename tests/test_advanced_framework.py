@@ -91,6 +91,12 @@ class AdvancedFrameworkTests(unittest.TestCase):
                     self.assertIn("QMT Tick", page["content"])
                     self.assertIn("SYNTHETIC_ONLY", page["content"])
                     self.assertNotIn("正文待写", page["content"])
+                elif page["path"] == "advanced/volume-3/10_execution_replay.md":
+                    self.assertIn("状态：教学正文 v1", page["content"])
+                    self.assertIn("python examples/volume3_execution_replay_lab.py --json", page["content"])
+                    self.assertIn("SYNTHETIC_ONLY", page["content"])
+                    self.assertIn("成交概率", page["content"])
+                    self.assertNotIn("正文待写", page["content"])
                 elif page["path"] == "advanced/volume-3/08_stat_arb.md":
                     self.assertIn("状态：真实价格教学案例 v1", page["content"])
                     self.assertIn("python examples/cointegration_synthetic_lab.py --json", page["content"])

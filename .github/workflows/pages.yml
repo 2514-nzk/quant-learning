@@ -82,7 +82,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_teaching_dataset_contract.py" -v
           python scripts/verify_teaching_datasets.py --json > /tmp/course_data.json
-          python -c 'import json; d=json.load(open("/tmp/course_data.json",encoding="utf-8")); assert d["verified"] and len(d["datasets"])==8 and not d["real_market_PIT_proven"]; print("Course data is self-contained")'
+          python -c 'import json; d=json.load(open("/tmp/course_data.json",encoding="utf-8")); assert d["verified"] and len(d["datasets"])==9 and not d["real_market_PIT_proven"]; print("Course data is self-contained")'
       - name: Verify Volume II v1, Appendix D and fourteen numerical exercises
         run: |
           python -m unittest discover -s tests -p "test_volume2_quality_gate.py" -v
@@ -117,6 +117,11 @@ jobs:
           python -m unittest discover -s tests -p "test_volume3_l2_auction_lab.py" -v
           python examples/volume3_l2_auction_lab.py --json > /tmp/v3_l2.json
           python -c 'import json; d=json.load(open("/tmp/v3_l2.json",encoding="utf-8")); assert d["evidence_grade"]=="SYNTHETIC_ONLY" and d["order_lifecycle"]["order_count"]==11 and d["order_lifecycle"]["trade_count"]==4 and not d["claims"]["real_market_L2_validated"] and not d["claims"]["qmt_tick_equivalence_proven"]; print("L2 measurement teaching-only boundary verified")'
+      - name: Verify Volume III Chapter 10 queue-aware execution replay lab
+        run: |
+          python -m unittest discover -s tests -p "test_volume3_execution_replay_lab.py" -v
+          python examples/volume3_execution_replay_lab.py --json > /tmp/v3_execution.json
+          python -c 'import json; d=json.load(open("/tmp/v3_execution.json",encoding="utf-8")); assert d["evidence_grade"]=="SYNTHETIC_ONLY" and not d["claims"]["real_market_execution_proven"] and not d["claims"]["real_fill_probability_calibrated"] and d["cancel_replace"]["replacement_filled_qty"]==500; print("Execution replay teaching-only boundary verified")'
       - name: Build reading site
         run: python reader/build_reader.py --output _site
       - name: Validate all three volumes on canonical homepage

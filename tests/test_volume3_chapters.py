@@ -1,4 +1,4 @@
-"""Editorial and data-boundary checks for Volume III written chapters 01–07 and 09.
+"""Editorial and data-boundary checks for Volume III written chapters 01–07 and 09–10.
 
 Proves textbook structure and consistency, NOT independent real-market performance.
 """
@@ -12,6 +12,7 @@ from urllib.parse import unquote
 
 from reader.build_reader import collect_documents, collect_framework_documents
 from examples.volume3_strategy_lab import load_fixture, evaluate
+from examples.volume3_execution_replay_lab import load_fixture as load_execution_fixture, evaluate as evaluate_execution
 
 ROOT = Path(__file__).resolve().parents[1]
 V3 = ROOT / "advanced/volume-3"
@@ -41,7 +42,7 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
                 self.assertIn("SYNTHETIC_ONLY" if n == 4 else "人工", page)
 
     def test_local_links_exist_without_external_private_dependencies(self):
-        docs = [V3 / (slug + ".md") for slug in NEW] + [V3 / "05_microcap_quality.md", V3 / "06_corporate_events.md", V3 / "07_theme_network.md", V3 / "09_l2_auction.md", V3 / "README.md"]
+        docs = [V3 / (slug + ".md") for slug in NEW] + [V3 / "05_microcap_quality.md", V3 / "06_corporate_events.md", V3 / "07_theme_network.md", V3 / "09_l2_auction.md", V3 / "10_execution_replay.md", V3 / "README.md"]
         checked = 0
         for doc in docs:
             body = doc.read_text("utf-8")
@@ -59,14 +60,15 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
                 checked += 1
         self.assertGreaterEqual(checked, 15)
 
-    def test_textbook_datasets_include_eighth_synthetic_l2_fixture(self):
+    def test_textbook_datasets_include_ninth_synthetic_execution_fixture(self):
         manifest = json.loads((ROOT / "data/teaching/manifest.json").read_text("utf-8"))
-        self.assertEqual(len(manifest["datasets"]), 8)
+        self.assertEqual(len(manifest["datasets"]), 9)
         names = [x["id"] for x in manifest["datasets"]]
         self.assertIn("volume3-weekly-synthetic-v1", names)
         self.assertIn("volume3-events-synthetic-v1", names)
         self.assertIn("volume3-theme-network-synthetic-v1", names)
         self.assertIn("volume3-l2-synthetic-v1", names)
+        self.assertIn("volume3-execution-synthetic-v1", names)
         payload = load_fixture()
         self.assertEqual(payload["evidence_grade"], "SYNTHETIC_ONLY")
         self.assertEqual(payload["week_count"], 16)
@@ -75,6 +77,13 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
         self.assertEqual(payload["calendar"], "ARTIFICIAL_PERIOD_SEQUENCE_NO_EXCHANGE_CALENDAR")
         self.assertEqual({w["taxonomy_version"] for w in payload["weeks"]},
                          {"TEACH_OLD", "TEACH_NEW"})
+        execution = load_execution_fixture()
+        execution_result = evaluate_execution(execution)
+        self.assertEqual(execution["expected_order_plans"], 5)
+        self.assertEqual(execution_result["evidence_grade"], "SYNTHETIC_ONLY")
+        self.assertFalse(execution_result["claims"]["real_market_execution_proven"])
+        self.assertFalse(execution_result["claims"]["real_fill_probability_calibrated"])
+        self.assertEqual(len(execution_result["execution_outcomes"]), 12)
 
     def test_course_lab_does_not_pretend_real_pit_oos_or_execution(self):
         result = evaluate(load_fixture())
@@ -105,14 +114,17 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
         self.assertIn("状态：教学正文 v1", third_chapters[5]["content"])
         self.assertIn("状态：教学正文 v1", third_chapters[6]["content"])
         self.assertIn("状态：教学正文 v1", third_chapters[8]["content"])
+        self.assertIn("状态：教学正文 v1", third_chapters[9]["content"])
+        self.assertIn("volume3_execution_replay_lab.py --json", third_chapters[9]["content"])
+        self.assertIn("SYNTHETIC_ONLY", third_chapters[9]["content"])
         self.assertIn("QMT Tick", third_chapters[8]["content"])
         self.assertIn("SYNTHETIC_ONLY", third_chapters[8]["content"])
 
     def test_reader_completion_respects_existing_storage_and_new_written_chapters(self):
         app = (ROOT / "reader/app.js").read_text("utf-8")
         self.assertIn('const STORAGE_KEY = "quant-learning-reader-v1"', app)
-        self.assertIn('8 章教学正文 · 1 章入门案例 · 4 章待写', app)
-        self.assertIn("0[1-7]|08|09", app)
+        self.assertIn('9 章教学正文 · 1 章入门案例 · 3 章待写', app)
+        self.assertIn("0[1-7]|08|09|10", app)
         self.assertIn("readingRoute = firstVolume.filter", app)
         self.assertNotIn('status: "1 章案例初稿 · 12 章待写"', app)
 
