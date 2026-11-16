@@ -91,7 +91,7 @@ jobs:
           python -m unittest discover -s tests -p "test_advanced_factor_research_lab.py" -v
           python -m unittest discover -s tests -p "test_advanced_model_validation_lab.py" -v
           python -m unittest discover -s tests -p "test_advanced_portfolio_execution_lab.py" -v
-      - name: Verify seven strategy chapters, microcap, event and theme-network teaching labs
+      - name: Verify eight written chapters, microcap, event and theme-network teaching labs
         run: |
           python -m unittest discover -s tests -p "test_volume3_strategy_lab.py" -v
           python -m unittest discover -s tests -p "test_volume3_chapters.py" -v
@@ -112,6 +112,11 @@ jobs:
           python -m unittest discover -s tests -p "test_volume3_theme_network_lab.py" -v
           python examples/volume3_theme_network_lab.py --json > /tmp/v3_theme.json
           python -c 'import json; d=json.load(open("/tmp/v3_theme.json",encoding="utf-8")); assert d["evidence_grade"]=="SYNTHETIC_ONLY" and d["overall"]["independent_time_blocks"]==6 and not d["incremental_predictive_value_proven"] and not d["causal_effect_proven"]; print("Theme-network teaching-only boundary verified")'
+      - name: Verify Volume III Chapter 09 L2 auction and order-flow measurement lab
+        run: |
+          python -m unittest discover -s tests -p "test_volume3_l2_auction_lab.py" -v
+          python examples/volume3_l2_auction_lab.py --json > /tmp/v3_l2.json
+          python -c 'import json; d=json.load(open("/tmp/v3_l2.json",encoding="utf-8")); assert d["evidence_grade"]=="SYNTHETIC_ONLY" and d["order_lifecycle"]["order_count"]==11 and d["order_lifecycle"]["trade_count"]==4 and not d["claims"]["real_market_L2_validated"] and not d["claims"]["qmt_tick_equivalence_proven"]; print("L2 measurement teaching-only boundary verified")'
       - name: Build reading site
         run: python reader/build_reader.py --output _site
       - name: Validate all three volumes on canonical homepage

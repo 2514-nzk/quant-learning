@@ -128,6 +128,26 @@
         "incremental predictive alpha",
         "causal effect or executable return"
       ]
+    },
+    {
+      "id": "volume3-l2-synthetic-v1",
+      "evidence_grade": "SYNTHETIC_ONLY",
+      "frozen": true,
+      "source": "version-controlled artificial opening-auction indicative snapshots, order-lifecycle events, linked trades and five-level book snapshots",
+      "data_file": "data/teaching/volume3_l2_synthetic_v1.json",
+      "expected_auction_snapshots": 3,
+      "expected_order_events": 20,
+      "expected_orders": 11,
+      "expected_trades": 4,
+      "expected_book_snapshots": 6,
+      "scope": "volume-3:09",
+      "not_allowed_claims": [
+        "real exchange feed verification",
+        "QMT Tick equivalence",
+        "investor identity or institutional flow",
+        "real order-flow alpha",
+        "confirmed execution or net returns"
+      ]
     }
   ]
 }

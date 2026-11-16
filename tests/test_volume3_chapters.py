@@ -1,4 +1,4 @@
-"""Editorial and data-boundary checks for Volume III written chapters 01–07.
+"""Editorial and data-boundary checks for Volume III written chapters 01–07 and 09.
 
 Proves textbook structure and consistency, NOT independent real-market performance.
 """
@@ -41,7 +41,7 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
                 self.assertIn("SYNTHETIC_ONLY" if n == 4 else "人工", page)
 
     def test_local_links_exist_without_external_private_dependencies(self):
-        docs = [V3 / (slug + ".md") for slug in NEW] + [V3 / "05_microcap_quality.md", V3 / "06_corporate_events.md", V3 / "07_theme_network.md", V3 / "README.md"]
+        docs = [V3 / (slug + ".md") for slug in NEW] + [V3 / "05_microcap_quality.md", V3 / "06_corporate_events.md", V3 / "07_theme_network.md", V3 / "09_l2_auction.md", V3 / "README.md"]
         checked = 0
         for doc in docs:
             body = doc.read_text("utf-8")
@@ -59,13 +59,14 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
                 checked += 1
         self.assertGreaterEqual(checked, 15)
 
-    def test_textbook_datasets_include_seventh_synthetic_theme_fixture(self):
+    def test_textbook_datasets_include_eighth_synthetic_l2_fixture(self):
         manifest = json.loads((ROOT / "data/teaching/manifest.json").read_text("utf-8"))
-        self.assertEqual(len(manifest["datasets"]), 7)
+        self.assertEqual(len(manifest["datasets"]), 8)
         names = [x["id"] for x in manifest["datasets"]]
         self.assertIn("volume3-weekly-synthetic-v1", names)
         self.assertIn("volume3-events-synthetic-v1", names)
         self.assertIn("volume3-theme-network-synthetic-v1", names)
+        self.assertIn("volume3-l2-synthetic-v1", names)
         payload = load_fixture()
         self.assertEqual(payload["evidence_grade"], "SYNTHETIC_ONLY")
         self.assertEqual(payload["week_count"], 16)
@@ -103,12 +104,15 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
         self.assertIn("状态：教学正文 v1", third_chapters[4]["content"])
         self.assertIn("状态：教学正文 v1", third_chapters[5]["content"])
         self.assertIn("状态：教学正文 v1", third_chapters[6]["content"])
+        self.assertIn("状态：教学正文 v1", third_chapters[8]["content"])
+        self.assertIn("QMT Tick", third_chapters[8]["content"])
+        self.assertIn("SYNTHETIC_ONLY", third_chapters[8]["content"])
 
     def test_reader_completion_respects_existing_storage_and_new_written_chapters(self):
         app = (ROOT / "reader/app.js").read_text("utf-8")
         self.assertIn('const STORAGE_KEY = "quant-learning-reader-v1"', app)
-        self.assertIn('7 章教学正文 · 1 章入门案例 · 5 章待写', app)
-        self.assertIn("0[1-7]|08", app)
+        self.assertIn('8 章教学正文 · 1 章入门案例 · 4 章待写', app)
+        self.assertIn("0[1-7]|08|09", app)
         self.assertIn("readingRoute = firstVolume.filter", app)
         self.assertNotIn('status: "1 章案例初稿 · 12 章待写"', app)
 

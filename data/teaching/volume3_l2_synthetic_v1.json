@@ -1,0 +1,632 @@
+{
+  "dataset_id": "volume3-l2-synthetic-v1",
+  "evidence_grade": "SYNTHETIC_ONLY",
+  "frozen": true,
+  "generated_for": "THIRD_VOLUME_CHAPTER_09_TEACHING_ONLY",
+  "calendar": "ARTIFICIAL_SESSION_CLOCK_NO_EXCHANGE_CALENDAR",
+  "timezone": "+08:00",
+  "tick_size": "0.01",
+  "notes": "All securities, timestamps, orders, trades, auction values and book snapshots are artificial. The normalized schema is a teaching contract, not an exchange wire-format dump, a licensed feed sample, QMT Tick output, or evidence of real A-share order-flow alpha.",
+  "source_contract": {
+    "source_kind": "SYNTHETIC_NORMALIZED_EXCHANGE_STYLE_L2",
+    "venue_reference": "SSE_STYLE_CLASSROOM_SCHEMA",
+    "feed_components": [
+      "opening_auction_indicative_snapshots",
+      "order_lifecycle_events",
+      "trade_events",
+      "five_level_book_snapshots"
+    ],
+    "is_exchange_raw": false,
+    "is_qmt_tick": false,
+    "investor_identity_available": false,
+    "notes": "Field names are canonicalized for teaching. Actual SSE/SZSE products, vendor feeds and broker APIs differ in protocol, field names, depth, sequence semantics and entitlements."
+  },
+  "expected_order_events": 20,
+  "expected_orders": 11,
+  "expected_trades": 4,
+  "large_order_threshold_shares": 400,
+  "session": {
+    "session_id": "SYN-L2-2099-01-01",
+    "security_id": "SYN001",
+    "venue": "SSE",
+    "trade_date": "2099-01-01",
+    "reference_price_ticks": 10000,
+    "auction_snapshots": [
+      {
+        "snapshot_id": "A001",
+        "exchange_time": "2099-01-01T09:19:59.999+08:00",
+        "receive_time": "2099-01-01T09:20:00.000+08:00",
+        "indicative_price_ticks": 10002,
+        "indicative_matched_qty": 1200,
+        "unmatched_buy_qty": 600,
+        "unmatched_sell_qty": 200,
+        "rule_derived_cancel_allowed": true
+      },
+      {
+        "snapshot_id": "A002",
+        "exchange_time": "2099-01-01T09:20:00.000+08:00",
+        "receive_time": "2099-01-01T09:20:00.001+08:00",
+        "indicative_price_ticks": 10004,
+        "indicative_matched_qty": 1500,
+        "unmatched_buy_qty": 500,
+        "unmatched_sell_qty": 300,
+        "rule_derived_cancel_allowed": false
+      },
+      {
+        "snapshot_id": "A003",
+        "exchange_time": "2099-01-01T09:24:59.999+08:00",
+        "receive_time": "2099-01-01T09:25:00.000+08:00",
+        "indicative_price_ticks": 10005,
+        "indicative_matched_qty": 1800,
+        "unmatched_buy_qty": 700,
+        "unmatched_sell_qty": 100,
+        "rule_derived_cancel_allowed": false
+      }
+    ],
+    "auction_result": {
+      "result_time": "2099-01-01T09:25:00.000+08:00",
+      "opening_price_ticks": 10006,
+      "matched_qty": 2000
+    },
+    "order_trade_events": [
+      {
+        "event_id": "E001",
+        "sequence_no": 1,
+        "event_type": "ORDER_ADD",
+        "exchange_time": "2099-01-01T09:30:00.001+08:00",
+        "receive_time": "2099-01-01T09:30:00.003+08:00",
+        "order_id": "B01",
+        "side": "BUY",
+        "price_ticks": 10010,
+        "quantity": 1000
+      },
+      {
+        "event_id": "E002",
+        "sequence_no": 2,
+        "event_type": "ORDER_ADD",
+        "exchange_time": "2099-01-01T09:30:00.002+08:00",
+        "receive_time": "2099-01-01T09:30:00.004+08:00",
+        "order_id": "B02",
+        "side": "BUY",
+        "price_ticks": 10000,
+        "quantity": 500
+      },
+      {
+        "event_id": "E003",
+        "sequence_no": 3,
+        "event_type": "ORDER_ADD",
+        "exchange_time": "2099-01-01T09:30:00.003+08:00",
+        "receive_time": "2099-01-01T09:30:00.005+08:00",
+        "order_id": "S01",
+        "side": "SELL",
+        "price_ticks": 10012,
+        "quantity": 800
+      },
+      {
+        "event_id": "E004",
+        "sequence_no": 4,
+        "event_type": "ORDER_ADD",
+        "exchange_time": "2099-01-01T09:30:00.004+08:00",
+        "receive_time": "2099-01-01T09:30:00.006+08:00",
+        "order_id": "S02",
+        "side": "SELL",
+        "price_ticks": 10013,
+        "quantity": 600
+      },
+      {
+        "event_id": "E005",
+        "sequence_no": 5,
+        "event_type": "ORDER_CANCEL",
+        "exchange_time": "2099-01-01T09:30:00.005+08:00",
+        "receive_time": "2099-01-01T09:30:00.007+08:00",
+        "order_id": "B02",
+        "cancelled_qty": 200
+      },
+      {
+        "event_id": "E006",
+        "sequence_no": 6,
+        "event_type": "ORDER_ADD",
+        "exchange_time": "2099-01-01T09:30:00.006+08:00",
+        "receive_time": "2099-01-01T09:30:00.008+08:00",
+        "order_id": "S03",
+        "side": "SELL",
+        "price_ticks": 10010,
+        "quantity": 300
+      },
+      {
+        "event_id": "E007",
+        "sequence_no": 7,
+        "event_type": "TRADE",
+        "exchange_time": "2099-01-01T09:30:00.007+08:00",
+        "receive_time": "2099-01-01T09:30:00.009+08:00",
+        "trade_id": "T01",
+        "buy_order_id": "B01",
+        "sell_order_id": "S03",
+        "price_ticks": 10010,
+        "quantity": 300
+      },
+      {
+        "event_id": "E008",
+        "sequence_no": 8,
+        "event_type": "ORDER_ADD",
+        "exchange_time": "2099-01-01T09:30:00.008+08:00",
+        "receive_time": "2099-01-01T09:30:00.010+08:00",
+        "order_id": "B03",
+        "side": "BUY",
+        "price_ticks": 10012,
+        "quantity": 400
+      },
+      {
+        "event_id": "E009",
+        "sequence_no": 9,
+        "event_type": "TRADE",
+        "exchange_time": "2099-01-01T09:30:00.009+08:00",
+        "receive_time": "2099-01-01T09:30:00.011+08:00",
+        "trade_id": "T02",
+        "buy_order_id": "B03",
+        "sell_order_id": "S01",
+        "price_ticks": 10012,
+        "quantity": 400
+      },
+      {
+        "event_id": "E010",
+        "sequence_no": 10,
+        "event_type": "ORDER_CANCEL",
+        "exchange_time": "2099-01-01T09:30:00.010+08:00",
+        "receive_time": "2099-01-01T09:30:00.012+08:00",
+        "order_id": "S02",
+        "cancelled_qty": 600
+      },
+      {
+        "event_id": "E011",
+        "sequence_no": 11,
+        "event_type": "ORDER_ADD",
+        "exchange_time": "2099-01-01T09:30:00.011+08:00",
+        "receive_time": "2099-01-01T09:30:00.013+08:00",
+        "order_id": "B04",
+        "side": "BUY",
+        "price_ticks": 10011,
+        "quantity": 250
+      },
+      {
+        "event_id": "E012",
+        "sequence_no": 12,
+        "event_type": "ORDER_CANCEL",
+        "exchange_time": "2099-01-01T09:30:00.012+08:00",
+        "receive_time": "2099-01-01T09:30:00.014+08:00",
+        "order_id": "B01",
+        "cancelled_qty": 100
+      },
+      {
+        "event_id": "E013",
+        "sequence_no": 13,
+        "event_type": "ORDER_ADD",
+        "exchange_time": "2099-01-01T09:30:00.013+08:00",
+        "receive_time": "2099-01-01T09:30:00.015+08:00",
+        "order_id": "S04",
+        "side": "SELL",
+        "price_ticks": 10009,
+        "quantity": 100
+      },
+      {
+        "event_id": "E014",
+        "sequence_no": 14,
+        "event_type": "TRADE",
+        "exchange_time": "2099-01-01T09:30:00.014+08:00",
+        "receive_time": "2099-01-01T09:30:00.016+08:00",
+        "trade_id": "T03",
+        "buy_order_id": "B04",
+        "sell_order_id": "S04",
+        "price_ticks": 10011,
+        "quantity": 100
+      },
+      {
+        "event_id": "E015",
+        "sequence_no": 15,
+        "event_type": "ORDER_ADD",
+        "exchange_time": "2099-01-01T09:30:00.015+08:00",
+        "receive_time": "2099-01-01T09:30:00.017+08:00",
+        "order_id": "S05",
+        "side": "SELL",
+        "price_ticks": 10010,
+        "quantity": 200
+      },
+      {
+        "event_id": "E016",
+        "sequence_no": 16,
+        "event_type": "TRADE",
+        "exchange_time": "2099-01-01T09:30:00.016+08:00",
+        "receive_time": "2099-01-01T09:30:00.018+08:00",
+        "trade_id": "T04",
+        "buy_order_id": "B01",
+        "sell_order_id": "S05",
+        "price_ticks": 10010,
+        "quantity": 200
+      },
+      {
+        "event_id": "E017",
+        "sequence_no": 17,
+        "event_type": "ORDER_CANCEL",
+        "exchange_time": "2099-01-01T09:30:00.017+08:00",
+        "receive_time": "2099-01-01T09:30:00.019+08:00",
+        "order_id": "S01",
+        "cancelled_qty": 400
+      },
+      {
+        "event_id": "E018",
+        "sequence_no": 18,
+        "event_type": "ORDER_ADD",
+        "exchange_time": "2099-01-01T09:30:00.018+08:00",
+        "receive_time": "2099-01-01T09:30:00.020+08:00",
+        "order_id": "S06",
+        "side": "SELL",
+        "price_ticks": 10013,
+        "quantity": 300
+      },
+      {
+        "event_id": "E019",
+        "sequence_no": 19,
+        "event_type": "ORDER_ADD",
+        "exchange_time": "2099-01-01T09:30:00.019+08:00",
+        "receive_time": "2099-01-01T09:30:00.021+08:00",
+        "order_id": "B05",
+        "side": "BUY",
+        "price_ticks": 10008,
+        "quantity": 300
+      },
+      {
+        "event_id": "E020",
+        "sequence_no": 20,
+        "event_type": "ORDER_CANCEL",
+        "exchange_time": "2099-01-01T09:30:00.020+08:00",
+        "receive_time": "2099-01-01T09:30:00.022+08:00",
+        "order_id": "B04",
+        "cancelled_qty": 150
+      }
+    ],
+    "book_snapshots": [
+      {
+        "snapshot_id": "B000",
+        "event_sequence_watermark": 0,
+        "exchange_time": "2099-01-01T09:30:00.000+08:00",
+        "receive_time": "2099-01-01T09:30:00.002+08:00",
+        "bids": [
+          {
+            "price_ticks": 10010,
+            "quantity": 1000
+          },
+          {
+            "price_ticks": 10000,
+            "quantity": 500
+          },
+          {
+            "price_ticks": 9990,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 9980,
+            "quantity": 200
+          },
+          {
+            "price_ticks": 9970,
+            "quantity": 100
+          }
+        ],
+        "asks": [
+          {
+            "price_ticks": 10012,
+            "quantity": 800
+          },
+          {
+            "price_ticks": 10013,
+            "quantity": 600
+          },
+          {
+            "price_ticks": 10020,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 10030,
+            "quantity": 200
+          },
+          {
+            "price_ticks": 10040,
+            "quantity": 100
+          }
+        ]
+      },
+      {
+        "snapshot_id": "B005",
+        "event_sequence_watermark": 5,
+        "exchange_time": "2099-01-01T09:30:00.005+08:00",
+        "receive_time": "2099-01-01T09:30:00.007+08:00",
+        "bids": [
+          {
+            "price_ticks": 10010,
+            "quantity": 1000
+          },
+          {
+            "price_ticks": 10000,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 9990,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 9980,
+            "quantity": 200
+          },
+          {
+            "price_ticks": 9970,
+            "quantity": 100
+          }
+        ],
+        "asks": [
+          {
+            "price_ticks": 10012,
+            "quantity": 800
+          },
+          {
+            "price_ticks": 10013,
+            "quantity": 600
+          },
+          {
+            "price_ticks": 10020,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 10030,
+            "quantity": 200
+          },
+          {
+            "price_ticks": 10040,
+            "quantity": 100
+          }
+        ]
+      },
+      {
+        "snapshot_id": "B010",
+        "event_sequence_watermark": 10,
+        "exchange_time": "2099-01-01T09:30:00.010+08:00",
+        "receive_time": "2099-01-01T09:30:00.012+08:00",
+        "bids": [
+          {
+            "price_ticks": 10010,
+            "quantity": 700
+          },
+          {
+            "price_ticks": 10000,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 9990,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 9980,
+            "quantity": 200
+          },
+          {
+            "price_ticks": 9970,
+            "quantity": 100
+          }
+        ],
+        "asks": [
+          {
+            "price_ticks": 10012,
+            "quantity": 400
+          },
+          {
+            "price_ticks": 10020,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 10030,
+            "quantity": 200
+          },
+          {
+            "price_ticks": 10040,
+            "quantity": 100
+          },
+          {
+            "price_ticks": 10050,
+            "quantity": 100
+          }
+        ]
+      },
+      {
+        "snapshot_id": "B014",
+        "event_sequence_watermark": 14,
+        "exchange_time": "2099-01-01T09:30:00.015+08:00",
+        "receive_time": "2099-01-01T09:30:00.017+08:00",
+        "bids": [
+          {
+            "price_ticks": 10011,
+            "quantity": 150
+          },
+          {
+            "price_ticks": 10010,
+            "quantity": 600
+          },
+          {
+            "price_ticks": 10000,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 9990,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 9980,
+            "quantity": 200
+          }
+        ],
+        "asks": [
+          {
+            "price_ticks": 10012,
+            "quantity": 400
+          },
+          {
+            "price_ticks": 10020,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 10030,
+            "quantity": 200
+          },
+          {
+            "price_ticks": 10040,
+            "quantity": 100
+          },
+          {
+            "price_ticks": 10050,
+            "quantity": 100
+          }
+        ]
+      },
+      {
+        "snapshot_id": "B019",
+        "event_sequence_watermark": 19,
+        "exchange_time": "2099-01-01T09:30:00.019+08:00",
+        "receive_time": "2099-01-01T09:30:00.021+08:00",
+        "bids": [
+          {
+            "price_ticks": 10011,
+            "quantity": 150
+          },
+          {
+            "price_ticks": 10010,
+            "quantity": 400
+          },
+          {
+            "price_ticks": 10008,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 10000,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 9990,
+            "quantity": 300
+          }
+        ],
+        "asks": [
+          {
+            "price_ticks": 10013,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 10020,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 10030,
+            "quantity": 200
+          },
+          {
+            "price_ticks": 10040,
+            "quantity": 100
+          },
+          {
+            "price_ticks": 10050,
+            "quantity": 100
+          }
+        ]
+      },
+      {
+        "snapshot_id": "B020",
+        "event_sequence_watermark": 20,
+        "exchange_time": "2099-01-01T09:30:00.021+08:00",
+        "receive_time": "2099-01-01T09:30:00.023+08:00",
+        "bids": [
+          {
+            "price_ticks": 10010,
+            "quantity": 400
+          },
+          {
+            "price_ticks": 10008,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 10000,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 9990,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 9980,
+            "quantity": 200
+          }
+        ],
+        "asks": [
+          {
+            "price_ticks": 10013,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 10020,
+            "quantity": 300
+          },
+          {
+            "price_ticks": 10030,
+            "quantity": 200
+          },
+          {
+            "price_ticks": 10040,
+            "quantity": 100
+          },
+          {
+            "price_ticks": 10050,
+            "quantity": 100
+          }
+        ]
+      }
+    ]
+  },
+  "measurement_cases": [
+    {
+      "case_id": "Q_ZERO",
+      "metric": "small_order_count",
+      "numerator": 0,
+      "denominator": 100,
+      "source_coverage_complete": true,
+      "applicable": true
+    },
+    {
+      "case_id": "Q_COVERAGE",
+      "metric": "cancelled_small_order_qty",
+      "numerator": null,
+      "denominator": 100,
+      "source_coverage_complete": false,
+      "applicable": true
+    },
+    {
+      "case_id": "Q_DENOM",
+      "metric": "cross_bucket_share",
+      "numerator": 0,
+      "denominator": 0,
+      "source_coverage_complete": true,
+      "applicable": true
+    },
+    {
+      "case_id": "Q_NA",
+      "metric": "continuous_book_of_opening_auction_only",
+      "numerator": null,
+      "denominator": null,
+      "source_coverage_complete": true,
+      "applicable": false
+    },
+    {
+      "case_id": "Q_FIELD",
+      "metric": "aggressor_side",
+      "numerator": null,
+      "denominator": 100,
+      "source_coverage_complete": true,
+      "applicable": true
+    }
+  ]
+}

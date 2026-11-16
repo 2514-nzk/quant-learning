@@ -1,6 +1,6 @@
 # 第三卷｜A 股策略与交易系统
 
-> **状态：第 01–07 章已完成可复算的教学正文 v1；第 08 章已完成真实价格教学案例 v1 与合成控制实验；其余 5 章为待写框架。** 本卷尚无通过真实市场独立 OOS、完整 PIT 和真实成交验证的策略结论。
+> **状态：第 01–07、09 章已完成可复算的教学正文 v1；第 08 章已完成真实价格教学案例 v1 与合成控制实验；第 10–13 章为待写框架。** 本卷尚无通过真实市场独立 OOS、完整 PIT 和真实成交验证的策略结论。
 
 本卷研究 A 股策略与交易系统的通用方法：研究合同、历史证券与行业定义、因子评价、事件研究、订单执行、组合风险和研究治理。教材示例不复现任何内部生产策略。
 
@@ -16,7 +16,7 @@
 | 06 | [第 06 章｜公告、股东与事件驱动](06_corporate_events.md) | 历史主体映射与披露时间能否满足研究门槛？ | 教学正文 v1 / 合成实验 |
 | 07 | [第 07 章｜题材网络与行业条件基线](07_theme_network.md) | 题材关系比行业基线提供了什么增量信息？ | 教学正文 v1 / 合成实验 |
 | 08 | [第 08 章｜协整、价差与统计套利](08_stat_arb.md) | 如何从真实价格学习配对交易及执行限制？ | 教学案例 v1 / 合成控制实验；正式检验待补 |
-| 09 | [第 09 章｜集合竞价、L2 数据与订单流](09_l2_auction.md) | L2 与普通行情的可观测边界在哪里？ | 框架待写 |
+| 09 | [第 09 章｜集合竞价、L2 数据与订单流](09_l2_auction.md) | L2 与普通行情的可观测边界在哪里？ | 教学正文 v1 / 合成 L2 测量审计 |
 | 10 | [第 10 章｜盘口信号、成交概率与执行回放](10_execution_replay.md) | 哪些订单能真正成交，如何进行回放？ | 框架待写 |
 | 11 | [第 11 章｜多策略组合与动态仓位](11_dynamic_alloc.md) | 怎样事前规定仓位、风险预算和退出规则？ | 框架待写 |
 | 12 | [第 12 章｜研究到实盘：数据、订单与治理](12_live_system.md) | 策略从回测到生产还需通过哪些门槛？ | 框架待写 |
@@ -64,6 +64,12 @@ python -m unittest discover -s tests -p "test_volume3_chapters.py" -v
 - [从相关性到协整：两只股票一起涨，就能做配对交易吗？](08_stat_arb.md)：真实历史价格、拟合价差、Z-score、检验前提与融券限制。
 - 合成控制实验 `examples/cointegration_synthetic_lab.py`：已知平稳价差 vs 独立随机游走，固定 200/100 训练—留出切分；用于程序验证，不构成市场证据。
 - 运行：`python examples/cointegration_pair_lab.py`、`python examples/cointegration_synthetic_lab.py --json`；测试：`python -m unittest discover -s tests -p "test_cointegration_synthetic_lab.py" -v`。**尚未证明真实股票协整或套利收益**。
+
+## 第 09 章：集合竞价与 L2 测量审计教学实验
+
+- [第 09 章正文](09_l2_auction.md)：沪深集合竞价时钟、交易所 L2 与 QMT Tick 的数据边界、委托/成交关联、订单生命周期、盘口深度、OFI、缺失语义和 PIT 时间门禁。
+- 数据集 [volume3-l2-synthetic-v1](../../data/teaching/volume3_l2_synthetic_v1.json) 为人工生成的规范化教学账本，不是交易所原始行情或 QMT Tick 样本。
+- 运行：`python examples/volume3_l2_auction_lab.py --json`；测试：`python -m unittest discover -s tests -p "test_volume3_l2_auction_lab.py" -v`。**不证明真实 L2 数据质量、投资者身份、订单流 alpha 或成交能力**。
 
 ## 统一交付标准
 
