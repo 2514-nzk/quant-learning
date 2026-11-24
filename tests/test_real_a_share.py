@@ -10,9 +10,10 @@ import tempfile
 import unittest
 from datetime import date, timedelta
 from pathlib import Path
+from unittest.mock import patch
 
 from scripts.collect_real_a_share import (
-    FIELDS, csv_text, moving_average, render_svg, standardized_rows, write_snapshot,
+    FIELDS, collect_one, csv_text, moving_average, render_svg, standardized_rows, write_snapshot,
 )
 from examples.real_kline_lab import explain
 
@@ -60,6 +61,32 @@ class AkShareKlineTests(unittest.TestCase):
         converted = standardized_rows(FakeFrame(turnover_rows), "000001", "平安银行", "akshare.stock_zh_a_hist_sina")
         self.assertEqual(converted[0]["turnover_pct"], "0.6000")
         self.assertEqual(em[-1]["turnover_pct"], "")
+
+    def test_collect_one_uses_current_akshare_names(self):
+        class CurrentEM:
+            def stock_zh_a_hist_em(self, **kwargs):
+                self.kwargs = kwargs
+                return FakeFrame(fake_rows("em"))
+
+            def stock_zh_a_hist_sina(self, **kwargs):
+                raise AssertionError("Sina should not be called when Eastmoney succeeds")
+
+        rows, source = collect_one(CurrentEM(), "000001", "平安银行")
+        self.assertEqual(source, "akshare.stock_zh_a_hist_em")
+        self.assertEqual(len(rows), 55)
+
+        class SinaFallback:
+            def stock_zh_a_hist_em(self, **kwargs):
+                raise RuntimeError("Eastmoney unavailable")
+
+            def stock_zh_a_hist_sina(self, **kwargs):
+                self.kwargs = kwargs
+                return FakeFrame(fake_rows("sina"))
+
+        with patch("scripts.collect_real_a_share.time.sleep"):
+            rows, source = collect_one(SinaFallback(), "000001", "平安银行")
+        self.assertEqual(source, "akshare.stock_zh_a_hist_sina")
+        self.assertEqual(len(rows), 55)
 
     def test_refuse_inconsistent_candle_and_duplicate_date(self):
         rows = fake_rows()
