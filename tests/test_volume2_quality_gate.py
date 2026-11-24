@@ -118,6 +118,37 @@ class VolumeTwoQualityGate(unittest.TestCase):
                       "2024-03-25 16:30", "NOT_COLLECTED", "0.10", "0.15"):
             self.assertIn(token, chapter)
 
+    def test_topk_real_comparison_and_buffer_arithmetic(self):
+        import json
+        from statistics import mean
+        rounds = json.loads((ROOT / "data/real_a_share/teaching_case.json").read_text("utf-8"))["rounds"]
+        for k, expected, replacements in (
+            (1, .21982881609262006, 12),
+            (2, .14858672505471504, 19),
+            (3, .03472348072185749, 15),
+            (4, .12881197772689168, 0),
+        ):
+            selected = [sorted(r["rows"], key=lambda x: (-x["mom5"], x["symbol"]))[:k] for r in rounds]
+            self.assertAlmostEqual(math.prod(1 + mean(x["forward_return"] for x in q) for q in selected)-1, expected)
+            sets = [{x["symbol"] for x in q} for q in selected]
+            self.assertEqual(sum(len(b-a) for a,b in zip(sets,sets[1:])), replacements)
+        old = set("ABC")
+        for new, count in ((set("DEF"),3),(set("ADE"),2),(set("ABD"),1)):
+            self.assertEqual(len(new-old),count)
+            self.assertAlmostEqual(sum(abs((i in new)/3-(i in old)/3) for i in old|new),2*count/3)
+        self.assertAlmostEqual(.9*.98/(.98+.82),.49)
+        self.assertAlmostEqual(.9*.82/(.98+.82),.41)
+        last = rounds[-1]["rows"]
+        mom = sorted(last,key=lambda r:-r["mom5"])
+        bias = sorted(last,key=lambda r:-(r["signal_close"]/r["ma5"]-1))
+        points = {}
+        for seq in (mom,bias):
+            for j,row in enumerate(seq):
+                points[row["symbol"]] = points.get(row["symbol"],0)+(4-j)/2
+        self.assertEqual(points,{"688256":4,"300750":2.5,"002594":2.5,"600519":1})
+        self.assertEqual(sorted(points,key=lambda code:(-points[code],code))[:2],["688256","002594"])
+
+
     def test_real_four_stock_editorial_examples(self):
         import json
         from statistics import mean, stdev
