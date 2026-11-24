@@ -503,6 +503,59 @@
     });
   }
 
+  // Render only fixed classroom calculations; no connection to a trading account.
+  function renderRiskDashboard(doc) {
+    if (!/^advanced\/volume-2\/(08_|11_|12_|13_|14_)/.test(doc.path)) return;
+    const panel = document.createElement("section");
+    panel.className = "risk-dashboard";
+    panel.innerHTML = '<h2>看图读懂风险与收益</h2><p>同一课堂股票池，人工数据，非实盘业绩。选择账户即可比较实际持仓、净值及归因。</p><div class="risk-content" aria-live="polite">正在读取计算结果…</div>';
+    els.article.append(panel);
+    const body = panel.querySelector(".risk-content");
+    const money = n => n.toLocaleString("zh-CN", {maximumFractionDigits: 2});
+    const pct = n => (100*n).toFixed(2) + "%";
+    const labels = {fixed:"固定等权",risk:"风险约束",monitored:"IC监控降仓"};
+    const palette = {fixed:"#64748b",risk:"#258b82",monitored:"#bd7840"};
+    function chart(series, unit, domain) {
+      const all = series.flatMap(s => s.values.map(v => v.value).filter(Number.isFinite));
+      if (!all.length) return '<p>没有有效数据。</p>';
+      let lo = domain ? domain[0] : Math.min(...all), hi = domain ? domain[1] : Math.max(...all);
+      if (hi === lo) {lo -= 1; hi += 1;}
+      const left=72,right=680,top=14,bottom=178;
+      const days = series.flatMap(s=>s.values.map(v=>v.day));
+      const d0=Math.min(...days),d1=Math.max(...days);
+      const x=d=>left+(d-d0)/Math.max(1,d1-d0)*(right-left);
+      const y=v=>bottom-(v-lo)/(hi-lo)*(bottom-top);
+      let svg='<svg viewBox="0 0 700 210" role="img" aria-label="课堂数据折线图">';
+      for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4;const yy=y(v);
+        svg+='<line x1="'+left+'" x2="'+right+'" y1="'+yy+'" y2="'+yy+'" stroke="currentColor" opacity=".12"/><text x="'+(left-8)+'" y="'+(yy+4)+'" text-anchor="end" fill="currentColor" font-size="11">'+escapeHTML(unit(v))+'</text>';
+      }
+      for(let i=0;i<=4;i++){const d=Math.round(d0+(d1-d0)*i/4);svg+='<text x="'+x(d)+'" y="199" text-anchor="middle" fill="currentColor" font-size="11">'+d+'</text>';}
+      for(const s of series){let segment=[];
+        const flush=()=>{if(segment.length){svg+='<polyline points="'+segment.join(" ")+'" fill="none" stroke="'+s.color+'" stroke-width="2.4" stroke-linejoin="round"/>';segment=[];}};
+        for(const v of s.values){if(!Number.isFinite(v.value)){flush();continue;}segment.push(x(v.day)+","+y(v.value));}flush();
+      }
+      return svg+'</svg><div class="risk-legend">'+series.map(s=>'<span><i style="background:'+s.color+'"></i>'+escapeHTML(s.name)+'</span>').join("")+'</div>';
+    }
+    fetch(new URL("assets/rev20-risk-dashboard.json", document.baseURI)).then(r=>{if(!r.ok)throw Error("数据未加载");return r.json();}).then(data=>{
+      if(!panel.isConnected)return;
+      if(data.source_kind!=="SYNTHETIC_ONLY")throw Error("数据标识错误");
+      const keys=Object.keys(labels);
+      body.innerHTML='<label>查看账户 <select class="risk-select">'+keys.map(k=>'<option value="'+k+'">'+labels[k]+'</option>').join("")+'</select></label><h3>净值对照（元）</h3><div class="risk-nav-chart"></div><div class="risk-selected"></div><h3>逐期 RankIC（信号时段）</h3><div class="risk-ic-chart"></div><h3>流动性约束敏感性</h3><div class="risk-capacity"></div>';
+      body.querySelector(".risk-nav-chart").innerHTML=chart(keys.map(k=>({name:labels[k],color:palette[k],values:data.nav[k]})),v=>money(v));
+      body.querySelector(".risk-ic-chart").innerHTML=chart([{name:"REV20 IC",color:palette.risk,values:data.factor_ic.map(v=>({day:v.signal,value:v.ic}))}],v=>v.toFixed(2),[-1,1]);
+      const cap=data.capacity.map(v=>'<tr><td>'+pct(v.rate)+'</td><td>'+money(v.nav)+'</td><td>'+v.unfilled+'</td><td>'+money(v.traded)+'</td></tr>').join("");
+      body.querySelector(".risk-capacity").innerHTML='<table><thead><tr><th>参与率代理</th><th>期末净值</th><th>未完全成交单</th><th>成交额</th></tr></thead><tbody>'+cap+'</tbody></table><p>不同假设下的模拟执行结果，不是实际资金容量。</p>';
+      function update(){
+        const k=body.querySelector("select").value,a=data.summary[k],at=data.attribution[k];
+        const ex=data.exposure[k];
+        const components={market:"市场参考",industry:"行业偏离",selection:"个股相对表现",fees:"手续费",slippage:"滑点",residual:"对账残差",actual:"实际盈亏"};
+        const attr=Object.entries(components).map(([v,label])=>'<tr><td>'+label+'</td><td>'+money(at[v])+'</td></tr>').join("");
+        body.querySelector(".risk-selected").innerHTML='<div class="risk-metrics"><div><small>期末净值</small><strong>'+money(a.final_nav)+'</strong></div><div><small>累计收益</small><strong>'+pct(a.total_return)+'</strong></div><div><small>最大回撤</small><strong>'+pct(a.max_drawdown)+'</strong></div><div><small>未完全成交单</small><strong>'+a.unfilled_orders+'</strong></div></div><h3>每日实际持仓比例</h3>'+chart([{name:"股票仓位",color:palette.risk,values:ex.map(v=>({day:v.day,value:v.stock}))},{name:"最大行业权重",color:palette.monitored,values:ex.map(v=>({day:v.day,value:v.max_industry}))}],pct,[0,1])+'<h3>收益来源（元）</h3><table><thead><tr><th>组成</th><th>金额</th></tr></thead><tbody>'+attr+'</tbody></table><p>参考篮子分解，不是回归估计的 Alpha/Beta；金额之和与账户盈亏对账。</p>';
+      }
+      body.querySelector("select").addEventListener("change",update);update();
+    }).catch(()=>{if(panel.isConnected)body.textContent="图表数据加载失败。仍可使用本章 Python 实验重新计算。";});
+  }
+
   function renderArticle(doc) {
     if (!window.marked || !window.DOMPurify) {
       els.article.innerHTML = `<p class="reader-error">正文解析组件没有加载成功。请刷新页面，或检查当前网络是否可以访问 jsDelivr。</p><pre>${escapeHTML(doc.content)}</pre>`;
@@ -555,6 +608,7 @@
       if (headingBySlug.has(fragment)) anchor.setAttribute("href", `#${headingBySlug.get(fragment)}`);
     });
     els.article.replaceChildren(...wrapper.childNodes);
+    renderRiskDashboard(doc);
     renderLabFor(doc);
     if (sections.length) {
       els.sectionIndex.innerHTML = `<div class="section-index-label">本章目录</div><div class="section-index-links">${sections.map((section) => `<a class="${section.level}" href="#${section.id}">${escapeHTML(section.title)}</a>`).join("")}</div>`;

@@ -286,5 +286,64 @@ class IntegratedClassroomTests(unittest.TestCase):
                          next(o["filled"] for o in account["orders"] if o["side"] == "BUY"))
 
 
+class RiskClassroomTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from examples.rev20_classroom_lab import risk_report
+        cls.r = risk_report()
+
+    def test_caps_and_time_gate(self):
+        from examples.rev20_classroom_lab import make_panel, RISK_TARGET
+        panel = make_panel()
+        for row in self.r["decisions"]:
+            for label in ("risk", "monitored"):
+                risk = row[label]
+                self.assertLessEqual(risk["scaled_vol"], RISK_TARGET+1e-12)
+                self.assertLessEqual(sum(risk["weights"].values()), .95+1e-12)
+                self.assertTrue(all(0 <= v <= .15+1e-12 for v in risk["weights"].values()))
+                for g in range(5):
+                    self.assertLessEqual(sum(v for k,v in risk["weights"].items()
+                                             if panel[k]["industry"] == g), .30+1e-12)
+            self.assertTrue(all(t+6 < row["signal"] for t in row["monitor"]["known_signals"]))
+            self.assertLessEqual(row["monitored"]["exposure"], row["risk"]["exposure"]+1e-12)
+
+    def test_risk_and_monitor_ignore_future(self):
+        from examples.rev20_classroom_lab import make_panel, observe_week, SIGNALS, risk_weights, monitor_at
+        panel = make_panel()
+        weeks = [observe_week(panel,t) for t in SIGNALS]
+        scores = weeks[18]["scores"]
+        original = risk_weights(panel,110,scores),monitor_at(weeks,110)
+        for row in panel.values():
+            row["close"][111:] = [999.] * len(row["close"][111:])
+        for w in weeks:
+            if w["label_available"] >= 110:
+                w["rank_ic"] = 1.
+        self.assertEqual(original,(risk_weights(panel,110,scores),monitor_at(weeks,110)))
+
+    def test_exact_daily_attribution_and_capacity_control(self):
+        r = self.r
+        for name, result in r["attribution"].items():
+            for d in result["daily"]:
+                self.assertAlmostEqual(d["market"]+d["industry"]+d["selection"]+
+                                       d["fees"]+d["slippage"],d["actual"],places=6)
+            self.assertAlmostEqual(result["totals"]["actual"],
+                                   r["accounts"][name]["final_nav"]-1_000_000,places=6)
+        for a in r["capacity"].values():
+            self.assertEqual(a["targets"],r["accounts"]["risk"]["targets"])
+        self.assertEqual(r["capacity"][.05],r["accounts"]["risk"])
+        self.assertEqual(set(r["decay"]["mean_ic"]),{1,5,10})
+        self.assertEqual(len(r["factor_ic"]),24)
+        self.assertTrue(all(abs(v["stock"]+v["cash"]-1)<1e-10
+                            for rows in r["exposures"].values() for v in rows))
+
+    def test_dashboard_is_serializable_and_preserves_evidence_boundary(self):
+        import json
+        from examples.rev20_classroom_lab import dashboard_data
+        data = dashboard_data(self.r)
+        self.assertEqual(data["source_kind"],"SYNTHETIC_ONLY")
+        self.assertEqual(set(data["nav"]),{"fixed","risk","monitored"})
+        json.dumps(data,allow_nan=False)
+
+
 if __name__ == "__main__":
     unittest.main()

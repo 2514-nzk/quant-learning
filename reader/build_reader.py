@@ -8,6 +8,8 @@ import json
 import math
 import re
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 
@@ -67,6 +69,8 @@ LABS = {
                 {"label": "查看逐期完整数据", "script": "examples/rev20_classroom_lab.py", "args": ["--json"]},
                 {"label": "运行完整研究与回测", "script": "examples/rev20_classroom_lab.py", "args": ["--integrated"]},
                 {"label": "查看完整模型和订单账本", "script": "examples/rev20_classroom_lab.py", "args": ["--integrated", "--json"]},
+                {"label": "运行风险与归因实验", "script": "examples/rev20_classroom_lab.py", "args": ["--risk"]},
+                {"label": "查看风险实验完整账本", "script": "examples/rev20_classroom_lab.py", "args": ["--risk", "--json"]},
             ],
         }
         for chapter in ("01_research_protocol", "05_pit_data", "07_factor_engineering", "08_factor_validation", "09_factor_combination", "10_machine_learning", "11_oos_drift", "12_portfolio_optimization", "13_backtest_execution", "14_reproducible_capstone")
@@ -207,6 +211,8 @@ def main() -> None:
         target = output / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / relative, target)
+    dashboard = subprocess.check_output([sys.executable, str(ROOT / "examples/rev20_classroom_lab.py"), "--dashboard"], text=True, encoding="utf-8")
+    (output / "assets" / "rev20-risk-dashboard.json").write_text(dashboard, encoding="utf-8")
     payload = {
         "title": "A 股量化研究入门",
         "description": "以100万元课堂模拟账户和四只知名A股的真实历史K线贯穿课程，先手算再检验。",

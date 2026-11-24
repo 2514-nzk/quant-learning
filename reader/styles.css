@@ -501,3 +501,15 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+
+/* Classroom risk dashboard: compact, responsive, no external chart dependency. */
+.risk-dashboard { margin: 2em 0; border: 1px solid var(--line); border-radius: 8px; padding: 1em; background: var(--paper-raised); }
+.risk-dashboard svg { display: block; width: 100%; height: auto; color: var(--ink); }
+.risk-dashboard .risk-legend { display: flex; flex-wrap: wrap; gap: .8em; font-size: .85em; }
+.risk-legend i { display: inline-block; width: .85em; height: .85em; margin-right: .35em; border-radius: 2px; }
+.risk-select { font: inherit; color: var(--ink); background: var(--paper-raised); border: 1px solid var(--line); border-radius: 5px; padding: .3em; }
+.risk-metrics { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .75em; margin: 1em 0; }
+.risk-metrics > div { border: 1px solid var(--line); border-radius: 6px; padding: .6em; }
+.risk-metrics strong, .risk-metrics small { display: block; }
+.risk-metrics strong { font-size: 1.1em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.risk-capacity { overflow-x: auto; }

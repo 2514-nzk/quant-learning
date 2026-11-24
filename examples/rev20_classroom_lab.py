@@ -316,13 +316,15 @@ def blocked_side(code, day):
     return None
 
 
-def simulate_account(panel, targets, cost=True, stress=True):
+def simulate_account(panel, targets, cost=True, stress=True, participation=.05):
     """Long-only weekly orders, close-based quantity, next-session execution.
     The fixed holdout starts after the synthetic delisting event. If a held
     security exits the listing interval, stop rather than invent a liquidation.
     """
     if not targets:
         raise ValueError("no target dates")
+    if not 0 < participation <= 1:
+        raise ValueError("invalid participation")
     cash = 1_000_000.0
     holdings = {}
     orders, daily = [], []
@@ -356,7 +358,7 @@ def simulate_account(panel, targets, cost=True, stress=True):
                     # Fixed illustrative adverse slippage; no real queue calibration.
                     px = ref*(1+(.0008 if side == "BUY" else -.0008)) if cost else ref
                     # At decision: trailing turnover proxy, not the execution day's volume.
-                    cap = int(.05*mean(row["amount"][decision-4:decision+1])/px/lot)*lot
+                    cap = int(participation*mean(row["amount"][decision-4:decision+1])/px/lot)*lot
                     fill = min(requested, cap) if stress else requested
                     reason = "PARTICIPATION_CAP" if fill < requested else "FILLED"
                     if stress and blocked_side(k, day) in (side, "BOTH"):
@@ -455,11 +457,205 @@ def concise_extended(result):
     print("No real market evidence. Use --integrated --json for audit records.")
 
 
+# Stage 3: risk budgets, exact accounting attribution and diagnostic scenarios.
+RISK_TARGET = .009  # synthetic daily volatility target, not a market calibration
+NAME_CAP = .15
+INDUSTRY_CAP = .30
+
+
+def risk_weights(panel, t, scores, exposure=0.95):
+    """Long-only inverse-volatility weights with caps and covariance scaling.
+    Unallocated weight remains cash. No claim of mean-variance optimality.
+    """
+    names = sorted(scores, key=lambda k: (-scores[k], k))[:TOP]
+    returns = {k: [panel[k]["close"][d]/panel[k]["close"][d-1]-1
+                   for d in range(t-19, t+1)] for k in names}
+    vol = {k: math.sqrt(mean((x-mean(v))**2 for x in v)) for k,v in returns.items()}
+    inv = {k: 1/max(vol[k], .001) for k in names}
+    total = sum(inv.values())
+    raw = {k: min(NAME_CAP, exposure*inv[k]/total) for k in names} if total else {}
+    for g in range(5):
+        group = [k for k in raw if panel[k]["industry"] == g]
+        weight = sum(raw[k] for k in group)
+        if weight > INDUSTRY_CAP:
+            for k in group:
+                raw[k] *= INDUSTRY_CAP/weight
+    # Portfolio series includes cash at zero return, and all cross-covariances.
+    series = [sum(raw[k]*returns[k][i] for k in raw) for i in range(20)]
+    sd = math.sqrt(mean((v-mean(series))**2 for v in series))
+    scale = min(1., RISK_TARGET/sd) if sd else 1.
+    weights = {k: v*scale for k,v in raw.items()}
+    return dict(weights=weights, historical_vol=sd, scaled_vol=sd*scale,
+                stock_vol=vol, scale=scale, exposure=sum(weights.values()),
+                cash_weight=1-sum(weights.values()))
+
+
+def monitor_at(weeks, t):
+    past = [w for w in weeks if w["label_available"] < t][-6:]
+    values = [w["rank_ic"] for w in past if w["rank_ic"] is not None]
+    coverage = sum(len(w["labels"]) for w in past)/sum(w["eligible"] for w in past) if past else None
+    if len(values) < 6 or coverage is None or coverage < .9:
+        state, scale = "INSUFFICIENT", .5
+    elif mean(values) < 0:
+        state, scale = "REVIEW", .5
+    else:
+        state, scale = "NORMAL", 1.
+    return dict(signal=t, known_signals=[w["signal"] for w in past],
+                mean_ic=mean(values) if values else None, coverage=coverage,
+                state=state, scale=scale)
+
+
+def decay_diagnostics(panel, weeks):
+    """Fixed 1/5/10-session holding horizons, identical dates and stock pairs."""
+    horizons = (1,5,10)
+    results = []
+    for w in weeks:
+        t = w["signal"]
+        entry = t+1
+        if entry+max(horizons) >= SESSIONS:
+            continue
+        codes = sorted(k for k in w["scores"] if entry+max(horizons) < panel[k]["delisted"])
+        score = [w["scores"][k] for k in codes]
+        ic = {h: spearman(score, [panel[k]["open"][entry+h]/panel[k]["open"][entry]-1
+                                 for k in codes]) for h in horizons}
+        results.append(dict(signal=t, comparable=len(codes), ic=ic))
+    # If a horizon's IC is undefined, exclude that date from all averages.
+    paired = [r for r in results if all(v is not None for v in r["ic"].values())]
+    return dict(periods=len(paired), rows=results,
+                mean_ic={h: mean(r["ic"][h] for r in paired) if paired else None for h in horizons})
+
+
+def overlap_diagnostics(panel, weeks):
+    result = []
+    last = None
+    for w in weeks:
+        f = feature_snapshot(panel, w["signal"])
+        first = set(sorted(f, key=lambda k:(-f[k][0], k))[:TOP])
+        second = set(sorted(f, key=lambda k:(-f[k][1], k))[:TOP])
+        result.append(dict(signal=w["signal"],
+                           rev_mom_jaccard=len(first&second)/len(first|second) if first|second else None,
+                           membership_change=len(first-last)/len(first) if last is not None and first else None))
+        last = first
+    return result
+
+
+def account_attribution(panel, account):
+    """Exact additive dollar attribution across overnight and intraday legs.
+    Market and industry are equal-weight synthetic reference baskets, not betas
+    estimated by regression. All held and reference securities must have prices.
+    """
+    rows = []
+    orders = {}
+    for o in account["orders"]:
+        orders.setdefault(o["day"], []).append(o)
+    for prev, now in zip(account["daily"], account["daily"][1:]):
+        day = now["day"]
+        market = industry = selection = 0.
+        # Known prior-close research universe, fixed for both legs of the day.
+        ref_codes = sorted(signal_snapshot(panel, day-1)[0])
+        # Held names may have left signal eligibility; retain them in their P&L.
+        for holdings, start_field, start_day, end_field, end_day in (
+            (prev["holdings"], "close", day-1, "open", day),
+            (now["holdings"], "open", day, "close", day),
+        ):
+            if not ref_codes:
+                raise ValueError("no reference universe")
+            def ret(k):
+                return panel[k][end_field][end_day]/panel[k][start_field][start_day]-1
+            if any(not panel[k]["listed"] <= start_day <= end_day < panel[k]["delisted"] for k in ref_codes):
+                raise ValueError("reference price missing; attribution requires exit data")
+            m = mean(ret(k) for k in ref_codes)
+            group = {g: [ret(k) for k in ref_codes if panel[k]["industry"] == g] for g in range(5)}
+            for k,q in holdings.items():
+                value = q*panel[k][start_field][start_day]
+                peers = group[panel[k]["industry"]]
+                if not peers:
+                    raise ValueError("missing industry reference")
+                g = mean(peers)
+                market += value*m
+                industry += value*(g-m)
+                selection += value*(ret(k)-g)
+        fee = -sum(o["fee"] for o in orders.get(day, []))
+        slip = -sum(o["slippage"] for o in orders.get(day, []))
+        actual = now["nav"]-prev["nav"]
+        residual = actual-market-industry-selection-fee-slip
+        rows.append(dict(day=day, market=market, industry=industry, selection=selection,
+                         fees=fee, slippage=slip, actual=actual, residual=residual))
+    keys = ("market","industry","selection","fees","slippage","actual","residual")
+    return dict(daily=rows, totals={k:sum(r[k] for r in rows) for k in keys})
+
+
+def risk_report():
+    panel = make_panel()
+    base = extended_report()
+    weeks, models = base["weeks"], base["models"]
+    risk, monitored, decisions = {}, {}, []
+    for w,h in zip(weeks[18:],models["holdout"]):
+        t = w["signal"]
+        scores = h["prediction"]["scores"][models["selected"]]
+        m = monitor_at(weeks,t)
+        fixed = risk_weights(panel,t,scores)
+        gated = risk_weights(panel,t,scores,exposure=.95*m["scale"])
+        risk[t], monitored[t] = fixed["weights"], gated["weights"]
+        decisions.append(dict(signal=t,risk=fixed,monitored=gated,monitor=m))
+    accounts = {
+        "fixed":base["accounts"]["selected"]["constrained"],
+        "risk":simulate_account(panel,risk),
+        "monitored":simulate_account(panel,monitored),
+    }
+    attribution = {k:account_attribution(panel,a) for k,a in accounts.items()}
+    capacity = {p:simulate_account(panel,risk,participation=p) for p in (.01,.05,.10)}
+    actual_exposure = {}
+    for name,a in accounts.items():
+        exposures = []
+        for d in a["daily"]:
+            w = {k:q*panel[k]["close"][d["day"]]/d["nav"] for k,q in d["holdings"].items()}
+            groups = {g:sum(v for k,v in w.items() if panel[k]["industry"]==g) for g in range(5)}
+            exposures.append(dict(day=d["day"],stock=sum(w.values()),cash=d["cash"]/d["nav"],
+                                  max_name=max(w.values(),default=0.),max_industry=max(groups.values())))
+        actual_exposure[name]=exposures
+    return dict(stage="risk_classroom_v3",source_kind=SOURCE, data_sha256=base["data_sha256"],
+                model=models["selected"], decisions=decisions, accounts=accounts,
+                attribution=attribution, capacity=capacity, exposures=actual_exposure,
+                decay=decay_diagnostics(panel,weeks), overlap=overlap_diagnostics(panel,weeks),
+                factor_ic=[dict(signal=w["signal"],ic=w["rank_ic"],available=w["label_available"]) for w in weeks],
+                boundaries=["All results are synthetic and published classroom examples.",
+                            "Target caps are not guaranteed actual holdings caps.",
+                            "Market/industry/selection is an exact dollar reference decomposition, not regression alpha/beta.",
+                            "Overlap and membership change are proxies, not actual crowding or turnover.",
+                            "Capacity scenarios vary an artificial trailing liquidity cap, not market capacity.",
+                            "Monitor uses REV20 IC as a reference, not a validated selected-model shutdown rule."])
+
+
+def dashboard_data(r):
+    """Small browser payload; full audit remains available in JSON mode."""
+    return dict(source_kind=r["source_kind"],model=r["model"],
+                nav={k:[dict(day=d["day"],value=d["nav"]) for d in a["daily"]] for k,a in r["accounts"].items()},
+                summary={k:{x:a[x] for x in ("final_nav","total_return","max_drawdown","fees","slippage","unfilled_orders")} for k,a in r["accounts"].items()},
+                attribution={k:a["totals"] for k,a in r["attribution"].items()},
+                exposure=r["exposures"],factor_ic=r["factor_ic"],decisions=r["decisions"],
+                decay=r["decay"]["mean_ic"],decay_periods=r["decay"]["periods"],
+                capacity=[dict(rate=p,nav=a["final_nav"],unfilled=a["unfilled_orders"],
+                               traded=a["traded_notional"]) for p,a in r["capacity"].items()])
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--integrated", action="store_true")
+    parser.add_argument("--risk", action="store_true")
+    parser.add_argument("--dashboard", action="store_true")
     args = parser.parse_args()
+    if args.risk or args.dashboard:
+        result = risk_report()
+        if args.dashboard or args.json:
+            print(json.dumps(dashboard_data(result) if args.dashboard else result, ensure_ascii=False, allow_nan=False))
+        else:
+            print("SYNTHETIC_ONLY - risk and attribution experiment")
+            print(json.dumps(dashboard_data(result)["summary"], ensure_ascii=False, indent=2))
+            print("Dollar attribution:", json.dumps(dashboard_data(result)["attribution"], ensure_ascii=False))
+            print("Use --risk --json for complete audit.")
+        return
     result = extended_report() if args.integrated else report()
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False))

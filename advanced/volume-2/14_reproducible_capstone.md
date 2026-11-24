@@ -21,7 +21,15 @@ python examples/rev20_classroom_lab.py --integrated --json
 python -m unittest discover -s tests -p "test_volume2_quality_gate.py" -v
 ~~~
 
-复核顺序：数据与资格 → 特征和标签 → 验证选择 → 目标权重 → 订单与现金 → 每日净值。下一阶段再扩展风险归因、真实公司行为、风险优化和仿真工程。
+复核顺序：数据与资格 → 特征和标签 → 验证选择 → 目标权重 → 订单与现金 → 每日净值。风险实验已扩展风险预算、账本归因、衰减与容量情景；下一阶段再扩展真实公司行为、完整风险优化和仿真工程。
+
+### 贯穿项目：从曲线查到账本
+
+运行风险实验会额外生成 decisions、accounts、attribution、exposures、decay、overlap、capacity，分别对应目标风险、实际账户、金额归因、真实模拟持仓比例、期限衰减、名单重合和成交限制敏感性。
+
+网页图表直接使用构建时运行同一 Python 实验得到的数据，选择账户可查看净值、回撤、持仓和收益来源；也可独立运行下方按钮复算。核对每一天市场、行业、个股贡献减去费用和滑点是否等于实际盈亏。策略结果允许为负。
+
+运行 `python examples/rev20_classroom_lab.py --risk --json` 获取完整风险账本，也可查看本章末尾图表和运行按钮。
 
 ## 1. 一份研究包的最低结构
 
