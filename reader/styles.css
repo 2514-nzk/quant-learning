@@ -517,3 +517,25 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .sensitivity-controls { display:flex; flex-wrap:wrap; gap:1em; margin:1em 0; }
 .sensitivity-controls label { display:flex; flex-direction:column; gap:.3em; font-size:.9em; }
 .sensitivity-controls select { color:var(--ink); background:var(--paper-raised); border:1px solid var(--line); border-radius:5px; padding:.35em; font:inherit; }
+
+/* Interactive numerical lessons are inline with the relevant explanation. */
+.mathlab { margin:1.8em 0 2.2em; padding:clamp(.8rem,2.4vw,1.35rem); border:1px solid var(--line); border-radius:9px; background:var(--paper-raised); min-width:0; }
+.mathlab .mathlab-tag { color:var(--muted); font:500 .75rem "DM Sans",sans-serif; letter-spacing:.05em; }
+.mathlab h4 { margin:.55rem 0 .65rem; color:var(--ink); font-size:1.12rem; line-height:1.5; }
+.mathlab p { font-size:.94em; margin:.6em 0; }
+.mathlab-controls { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); gap:.8rem 1.2rem; margin:1rem 0; }
+.mathlab-controls label { display:flex; flex-direction:column; gap:.4rem; font-size:.86em; min-width:0; }
+.mathlab-controls label span { display:flex; align-items:center; justify-content:space-between; gap:.4rem; }
+.mathlab-controls output { font-variant-numeric:tabular-nums; font-weight:600; color:var(--ink); }
+.mathlab-controls input { width:100%; margin:0; min-height:26px; accent-color:#258b82; cursor:pointer; }
+.mathlab-reset { font:inherit; font-size:.82em; border:1px solid var(--line); border-radius:5px; padding:.35em .7em; background:var(--paper-raised); color:var(--ink); cursor:pointer; }
+.mathlab :focus-visible { outline:2px solid #258b82; outline-offset:3px; }
+.mathlab-metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,145px),1fr)); gap:.5rem; margin:1em 0; }
+.mathlab-metrics > div { border:1px solid var(--line); border-radius:6px; padding:.65rem; min-width:0; }
+.mathlab-metrics small,.mathlab-metrics strong { display:block; }
+.mathlab-metrics strong { font-size:1.12em; line-height:1.4; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.mathlab svg { width:100%; height:auto; display:block; margin:.75em 0 .2em; }
+.mathlab svg text { font:11px "DM Sans","Noto Sans SC",sans-serif; fill:currentColor; }
+.mathlab .risk-legend { display:flex; flex-wrap:wrap; gap:.45em 1em; font-size:.8em; }
+.mathlab table { font-size:.88em; }
+@media(max-width:520px){.mathlab{padding:.75rem}.mathlab-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.mathlab-metrics strong{font-size:1em}.mathlab-controls{grid-template-columns:1fr}}

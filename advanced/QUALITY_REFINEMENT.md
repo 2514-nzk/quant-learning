@@ -14,3 +14,7 @@
 执行：`python -m unittest discover -s tests -p "test_public_course_quality.py" -v`、`node tests/reader_runtime.test.js`、`node tests/real_browser_lab.test.js`。原有测试仍执行。模拟 worker 测试不等于真实浏览器中的完整 Pyodide 兼容性验证。
 
 下一步：真实市场扩容必须先获得合法再分发的独立数据快照、历史成员与公司行为证据；尚未完成全市场 PIT、独立样本外、实际成交与容量验证。逐章专业数学复核和实际浏览器视觉测试仍需继续。不能将可运行的人工策略写成已验证的实盘策略。
+
+## 数学与机器学习交互实验
+
+新增 8 类浏览器原生实验：贝叶斯、相关/协方差、OLS/Ridge、梯度下降、近似置信区间、回归树、平方损失 Boosting、两资产离散组合。第一卷第 11–13 章与第二卷第 02、10、12 章按知识位置插入。所有数据均为人工、固定训练/公开验证划分，不改变真实四股或 REV20 面板。运行 `node tests/math_lab.test.js` 核对公式、边界、训练误差与可行权重；这不等于实际浏览器视觉审查或真实市场验证。

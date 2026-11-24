@@ -217,6 +217,7 @@ def main() -> None:
     shutil.copy2(ROOT / "reader" / "index.html", output / "index.html")
     shutil.copy2(ROOT / "reader" / "app.js", output / "app.js")
     shutil.copy2(ROOT / "reader" / "real-case.js", output / "real-case.js")
+    shutil.copy2(ROOT / "reader" / "math-lab.js", output / "math-lab.js")
     shutil.copy2(ROOT / "reader" / "styles.css", output / "styles.css")
     shutil.copy2(ROOT / "reader" / "favicon.ico", output / "favicon.ico")
     shutil.copytree(ROOT / "reader" / "assets", output / "assets", dirs_exist_ok=True)

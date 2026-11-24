@@ -663,6 +663,7 @@
       if (headingBySlug.has(fragment)) anchor.setAttribute("href", `#${headingBySlug.get(fragment)}`);
     });
     els.article.replaceChildren(...wrapper.childNodes);
+    window.QuantMathLab?.mount(els.article);
     renderRealSensitivity(doc);
     renderRiskDashboard(doc);
     renderLabFor(doc);
