@@ -123,7 +123,7 @@ H_1:\quad E[IC_t]>0.
 
 至少需满足：
 
-~~~text
+~~~formula
 feature_available_at <= decision_at < entry_at < exit_at <= label_end_at
 signal_at <= decision_at
 max(train.label_end_at) < min(valid.signal_at)

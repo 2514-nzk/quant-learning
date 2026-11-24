@@ -66,9 +66,11 @@ python examples/advanced_factor_research_lab.py --json
 python -m unittest discover -s tests -p "test_advanced_factor_research_lab.py" -v
 ~~~
 
+举个具体的时间例子：验证期周五 15:00 开始，一条训练标签周五 14:50 才可用。如果安全间隔设为 15 分钟，那么 14:50 加 15 分钟是 15:05，已经越过验证信号，因此应删除该训练样本。
+
 函数 `purge_forward(train, valid, safety_gap_minutes=0)` 找到最早验证信号，并按
 
-~~~text
+~~~formula
 label_available_at + safety_gap < valid_first_signal_at
 ~~~
 

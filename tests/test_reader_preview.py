@@ -58,6 +58,9 @@ class ReaderPreviewTests(unittest.TestCase):
         self.assertIn("if (!window.katex) return", js)
         self.assertIn("katex.min.js", html)
         self.assertIn("katex.min.css", html)
+        self.assertIn("pre > code.language-formula", js)
+        self.assertIn('panel.textContent =', js)
+        self.assertIn("formula-reading", js)
 
 
 if __name__ == "__main__":

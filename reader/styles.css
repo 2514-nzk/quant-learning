@@ -484,3 +484,20 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
   .math-block { padding: .75em .6em; }
   .math-block .katex { font-size: 1.05em; }
 }
+
+/* Plain-language equations and hand calculations, including the beginner volume. */
+.formula-reading {
+  margin: 1.25em 0;
+  padding: .85em 1em;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--green);
+  border-radius: 6px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  font-family: "DM Sans", "Noto Sans SC", sans-serif;
+  font-size: 1.02em;
+  line-height: 1.95;
+  font-variant-numeric: tabular-nums;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

@@ -27,7 +27,7 @@ Point-in-Time（PIT）的核心问题：**研究者在信号形成那一刻，�
 
 设 i 为证券、f 为指标、t 为信号时刻，c(t) 是已冻结的信息截止。
 
-~~~text
+~~~formula
 S(i, f, t) = {
     r | r.code = i,
         r.field = f,
@@ -38,6 +38,8 @@ S(i, f, t) = {
 
 chosen(i, f, t) = argmax [period_end, known_at, revision_id] over S
 ~~~
+
+上面的集合写法可以按数据库查询来理解：先筛出这只证券、这个指标的历史记录，再排除报告期或信息可得时间不合格的版本。S 是剩下的候选集合；argmax 表示按照报告期、已知时间、修订版本的顺序挑选排序最大的记录，而不是取这些字段数值的最大值。
 
 教学代码先选择**当时已知的最新报告期**，再选该期已知的最新修订；这是一个明确的选择规则，并不是所有财务指标天然共用的标准。TTM、平均权益、会计差错、公告撤回、不同合并口径都需另做规则。
 
@@ -59,7 +61,7 @@ chosen(i, f, t) = argmax [period_end, known_at, revision_id] over S
 
 对于某个上市状态版本，可定义半开区间：
 
-~~~text
+~~~formula
 start_on <= signal_date < end_before
 known_at <= feature_cutoff
 ~~~
@@ -120,7 +122,7 @@ known_at <= feature_cutoff
 
 为每次历史快照提供：
 
-~~~text
+~~~formula
 PIT_coverage = 截止时有可信可用值的样本数 / 合格历史样本数
 missing_rate = 有缺失原因的样本数 / 应采集样本数
 revision_rate = 存在多版记录的实体-字段-报告期数 / 对应总期数

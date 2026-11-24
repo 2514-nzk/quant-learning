@@ -513,6 +513,13 @@
     const wrapper = document.createElement("div");
     wrapper.innerHTML = window.DOMPurify.sanitize(raw);
     typesetMath(wrapper);
+    // Teaching calculations use readable Chinese notation, not a code toolbar.
+    wrapper.querySelectorAll("pre > code.language-formula").forEach((code) => {
+      const panel = document.createElement("div");
+      panel.className = "formula-reading";
+      panel.textContent = (code.textContent || "").trim();
+      code.parentElement.replaceWith(panel);
+    });
     wrapper.querySelectorAll("a[href]").forEach((anchor) => normalizeMarkdownLink(anchor, doc));
     wrapper.querySelectorAll("img[src]").forEach((image) => {
       const src = image.getAttribute("src") || "";
