@@ -194,6 +194,111 @@ def run(groups,validation_year,test_year,ks):
                            "low relative volume is not cross-sectional liquidity or capacity"]}
 
 
+# All variants use the same full-feature valid cross-section, including
+# the baseline. A missing feature must not create a new sample in an ablation.
+ABLATIONS = {
+    "DOUBLE_REV": (0,1),
+    "DOUBLE_REV_MOM60": (0,1,2),
+    "DOUBLE_REV_LOWVOL5": (0,1,3),
+    "DOUBLE_REV_LOWREL_VOL": (0,1,4),
+    "FULL": tuple(range(D)),
+    **{"DROP_"+f: tuple(j for j in range(D) if j!=i)
+       for i,f in enumerate(FEATURES)},
+}
+
+
+def fit_subset(groups,lam,indices):
+    if not indices or len(set(indices))!=len(indices) or any(i not in range(D) for i in indices):
+        raise ValueError("Invalid feature subset")
+    masked=[dict(g,rows=[(code,[v if i in indices else 0. for i,v in enumerate(x)],y)
+                          for code,x,y in g["rows"]]) for g in groups]
+    return fit(masked,lam)
+
+
+def select_subset(train,val,indices,ks):
+    candidates=[]
+    for lam in LAMBDAS:
+        beta=fit_subset(train,lam,indices)
+        ic=compare(val,beta,ks)["mean_rank_ic"]["RIDGE"]
+        candidates.append({"lambda":lam,"beta":beta,"validation_mean_rank_ic":ic})
+    usable=[c for c in candidates if c["validation_mean_rank_ic"] is not None]
+    if not usable:
+        raise ValueError("No valid validation IC for subset")
+    return {"features":[FEATURES[i] for i in indices],"candidates":candidates,
+            "selected":max(usable,key=lambda c:(c["validation_mean_rank_ic"],c["lambda"]))}
+
+
+def exact_signflip(deltas):
+    """Small-sample diagnostic only; independent symmetric sign assumptions."""
+    n=len(deltas)
+    if not n or n>16:
+        return None
+    observed=abs(sum(deltas))
+    count=0
+    for mask in range(1<<n):
+        value=sum(v if (mask>>i)&1 else -v for i,v in enumerate(deltas))
+        count+=abs(value)>=observed-1e-12
+    return count/(1<<n)
+
+
+def holm(tests):
+    # Do not shrink the planned family when a p-value is unavailable.
+    ordered=sorted((r for r in tests if r["p"] is not None),key=lambda r:r["p"])
+    previous=0.
+    for r in tests:
+        r["holm_p"]=None
+    for i,r in enumerate(ordered):
+        previous=max(previous,min(1.,r["p"]*(len(tests)-i)))
+        r["holm_p"]=previous
+    return tests
+
+
+def ablation(groups,validation_year,test_year,ks):
+    train,val,test,purged=split_groups(groups,validation_year,test_year)
+    if not train or not val or not test:
+        raise ValueError("Need train, validation and test groups")
+    # Freeze every fit and validation choice before evaluating any test labels.
+    choices={name:select_subset(train,val,indices,ks)
+             for name,indices in ABLATIONS.items()}
+    evaluated={name:compare(test,c["selected"]["beta"],ks)
+               for name,c in choices.items()}
+    names=("REV20",*ABLATIONS)
+    baseline=evaluated["FULL"]
+    rounds=[]
+    for i,row in enumerate(baseline["rounds"]):
+        models={"REV20":row["models"]["REV20"]}
+        for name,r in evaluated.items():
+            models[name]=r["rounds"][i]["models"]["RIDGE"]
+        rounds.append({"signal":row["signal"],"exit":row["exit"],
+                       "valid_scores":row["valid_scores"],"valid_labels":row["valid_labels"],
+                       "models":models})
+    common=[r for r in rounds if all(p["gross"] is not None
+              for f in names for p in r["models"][f]["top"])]
+    tests=[]
+    contrasts=[(f,"REV20") for f in ABLATIONS]+[
+               ("FULL","DROP_"+f) for f in FEATURES]
+    for left,right in contrasts:
+        paired=[(r["signal"],r["models"][left]["rank_ic"]-r["models"][right]["rank_ic"])
+                for r in rounds if r["models"][left]["rank_ic"] is not None
+                and r["models"][right]["rank_ic"] is not None]
+        ds=[v for _,v in paired]
+        tests.append({"left":left,"right":right,"dates":[d for d,_ in paired],
+                      "deltas":ds,"mean_delta":avg(ds),"positive_count":sum(v>0 for v in ds),
+                      "p":exact_signflip(ds)})
+    return {"choices":choices,"rounds":rounds,
+            "mean_rank_ic":{f:avg([r["models"][f]["rank_ic"] for r in rounds
+                                 if r["models"][f]["rank_ic"] is not None]) for f in names},
+            "common_all_model_all_k_dates":[r["signal"] for r in common],
+            "common_all_model_all_k":[{"k":k,"mean_excess":{
+                f:avg([r["models"][f]["top"][j]["excess"] for r in common]) for f in names}}
+                for j,k in enumerate(ks)],
+            "paired_ic_diagnostics":holm(tests),
+            "limitations":["descriptive historical holdout; no selection from test results",
+                           "sign-flip diagnostic assumes independent symmetric date differences",
+                           "exact enumeration only for 1–16 paired dates; no p-value otherwise",
+                           "Holm covers the listed 15 contrasts, not all prior exploratory work",
+                           "no proof of time independence, independent OOS, execution or net returns"]}
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument("--input",type=Path,required=True)
@@ -205,6 +310,7 @@ def main():
     p.add_argument("--date-column",default="trade_date")
     p.add_argument("--code-column",default="ts_code")
     p.add_argument("--k",nargs="+",type=int,default=[10,20,30,50])
+    p.add_argument("--ablation",action="store_true",help="compare fixed subsets and paired date diagnostics")
     a=p.parse_args()
     if not a.start_year<a.validation_year<a.test_year<=a.end_year:
         p.error("Require chronological train, validation, test years")
@@ -231,7 +337,10 @@ def main():
         if not code or code in panel[d]:
             raise ValueError("Missing or duplicate security/date key")
         panel[d][code]=tuple(positive(r[k]) for k in ("open","close","volume"))
-    result=run([group(panel,t,ds) for t,ds in specs.items()],a.validation_year,a.test_year,a.k)
+    groups=[group(panel,t,ds) for t,ds in specs.items()]
+    result=run(groups,a.validation_year,a.test_year,a.k)
+    if a.ablation:
+        result["ablation"]=ablation(groups,a.validation_year,a.test_year,a.k)
     result["input_sha256"]=file_sha(a.input)
     result["protocol"]={"months":MONTHS,"label":"next_open_5","ks":a.k}
     a.output.parent.mkdir(parents=True,exist_ok=True)

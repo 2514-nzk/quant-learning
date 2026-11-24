@@ -277,6 +277,34 @@ class VolumeTwoQualityGate(unittest.TestCase):
         self.assertIsNone(standardize([("A",[1]*5,0),("B",[1]*5,1)]))
 
 
+    def test_local_ridge_ablation_contract(self):
+        from examples.multifactor_daily_ridge import standardize, ablation, fit_subset, exact_signflip, holm
+        raw=[("A",[1,2,3,4,5],.1),("B",[2,4,6,8,10],None),("C",[3,6,9,12,15],-.1)]
+        z=standardize(raw)
+        train={"signal":"2020-02-01","exit":"2020-02-08","rows":z}
+        val={"signal":"2021-02-01","exit":"2021-02-08","rows":z}
+        test={"signal":"2022-02-01","exit":"2022-02-08","rows":z}
+        b=fit_subset([train],.1,(0,1))
+        self.assertEqual(b[2:],[0.,0.,0.])
+        r=ablation([train,val,test],2021,2022,[1,2])
+        self.assertEqual(len(r["choices"]),10)
+        self.assertEqual(sum(len(v["candidates"]) for v in r["choices"].values()),40)
+        self.assertEqual(len(r["paired_ic_diagnostics"]),15)
+        self.assertEqual(r["rounds"][0]["valid_scores"],3)
+        self.assertEqual(r["rounds"][0]["valid_labels"],2)
+        self.assertEqual(r["common_all_model_all_k_dates"],[])
+        changed=dict(test,rows=[(c,x,-y if y is not None else None) for c,x,y in z])
+        other=ablation([train,val,changed],2021,2022,[1,2])
+        self.assertEqual(r["choices"],other["choices"])
+        self.assertNotEqual(r["mean_rank_ic"],other["mean_rank_ic"])
+        self.assertAlmostEqual(exact_signflip([.03,.02,-.01]),.5)
+        self.assertIsNone(exact_signflip([1.]*17))
+        p=holm([{"p":.01},{"p":.04},{"p":None}])
+        self.assertAlmostEqual(p[0]["holm_p"],.03)
+        self.assertAlmostEqual(p[1]["holm_p"],.08)
+        self.assertIsNone(p[2]["holm_p"])
+
+
     def test_real_four_stock_editorial_examples(self):
         import json
         from statistics import mean, stdev
