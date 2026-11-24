@@ -50,6 +50,20 @@ python examples/advanced_real_evidence_audit.py --json
 
 **仅有更大数据量并不等于具有严格 PIT 或独立 OOS**：没有历史首次披露/供应商接收证据，必须如实写明。发布真实股票数据还应审查第三方行情再分发许可；不因程序能够抓取就当然具备再分发权。
 
+### 5.1 批量真实日线练习
+
+以 2016—2025 年为首批完整年度，优先选择有历史来源的明确证券清单（CSV 列 `symbol`，可有 `name`）。也可显式选择当前沪深300成分作为回顾性固定名单练习，不是历史沪深300。两种模式均不自动构建 PIT 母体。
+
+~~~bash
+python -m pip install akshare
+python scripts/collect_research_daily.py --symbols-file /your/list.csv --out /your/daily-v1
+python scripts/collect_research_daily.py --current-csi300 --out /your/daily-csi300-v1
+~~~
+
+程序优先调用 AKShare `stock_zh_a_hist`，失败后尝试 `stock_zh_a_daily`（新浪）。逐证券分别保存不复权与后复权原始字段、名单快照、请求范围、取数时刻、版本和哈希。原始列不强行合并，清单逐文件标明成交量单位；不同来源的 raw/hfq 配对单独标记，研究时必须先核对一致性。目录必须为空或不存在，防止覆盖原始证据。缺失或异常证券记入清单，返回非零退出码，不补造数据。未验证的历史缺失不等于停牌。后复权序列也不自动满足 PIT 或总回报定义；真实执行须用不复权报价及公司行为账本。
+
+文档：[AKShare 股票接口](https://akshare-hh.readthedocs.io/en/latest/data/stock/stock.html)、[指数接口](https://akshare-hh.readthedocs.io/en/latest/data/index/index.html)。批量数据保留在本地，未经许可审核不自动提交或发布。这里提供采集工具，不宣称已经取得 300 股实际日线。
+
 ## 6. 本附录的完成标准
 
 仓库中固定数据能由同一命令检查，合成事件由单独 JSON 提供，示例代码不会访问其他项目路径；读者不接入外部私有数据也能复算算法与教学结论。这就是数据层面的**可复现教学**。全市场 PIT/OOS 与真实策略业绩仍是另外需要证据的研究问题。

@@ -145,6 +145,28 @@ class VolumeTwoQualityGate(unittest.TestCase):
         self.assertAlmostEqual(ics[j], -.2)
         self.assertAlmostEqual(tops[j]-eqs[j], .0118989615)
 
+    def test_real_time_series_and_execution_examples(self):
+        import csv
+        import json
+        from statistics import mean
+        from examples.real_stock_learner import rank_ic
+        rounds = json.loads((ROOT / "data/real_a_share/teaching_case.json").read_text("utf-8"))["rounds"]
+        ics = [rank_ic(r["rows"]) for r in rounds]
+        u = [v-mean(ics) for v in ics]
+        def ac(k):
+            return sum(u[i]*u[i-k] for i in range(k,len(u)))/len(u)
+        self.assertAlmostEqual(ac(1)/ac(0), -.2805253736)
+        self.assertAlmostEqual(math.sqrt((ac(0)+2*(2/3*ac(1)+1/3*ac(2)))/len(u)), .0751651470)
+        with (ROOT / "data/real_a_share/688256.csv").open(encoding="utf-8") as f:
+            bars = {r["trade_date"]: r for r in csv.DictReader(f)}
+        self.assertEqual(float(bars["2024-02-08"]["close"]),115.4)
+        self.assertEqual(float(bars["2024-02-19"]["open"]),124.2)
+        self.assertEqual(math.floor(100000/124.2),805)
+        self.assertAlmostEqual(float(bars["2024-06-28"]["close"])/float(bars["2024-06-24"]["open"])-1,-.0750931099,places=8)
+        self.assertEqual(rounds[-1]["exit_date"],"2024-06-28")
+        self.assertLess(rounds[-1]["signal_date"],"2024-06-25")
+        self.assertGreater(rounds[-1]["exit_date"],"2024-06-25")
+
     def test_worked_example_math(self):
         self.assertAlmostEqual(.7 * .1 / (.7 * .1 + .2 * .9), .28)
         self.assertAlmostEqual((4 / 3) / (2 / 3 + 1), .8)
