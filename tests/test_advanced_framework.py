@@ -102,12 +102,15 @@ class AdvancedFrameworkTests(unittest.TestCase):
                     self.assertIn("python examples/cointegration_synthetic_lab.py --json", page["content"])
                     self.assertIn("python examples/cointegration_pair_lab.py", page["content"])
                     self.assertIn("融券", page["content"])
+                elif page["path"] in ("advanced/volume-3/11_dynamic_alloc.md",
+                                       "advanced/volume-3/12_live_system.md",
+                                       "advanced/volume-3/13_capstone.md"):
+                    self.assertIn("状态：教学正文 v1", page["content"])
+                    self.assertIn("python examples/volume3_capstone_lab.py --json", page["content"])
+                    self.assertIn("SYNTHETIC_ONLY", page["content"])
+                    self.assertNotIn("正文待写", page["content"])
                 else:
-                    self.assertTrue(page["path"].startswith("advanced/volume-3/"))
-                    self.assertIn("正文待写", page["content"])
-                    self.assertIn("实验未运行", page["content"])
-                    for heading in ("本章核心问题", "计划知识模块", "计划动手实验", "本章交付物"):
-                        self.assertIn(heading, page["content"])
+                    self.fail(f"Unclassified teaching page: {page['path']}")
 
     def test_volume_index_links(self):
         for dirname, count in (("volume-2", 14), ("volume-3", 13)):

@@ -53,11 +53,25 @@ LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+\.md)(?:#[^)]*)?\)")
 RUNNABLE_SCRIPTS = [
     "examples/real_stock_learner.py",
     "examples/rev20_classroom_lab.py",
+    "examples/volume3_capstone_lab.py",
 ]
 RUNNABLE_DATA = [
     "data/real_a_share/teaching_case.json",
 ]
 LABS = {
+    **{
+        f"advanced/volume-3/{slug}.md": {
+            "kind": "scripts",
+            "title": "运行第三卷综合课堂实验",
+            "description": "同一人工面板的多策略账户、独立纸面故障演练和证据门槛。无真实交易接口。",
+            "files": ["examples/rev20_classroom_lab.py"],
+            "scripts": [
+                {"label": "运行本章实验", "script": "examples/volume3_capstone_lab.py", "args": ["--chapter", slug[:2]]},
+                {"label": "查看完整研究报告", "script": "examples/volume3_capstone_lab.py", "args": ["--json"]},
+            ],
+        }
+        for slug in ("11_dynamic_alloc", "12_live_system", "13_capstone")
+    },
     **{
         f"advanced/volume-2/{chapter}.md": {
             "kind": "scripts",

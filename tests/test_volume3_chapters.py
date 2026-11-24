@@ -42,7 +42,7 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
                 self.assertIn("SYNTHETIC_ONLY" if n == 4 else "人工", page)
 
     def test_local_links_exist_without_external_private_dependencies(self):
-        docs = [V3 / (slug + ".md") for slug in NEW] + [V3 / "05_microcap_quality.md", V3 / "06_corporate_events.md", V3 / "07_theme_network.md", V3 / "09_l2_auction.md", V3 / "10_execution_replay.md", V3 / "README.md"]
+        docs = [V3 / (slug + ".md") for slug in NEW] + [V3 / "05_microcap_quality.md", V3 / "06_corporate_events.md", V3 / "07_theme_network.md", V3 / "09_l2_auction.md", V3 / "10_execution_replay.md", V3 / "11_dynamic_alloc.md", V3 / "12_live_system.md", V3 / "13_capstone.md", V3 / "README.md"]
         checked = 0
         for doc in docs:
             body = doc.read_text("utf-8")
@@ -123,10 +123,78 @@ class ThirdVolumeChaptersTests(unittest.TestCase):
     def test_reader_completion_respects_existing_storage_and_new_written_chapters(self):
         app = (ROOT / "reader/app.js").read_text("utf-8")
         self.assertIn('const STORAGE_KEY = "quant-learning-reader-v1"', app)
-        self.assertIn('9 章教学正文 · 1 章入门案例 · 3 章待写', app)
-        self.assertIn("0[1-7]|08|09|10", app)
+        self.assertIn('12 章教学正文 · 1 章入门案例', app)
+        self.assertIn("0[1-7]|08|09|10|1[1-3]", app)
         self.assertIn("readingRoute = firstVolume.filter", app)
         self.assertNotIn('status: "1 章案例初稿 · 12 章待写"', app)
+
+
+class CapstoneTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from examples.volume3_capstone_lab import report
+        cls.r = report()
+
+    def test_caps_future_isolation_and_accounting(self):
+        from examples.volume3_capstone_lab import make_panel, allocation_at, POLICY
+        panel = make_panel()
+        old = allocation_at(panel,110)
+        for row in panel.values():
+            row["close"][111:] = [999.] * len(row["close"][111:])
+        self.assertEqual(old,allocation_at(panel,110))
+        for d in self.r["allocation"]["decisions"]:
+            self.assertAlmostEqual(sum(d["fixed"].values()),.95)
+            self.assertAlmostEqual(sum(d["budgets"].values()),1.)
+            self.assertLessEqual(sum(d["risk"].values()),.95+1e-10)
+            self.assertLessEqual(d["estimated_vol"],POLICY["daily_vol_target"]+1e-12)
+            for g in range(5):
+                self.assertLessEqual(sum(w for k,w in d["risk"].items()
+                                         if panel[k]["industry"]==g),.30+1e-10)
+            self.assertTrue(all(0<=w<=.15+1e-10 for w in d["risk"].values()))
+        for a in self.r["allocation"]["attribution"].values():
+            self.assertTrue(all(abs(d["residual"])<1e-6 for d in a["daily"]))
+        self.assertEqual(self.r["allocation"]["accounts"]["cash"]["final_nav"],1_000_000)
+
+    def test_reservations_timeout_restart_and_fill_conflict(self):
+        from examples.volume3_capstone_lab import PaperLedger, broker_view
+        l = PaperLedger()
+        self.assertEqual(l.submit("x","S01","BUY",200,1000,1,1),"ACCEPTED")
+        self.assertEqual(l.reserved_cash(),200000)
+        self.assertEqual(l.fill("f","x",100,990),"APPLIED")
+        self.assertEqual(l.s["cash"],901000)
+        self.assertEqual(l.reserved_cash(),100000)
+        l.timeout("x")
+        l=PaperLedger(l.snapshot())
+        self.assertEqual(l.submit("x","S01","BUY",200,1000,1,1),"DUPLICATE")
+        self.assertEqual(l.fill("f","x",100,990),"DUPLICATE")
+        self.assertEqual(l.s["cash"],901000)
+        self.assertFalse(l.resume(broker_view(l),True,1))
+        self.assertEqual(l.fill("f","x",100,991),"CONFLICT")
+        self.assertEqual(l.s["cash"],901000)
+        l.cancel_confirmed("x")
+        self.assertEqual(l.reserved_cash(),0)
+        self.assertTrue(l.resume(broker_view(l),True,1))
+        self.assertEqual(l.submit("sell","S01","SELL",100,1000,1,1),"T_PLUS_ONE_OR_RESERVED")
+        l.next_session()
+        self.assertEqual(l.submit("sell","S01","SELL",100,1000,2,2),"ACCEPTED")
+        self.assertEqual(l.submit("sell2","S01","SELL",100,1000,2,2),"T_PLUS_ONE_OR_RESERVED")
+        self.assertEqual(l.fill("f2","sell",100,1010),"APPLIED")
+        self.assertEqual(l.s["cash"],1002000)
+
+    def test_gate_cannot_convert_synthetic_to_live(self):
+        from examples.volume3_capstone_lab import gate_decision,digest,report
+        r=self.r
+        self.assertEqual(r["decision"],"RESEARCH_ONLY")
+        self.assertTrue(r["gates"]["ledger_reconciled"])
+        self.assertTrue(r["gates"]["fault_drill"])
+        self.assertFalse(r["gates"]["real_pit"])
+        self.assertFalse(r["gates"]["independent_oos"])
+        self.assertFalse(r["gates"]["real_execution"])
+        self.assertFalse(r["gates"]["production_approval"])
+        self.assertEqual(gate_decision(dict(r["gates"],fault_drill=False)),"STOP_AND_REPAIR")
+        self.assertEqual(gate_decision({k:True for k in r["gates"]}),"ELIGIBLE_FOR_HUMAN_REVIEW")
+        self.assertEqual(digest({k:v for k,v in r.items() if k!="report_sha256"}),r["report_sha256"])
+        self.assertEqual(report()["report_sha256"],r["report_sha256"])
 
 
 if __name__ == "__main__":

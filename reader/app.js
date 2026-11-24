@@ -168,8 +168,8 @@
       },
       {
         number: "03", title: "第三卷 · A 股策略与交易系统",
-        description: "研究市场择时、行业轮动、反转、微盘、事件、配对交易、盘口与订单。最后三章还在建设。",
-        path: thirdVolume[0]?.path, status: "9 章教学正文 · 1 章入门案例 · 3 章待写", action: "查看第三卷",
+        description: "研究择时、行业、反转、配对交易与订单，再完成多策略配置、纸面故障演练及综合研究报告。",
+        path: thirdVolume[0]?.path, status: "12 章教学正文 · 1 章入门案例", action: "查看第三卷",
       },
     ];
     els.pathGrid.innerHTML = volumes.filter((volume) => volume.path).map((volume) =>
@@ -673,7 +673,8 @@
     else if (current.path === "advanced/volume-3/09_l2_auction.md") position = "第三卷 第 9 / 13 章 · L2 教学正文";
     else if (current.path === "advanced/volume-3/10_execution_replay.md") position = "第三卷 第 10 / 13 章 · 执行回放教学正文";
     else if (/^advanced\/volume-3\/0[1-7]_/.test(current.path)) position = `第三卷 第 ${Number(current.path.match(/\/0([1-7])_/)[1])} / 13 章 · 教学正文`;
-    else if (current.path.startsWith("advanced/volume-3/")) position = "第三卷 · 目录框架待写";
+    else if (/^advanced\/volume-3\/1[1-3]_/.test(current.path)) position = `第三卷 第 ${Number(current.path.match(/\/(1[1-3])_/)[1])} / 13 章 · 教学正文`;
+    else if (current.path.startsWith("advanced/volume-3/")) position = "第三卷 · 课程目录";
     else if (volumeTwoChapter) position = `第二卷 第 ${Number(volumeTwoChapter[1])} / 14 章`;
     else if (current.path === "advanced/volume-2/README.md") position = "第二卷 · 课程目录";
     else if (chapter) position = `第 ${chapter[1]} / ${mainChapterCount} 章`;
@@ -682,7 +683,7 @@
     els.readingProgress.setAttribute("aria-valuenow", String(percent));
     els.backToTop.hidden = els.reader.scrollTop < 380;
     state.positions[current.path] = els.reader.scrollTop;
-    if ((!current.path.startsWith("advanced/volume-3/") || /^advanced\/volume-3\/(0[1-7]|08|09|10)_/.test(current.path)) && maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
+    if ((!current.path.startsWith("advanced/volume-3/") || /^advanced\/volume-3\/(0[1-7]|08|09|10|1[1-3])_/.test(current.path)) && maximum > 0 && percent >= 92 && !state.completed.includes(current.path)) {
       state.completed.push(current.path);
       updateChapterActions();
       renderNavigation();

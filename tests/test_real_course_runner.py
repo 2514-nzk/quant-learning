@@ -59,7 +59,11 @@ class RealStockCourseTests(unittest.TestCase):
         self.assertAlmostEqual(all_rounds["selected_total_pct"], 14.85867224, places=4)
 
     def test_browser_labs_keep_real_and_synthetic_cases_separate(self):
-        self.assertEqual(RUNNABLE_SCRIPTS, ["examples/real_stock_learner.py", "examples/rev20_classroom_lab.py"])
+        self.assertEqual(RUNNABLE_SCRIPTS, ["examples/real_stock_learner.py", "examples/rev20_classroom_lab.py", "examples/volume3_capstone_lab.py"])
+        for slug in ("11_dynamic_alloc", "12_live_system", "13_capstone"):
+            lab = LABS[f"advanced/volume-3/{slug}.md"]
+            self.assertEqual(lab["files"], ["examples/rev20_classroom_lab.py"])
+            self.assertTrue(all(x["script"] == "examples/volume3_capstone_lab.py" for x in lab["scripts"]))
         self.assertEqual(RUNNABLE_DATA, ["data/real_a_share/teaching_case.json"])
         for path in ("教程/真实_Python入门.md", "教程/真实_08_单因子评价.md", "教程/真实_16_综合练习.md"):
             self.assertIn(path, LABS)
