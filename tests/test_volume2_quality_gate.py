@@ -193,6 +193,46 @@ class VolumeTwoQualityGate(unittest.TestCase):
         dividend_total = (float(closes["600519"]["2024-06-21"]["close"]) + 30.876) / float(closes["600519"]["2024-06-14"]["close"]) - 1
         self.assertAlmostEqual(raw, -.0540192926, places=8)
         self.assertAlmostEqual(dividend_total, -.0341633441, places=8)
+        with (ROOT / "data/real_a_share/688256.csv").open(encoding="utf-8") as f:
+            cambricon = {r["trade_date"]: r for r in csv.DictReader(f)}
+        prior_close = float(cambricon["2024-02-08"]["close"])
+        next_open = float(cambricon["2024-02-19"]["open"])
+        self.assertAlmostEqual(prior_close, 115.40)
+        self.assertAlmostEqual(next_open, 124.20)
+        self.assertAlmostEqual(next_open / prior_close - 1, .0762564991, places=8)
+        self.assertEqual(int(100000 / prior_close), 866)
+        self.assertEqual(int(100000 / next_open), 805)
+
+        def ranks(values):
+            order = sorted(range(len(values)), key=lambda i: values[i])
+            result = [0] * len(values)
+            for rank, index in enumerate(order, 1):
+                result[index] = rank
+            return result
+
+        def spearman(x, y):
+            rx, ry = ranks(x), ranks(y)
+            mx, my = sum(rx) / len(rx), sum(ry) / len(ry)
+            cov = sum((u-mx)*(v-my) for u,v in zip(rx,ry))
+            sx = sum((u-mx)**2 for u in rx) ** .5
+            sy = sum((v-my)**2 for v in ry) ** .5
+            return cov / (sx*sy)
+
+        order = list(files)
+        self.assertAlmostEqual(spearman([returns[c][5] for c in order],
+                                        [returns[c][20] for c in order]), .8)
+        self.assertAlmostEqual(spearman([returns[c][20] for c in order],
+                                        [returns[c][60] for c in order]), 1.0)
+        import itertools
+        possible = {
+            round(1 - 6 * sum((i+1-p[i])**2 for i in range(4)) / 60, 1)
+            for p in itertools.permutations(range(1,5))
+        }
+        self.assertEqual(possible, {i/5 for i in range(-5,6)})
+        case = json.loads((ROOT / "data" / "real_a_share" / "teaching_case.json").read_text("utf-8"))
+        self.assertEqual(len(case["rounds"]), 18)
+        self.assertEqual(sum(len(period["rows"]) for period in case["rounds"]), 72)
+        self.assertEqual(18 * (4*3//2), 108)
 
     def test_worked_example_math(self):
         self.assertAlmostEqual(.7 * .1 / (.7 * .1 + .2 * .9), .28)
