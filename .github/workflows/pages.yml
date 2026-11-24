@@ -88,6 +88,7 @@ jobs:
         run: |
           python -m unittest discover -s tests -p "test_volume2_quality_gate.py" -v
           python -m unittest discover -s tests -p "test_collect_research_daily.py" -v
+          python -m unittest discover -s tests -p "test_audit_research_daily.py" -v
           python -m unittest discover -s tests -p "test_advanced_framework.py" -v
           python -m unittest discover -s tests -p "test_advanced_foundations_market_rules_lab.py" -v
           python -m unittest discover -s tests -p "test_advanced_factor_research_lab.py" -v
