@@ -253,6 +253,30 @@ class VolumeTwoQualityGate(unittest.TestCase):
             mom60_date(days,days[59])
 
 
+    def test_multifactor_ridge_temporal_contract(self):
+        from examples.multifactor_daily_ridge import standardize, split_groups, fit, compare
+        raw = [("A",[1,2,3,4,5],.1),("B",[2,4,6,8,10],None),("C",[3,6,9,12,15],-.1)]
+        z = standardize(raw)
+        self.assertEqual(len(z),3)
+        self.assertEqual(z[1][1],[0.]*5)
+        self.assertIsNone(z[1][2])
+        groups = [{"signal":"2020-01-01","exit":"2020-01-08","rows":z},
+                  {"signal":"2020-12-31","exit":"2021-01-08","rows":z},
+                  {"signal":"2021-02-01","exit":"2021-02-08","rows":z},
+                  {"signal":"2022-02-01","exit":"2022-02-08","rows":z}]
+        train,val,test,purged = split_groups(groups,2021,2022)
+        self.assertEqual((len(train),len(val),len(test),len(purged)),(1,1,1,1))
+        beta = fit(train,.1)
+        self.assertTrue(all(v<0 for v in beta))
+        self.assertTrue(all(abs(v-beta[0])<1e-10 for v in beta))
+        report = compare(test,beta,[1])
+        self.assertEqual(report["mean_rank_ic"]["RIDGE"],1.)
+        self.assertEqual(report["mean_rank_ic"]["REV20"],-1.)
+        self.assertEqual(report["rounds"][0]["valid_scores"],3)
+        self.assertEqual(report["rounds"][0]["valid_labels"],2)
+        self.assertIsNone(standardize([("A",[1]*5,0),("B",[1]*5,1)]))
+
+
     def test_real_four_stock_editorial_examples(self):
         import json
         from statistics import mean, stdev
