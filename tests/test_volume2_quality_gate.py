@@ -118,6 +118,33 @@ class VolumeTwoQualityGate(unittest.TestCase):
                       "2024-03-25 16:30", "NOT_COLLECTED", "0.10", "0.15"):
             self.assertIn(token, chapter)
 
+    def test_real_four_stock_editorial_examples(self):
+        import json
+        from statistics import mean, stdev
+        from examples.real_stock_learner import rank_ic
+        rounds = json.loads((ROOT / "data/real_a_share/teaching_case.json").read_text("utf-8"))["rounds"]
+        ics, tops, bottoms, eqs = [], [], [], []
+        selected_up = total_up = 0
+        for period in rounds:
+            rows = sorted(period["rows"], key=lambda r: -r["mom5"])
+            ics.append(rank_ic(rows))
+            tops.append(mean(r["forward_return"] for r in rows[:2]))
+            bottoms.append(mean(r["forward_return"] for r in rows[2:]))
+            eqs.append(mean(r["forward_return"] for r in rows))
+            selected_up += sum(r["forward_return"] > 0 for r in rows[:2])
+            total_up += sum(r["forward_return"] > 0 for r in rows)
+        self.assertEqual(len(rounds), 18)
+        self.assertEqual((selected_up, total_up), (20, 39))
+        self.assertAlmostEqual(mean(ics), -.1222222222)
+        self.assertAlmostEqual(stdev(ics), .5906681716)
+        self.assertAlmostEqual(mean(ics)/stdev(ics), -.2069219709)
+        self.assertAlmostEqual(math.prod(1+r for r in tops)-1, .1485867251)
+        self.assertAlmostEqual(math.prod(1+r for r in bottoms)-1, .0958808286)
+        self.assertAlmostEqual(math.prod(1+r for r in eqs)-1, .1288119777)
+        j = next(i for i, r in enumerate(rounds) if r["signal_date"] == "2024-01-23")
+        self.assertAlmostEqual(ics[j], -.2)
+        self.assertAlmostEqual(tops[j]-eqs[j], .0118989615)
+
     def test_worked_example_math(self):
         self.assertAlmostEqual(.7 * .1 / (.7 * .1 + .2 * .9), .28)
         self.assertAlmostEqual((4 / 3) / (2 / 3 + 1), .8)
