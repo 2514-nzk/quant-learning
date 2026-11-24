@@ -53,7 +53,8 @@ class ReaderPreviewTests(unittest.TestCase):
     def test_chapter_links_use_preview_source_and_math_has_readable_fallback(self):
         html = (ROOT / "reader/index.html").read_text(encoding="utf-8")
         js = (ROOT / "reader/app.js").read_text(encoding="utf-8")
-        self.assertIn("docs/three-volume-research-framework", js)
+        self.assertIn('const sourceBranch = "master"', js)
+        self.assertNotIn("docs/three-volume-research-framework", js)
         self.assertIn("typesetMath(wrapper)", js)
         self.assertIn("if (!window.katex) return", js)
         self.assertIn("katex.min.js", html)

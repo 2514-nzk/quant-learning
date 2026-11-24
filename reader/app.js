@@ -162,13 +162,13 @@
       },
       {
         number: "02", title: "第二卷 · 专业量化研究方法",
-        description: "14 章校审后教学版：PIT 数据、统计推断、因子、机器学习、样本外、组合与执行。",
-        path: secondChapters[0]?.path, status: `${secondDone}/${secondChapters.length} 章已读`, action: "打开新增正文",
+        description: "从 REV20 反转因子出发，学会清理数据、检验因子、比较模型，再走向组合与回测。",
+        path: secondChapters[0]?.path, status: `${secondDone}/${secondChapters.length} 章已读`, action: "开始研究项目",
         featured: true,
       },
       {
         number: "03", title: "第三卷 · A 股策略与交易系统",
-        description: "共 13 章；01–07、09–10 为策略实战教学正文，第 08 章为真实价格配对交易入门，11–13 为待写框架。",
+        description: "研究市场择时、行业轮动、反转、微盘、事件、配对交易、盘口与订单。最后三章还在建设。",
         path: thirdVolume[0]?.path, status: "9 章教学正文 · 1 章入门案例 · 3 章待写", action: "查看第三卷",
       },
     ];
@@ -216,7 +216,7 @@
     }
     try {
       const encodedPath = doc.path.split("/").map(encodeURIComponent).join("/");
-      const sourceBranch = doc.path.startsWith("advanced/") ? "docs/three-volume-research-framework" : "master";
+      const sourceBranch = "master";
       const source = new URL(`https://github.com/2514-nzk/quant-learning/blob/${sourceBranch}/${encodedPath}`);
       const target = new URL(href, source);
       const prefix = `/2514-nzk/quant-learning/blob/${sourceBranch}/`;
@@ -526,7 +526,7 @@
       if (!/^(https?:|data:|\/\/)/i.test(src)) {
         const encodedPath = doc.path.split("/").map(encodeURIComponent).join("/");
         try {
-          const sourceBranch = doc.path.startsWith("advanced/") ? "docs/three-volume-research-framework" : "master";
+          const sourceBranch = "master";
           const target = new URL(src, `https://raw.githubusercontent.com/2514-nzk/quant-learning/${sourceBranch}/${encodedPath}`);
           const assetPrefix = "https://raw.githubusercontent.com/2514-nzk/quant-learning/master/reader/assets/";
           image.src = target.href.startsWith(assetPrefix)

@@ -58,12 +58,18 @@ class RealStockCourseTests(unittest.TestCase):
         all_rounds = summarize(rounds)
         self.assertAlmostEqual(all_rounds["selected_total_pct"], 14.85867224, places=4)
 
-    def test_browser_labs_use_actual_case_only(self):
-        self.assertEqual(RUNNABLE_SCRIPTS, ["examples/real_stock_learner.py"])
+    def test_browser_labs_keep_real_and_synthetic_cases_separate(self):
+        self.assertEqual(RUNNABLE_SCRIPTS, ["examples/real_stock_learner.py", "examples/rev20_classroom_lab.py"])
         self.assertEqual(RUNNABLE_DATA, ["data/real_a_share/teaching_case.json"])
         for path in ("教程/真实_Python入门.md", "教程/真实_08_单因子评价.md", "教程/真实_16_综合练习.md"):
             self.assertIn(path, LABS)
             self.assertEqual(LABS[path]["files"], RUNNABLE_DATA)
+            self.assertEqual(LABS[path]["kind"], "real-data")
+        for chapter in ("01_research_protocol", "05_pit_data", "08_factor_validation", "14_reproducible_capstone"):
+            lab = LABS[f"advanced/volume-2/{chapter}.md"]
+            self.assertEqual(lab["kind"], "scripts")
+            self.assertEqual(lab["files"], [])
+            self.assertTrue(all(x["script"] == "examples/rev20_classroom_lab.py" for x in lab["scripts"]))
         docs = collect_documents()
         self.assertEqual(len(docs), 22)
         self.assertTrue(all(d["path"].startswith("教程/真实_") for d in docs))

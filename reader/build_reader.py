@@ -50,11 +50,25 @@ LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+\.md)(?:#[^)]*)?\)")
 
 RUNNABLE_SCRIPTS = [
     "examples/real_stock_learner.py",
+    "examples/rev20_classroom_lab.py",
 ]
 RUNNABLE_DATA = [
     "data/real_a_share/teaching_case.json",
 ]
 LABS = {
+    **{
+        f"advanced/volume-2/{chapter}.md": {
+            "kind": "scripts",
+            "title": "运行 REV20 课堂项目",
+            "description": "40 只虚构股票、24 期观察。计算历史资格、排名、毛收益对照与数据反例；不是实际交易回测。",
+            "files": [],
+            "scripts": [
+                {"label": "运行课堂实验", "script": "examples/rev20_classroom_lab.py", "args": []},
+                {"label": "查看逐期完整数据", "script": "examples/rev20_classroom_lab.py", "args": ["--json"]},
+            ],
+        }
+        for chapter in ("01_research_protocol", "05_pit_data", "08_factor_validation", "14_reproducible_capstone")
+    },
     "教程/真实_Python入门.md": {
         "kind": "real-data",
         "title": "用真实价格运行这段选股练习",

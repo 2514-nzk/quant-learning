@@ -154,5 +154,46 @@ class VolumeTwoQualityGate(unittest.TestCase):
         self.assertIn("教学版 v1", js)
         self.assertNotIn("初稿试读", js)
 
+class ClassroomResearchTests(unittest.TestCase):
+    def test_reproducible_panel_and_no_future_feature(self):
+        from examples.rev20_classroom_lab import make_panel, signal_snapshot, report
+        panel = make_panel()
+        self.assertEqual(len(panel), 40)
+        original = signal_snapshot(panel, 20)
+        panel["S01"]["close"][21:] = [999.0] * len(panel["S01"]["close"][21:])
+        self.assertEqual(original, signal_snapshot(panel, 20))
+        r = report()
+        self.assertEqual(r, report())
+        self.assertEqual(r["source_kind"], "SYNTHETIC_ONLY")
+        self.assertEqual(len(r["weeks"]), 24)
+        self.assertEqual([w["signal"] for w in r["weeks"]], list(range(20, 136, 5)))
+        self.assertNotIn(75, r["trainable_at_first_validation"])
+        self.assertIn(70, r["trainable_at_first_validation"])
+        self.assertTrue(all(w["label_available"] == w["signal"]+6 for w in r["weeks"]))
+        for w in r["weeks"]:
+            self.assertEqual(len(w["scores"])+len(w["excluded"]), 40)
+            self.assertEqual(len(w["labels"])+len(w["missing_labels"]), w["eligible"])
+            if w["missing_labels"]:
+                self.assertIsNone(w["gross_difference"])
+
+    def test_pit_split_dividend_and_fee_counterexamples(self):
+        from examples.rev20_classroom_lab import pitfalls, spearman, make_panel, signal_snapshot
+        p = pitfalls()
+        self.assertEqual(p["pit"], {"correct": .10, "wrong_latest": .15})
+        self.assertEqual(p["split"]["raw_return"], -.5)
+        self.assertEqual(p["split"]["adjusted_return"], 0)
+        self.assertEqual(p["split"]["before"], p["split"]["after"])
+        self.assertEqual(p["dividend"]["total_return"], 0)
+        self.assertEqual(p["blocked_buy"]["filled"], 0)
+        self.assertLess(p["fee_example"]["net_pnl"], 0)
+        self.assertAlmostEqual(spearman([1,2,3,4], [1,3,2,4]), .8)
+        self.assertIsNone(spearman([1,1], [2,3]))
+        panel = make_panel()
+        self.assertEqual(signal_snapshot(panel, 20)[1]["S39"], "OUTSIDE_LISTING")
+        self.assertEqual(signal_snapshot(panel, 55)[1]["S39"], "SHORT_HISTORY")
+        self.assertEqual(signal_snapshot(panel, 80)[1]["S38"], "ST_POLICY")
+        self.assertEqual(signal_snapshot(panel, 95)[1]["S40"], "OUTSIDE_LISTING")
+
+
 if __name__ == "__main__":
     unittest.main()
