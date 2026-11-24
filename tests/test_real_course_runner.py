@@ -65,7 +65,7 @@ class RealStockCourseTests(unittest.TestCase):
             self.assertIn(path, LABS)
             self.assertEqual(LABS[path]["files"], RUNNABLE_DATA)
             self.assertEqual(LABS[path]["kind"], "real-data")
-        for chapter in ("01_research_protocol", "05_pit_data", "08_factor_validation", "14_reproducible_capstone"):
+        for chapter in ("01_research_protocol", "05_pit_data", "07_factor_engineering", "08_factor_validation", "09_factor_combination", "10_machine_learning", "11_oos_drift", "12_portfolio_optimization", "13_backtest_execution", "14_reproducible_capstone"):
             lab = LABS[f"advanced/volume-2/{chapter}.md"]
             self.assertEqual(lab["kind"], "scripts")
             self.assertEqual(lab["files"], [])

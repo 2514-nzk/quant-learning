@@ -14,14 +14,14 @@
 
 ### 先复算贯穿项目
 
-运行 [REV20 课堂实验](../../examples/rev20_classroom_lab.py)，可生成逐期信号、资格排除原因、标签缺失、RankIC、同日等权比较和数据哈希。再分别运行本章原有账户实验。两者尚未接成同一交易流水线，不应将毛观察收益当作实盘净值。
+运行 [REV20 课堂实验](../../examples/rev20_classroom_lab.py) 的进阶版，可从同一面板生成信号、模型训练记录、冻结选择、目标权重、三种执行情景的逐笔模拟订单、每日净值与数据哈希。毛观察收益与模拟账户收益分别记录；原有独立实验继续用于更深入的风险和执行方法。
 
 ~~~bash
-python examples/rev20_classroom_lab.py --json
+python examples/rev20_classroom_lab.py --integrated --json
 python -m unittest discover -s tests -p "test_volume2_quality_gate.py" -v
 ~~~
 
-后续顺序：统一特征面板 → 模型预测 → 目标权重 → 订单状态机 → 每日账本 → 风险归因 → 仿真。每一步保留前版基线和失败记录。
+复核顺序：数据与资格 → 特征和标签 → 验证选择 → 目标权重 → 订单与现金 → 每日净值。下一阶段再扩展风险归因、真实公司行为、风险优化和仿真工程。
 
 ## 1. 一份研究包的最低结构
 

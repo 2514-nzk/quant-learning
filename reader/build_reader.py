@@ -60,14 +60,16 @@ LABS = {
         f"advanced/volume-2/{chapter}.md": {
             "kind": "scripts",
             "title": "运行 REV20 课堂项目",
-            "description": "40 只虚构股票、24 期观察。计算历史资格、排名、毛收益对照与数据反例；不是实际交易回测。",
+            "description": "同一人工股票池：从资格和排名到滚动模型、订单与净值。基础版可先手算，进阶版比较三种策略和三种执行情景。",
             "files": [],
             "scripts": [
                 {"label": "运行课堂实验", "script": "examples/rev20_classroom_lab.py", "args": []},
                 {"label": "查看逐期完整数据", "script": "examples/rev20_classroom_lab.py", "args": ["--json"]},
+                {"label": "运行完整研究与回测", "script": "examples/rev20_classroom_lab.py", "args": ["--integrated"]},
+                {"label": "查看完整模型和订单账本", "script": "examples/rev20_classroom_lab.py", "args": ["--integrated", "--json"]},
             ],
         }
-        for chapter in ("01_research_protocol", "05_pit_data", "08_factor_validation", "14_reproducible_capstone")
+        for chapter in ("01_research_protocol", "05_pit_data", "07_factor_engineering", "08_factor_validation", "09_factor_combination", "10_machine_learning", "11_oos_drift", "12_portfolio_optimization", "13_backtest_execution", "14_reproducible_capstone")
     },
     "教程/真实_Python入门.md": {
         "kind": "real-data",

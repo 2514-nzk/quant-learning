@@ -195,5 +195,96 @@ class ClassroomResearchTests(unittest.TestCase):
         self.assertEqual(signal_snapshot(panel, 95)[1]["S40"], "OUTSIDE_LISTING")
 
 
+class IntegratedClassroomTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from examples.rev20_classroom_lab import extended_report
+        cls.result = extended_report()
+
+    def test_selection_freezes_before_holdout_and_purges_late_labels(self):
+        r = self.result
+        m = r["models"]
+        self.assertEqual(m["freeze_at"], 110)
+        self.assertEqual(len(m["validation"]), 6)
+        self.assertFalse(m["validation"][-1]["selection_eligible"])
+        self.assertTrue(m["validation"][-2]["selection_eligible"])
+        for item in m["validation"] + m["holdout"]:
+            p = item["prediction"]
+            self.assertTrue(all(t+6 < p["signal"] for t in p["trained_signals"]))
+            self.assertEqual(len(p["beta"]), 3)
+        self.assertEqual(len(r["diagnostics"]), 24)
+
+    def test_future_changes_cannot_change_current_prediction_or_frozen_choice(self):
+        from examples.rev20_classroom_lab import (make_panel, observe_week, SIGNALS,
+                                                  predict_candidates, model_experiment)
+        panel = make_panel()
+        weeks = [observe_week(panel, t) for t in SIGNALS]
+        p = predict_candidates(panel, weeks, 110)
+        winner = model_experiment(panel, weeks)["selected"]
+        for w in weeks:
+            if w["label_available"] >= 110:
+                w["labels"] = {k: -100*y+1 for k, y in w["labels"].items()}
+        for row in panel.values():
+            row["close"][111:] = [1000.] * len(row["close"][111:])
+        self.assertEqual(p, predict_candidates(panel, weeks, 110))
+        self.assertEqual(winner, model_experiment(panel, weeks)["selected"])
+
+    def test_account_reconciles_each_order_and_each_daily_nav(self):
+        from examples.rev20_classroom_lab import make_panel
+        panel = make_panel()
+        self.assertEqual(set(self.result["accounts"]), {"rev20", "selected", "equal"})
+        for variants in self.result["accounts"].values():
+            self.assertEqual(set(variants), {"ideal", "cost_only", "constrained"})
+            self.assertEqual(variants["ideal"]["fees"], 0)
+            self.assertEqual(variants["ideal"]["slippage"], 0)
+            self.assertEqual(variants["cost_only"]["targets"], variants["constrained"]["targets"])
+            for account in variants.values():
+                cash = 1_000_000.
+                shares = {}
+                by_day = {}
+                for order in account["orders"]:
+                    by_day.setdefault(order["day"], []).append(order)
+                for d in account["daily"]:
+                    opening_shares = dict(shares)
+                    for o in by_day.get(d["day"], []):
+                        self.assertEqual(o["day"], o["decision"]+1)
+                        self.assertTrue(0 <= o["filled"] <= o["requested"])
+                        self.assertEqual(o["filled"] % 100, 0)
+                        k = o["code"]
+                        if o["side"] == "BUY":
+                            cash -= o["notional"] + o["fee"]
+                            shares[k] = shares.get(k, 0)+o["filled"]
+                        else:
+                            self.assertLessEqual(o["filled"], opening_shares.get(k, 0))
+                            opening_shares[k] -= o["filled"]
+                            cash += o["notional"] - o["fee"]
+                            shares[k] = shares.get(k, 0)-o["filled"]
+                        if not shares.get(k):
+                            shares.pop(k, None)
+                        self.assertAlmostEqual(cash, o["cash_after"], places=6)
+                        self.assertGreaterEqual(cash, -1e-6)
+                    self.assertEqual(shares, d["holdings"])
+                    self.assertAlmostEqual(cash, d["cash"], places=6)
+                    self.assertAlmostEqual(cash+sum(q*panel[k]["close"][d["day"]]
+                                                    for k,q in shares.items()), d["nav"], places=6)
+                self.assertAlmostEqual(account["final_nav"], account["daily"][-1]["nav"])
+
+    def test_blocked_sell_does_not_release_cash(self):
+        from examples.rev20_classroom_lab import make_panel, simulate_account, signal_snapshot
+        panel = make_panel()
+        # S08: day 111 not blocked for buy; day 116+8 is not a sell block.
+        # Find an eligible name for which the second order is blocked for selling.
+        from examples.rev20_classroom_lab import blocked_side
+        code = next(k for k in signal_snapshot(panel, 110)[0]
+                    if blocked_side(k, 111) not in ("BUY","BOTH")
+                    and blocked_side(k, 116) in ("SELL","BOTH"))
+        account = simulate_account(panel, {110:{code:.1},115:{}})
+        sell = next(o for o in account["orders"] if o["side"] == "SELL")
+        self.assertEqual(sell["filled"], 0)
+        self.assertEqual(sell["reason"], "SYNTHETIC_BLOCK")
+        self.assertEqual(account["daily"][-1]["holdings"][code],
+                         next(o["filled"] for o in account["orders"] if o["side"] == "BUY"))
+
+
 if __name__ == "__main__":
     unittest.main()
