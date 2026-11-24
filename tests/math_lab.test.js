@@ -53,7 +53,7 @@ for(const [key,lab] of Object.entries(m.labs)){
   }
 }
 const routes={"advanced/volume-2/02_math_statistics.md":["bayes","correlation","ridge","gradient","confidence"],
- "advanced/volume-2/10_machine_learning.md":["ridge","tree","boost"],"advanced/volume-2/12_portfolio_optimization.md":["portfolio"],
+ "advanced/volume-2/10_machine_learning.md":["ridge","tree","boost"],"advanced/volume-2/12_portfolio_optimization.md":["portfolio","nav"],
  "教程/真实_11_线性模型.md":["ridge"],"教程/真实_12_树与森林.md":["tree"],"教程/真实_13_逐步提升模型.md":["boost"]};
 for(const [file,ids] of Object.entries(routes)){
   const md=fs.readFileSync(file,"utf8");
@@ -119,5 +119,78 @@ for(const [file,ids] of Object.entries(researchRoutes)){
  const md=fs.readFileSync(file,"utf8");
  assert.deepEqual([...md.matchAll(/data-lesson-lab="([^"]+)"/g)].map(a=>a[1]),ids);
 }
-assert.equal(Object.keys(m.labs).length,17);
+assert.equal(Object.keys(m.labs).length,24);
 console.log("PASS: nine factor research and inference labs, strict timing and missing data");
+
+// Execution and account fixtures.
+const split=m.corporateAction(100,2,0,0);
+close(split.raw,-.5);close(split.adjusted,0);close(split.economic,0);close(split.newValue,1000);
+const div=m.corporateAction(100,1,1,0);
+close(div.raw,-.1);close(div.economic,0);close(div.cash,100);
+const combined=m.corporateAction(100,2,1,.1);
+close(combined.adjusted,.1);close(combined.economic,.09);
+close(combined.forward[1]/combined.forward[0]-1,combined.adjusted);
+close(combined.backward[1]/combined.backward[0]-1,combined.adjusted);
+const sell=m.restrictedOrder("SELL",500,300,200,5000,10,0,500);
+assert.equal(sell.fill,300);assert.equal(sell.holdings,200);assert.equal(sell.sellable,0);assert.equal(sell.cash,8000);
+const blocked=m.restrictedOrder("SELL",500,300,200,5000,10,3,500);
+assert.equal(blocked.fill,0);assert.equal(blocked.cash,5000);assert.equal(blocked.holdings,500);
+assert.equal(m.restrictedOrder("BUY",500,300,0,5000,10,2,1000).fill,0);
+assert.equal(m.restrictedOrder("BUY",500,300,0,5000,10,1,1000).fill,0);
+const buy=m.restrictedOrder("BUY",1000,300,200,5000,10,0,1000);
+assert.equal(buy.fill,500);assert.equal(buy.cash,0);assert.equal(buy.sellable,300);
+assert.equal(m.restrictedOrder("SELL",100,300,200,5000,10,0,0).fill,0);
+const rt=m.roundTrip(100,.01,.0003,5,.0005,0);
+close(rt.grossPnl,10);close(rt.pnl,-.5251);
+const slipped=m.roundTrip(1000,.02,.0003,5,.0005,.001);
+close(slipped.pnl,slipped.grossPnl-slipped.slippage-slipped.buyFee-slipped.sellFee);
+assert.equal(m.tradeFee(0,"SELL",.0003,5,.00001,.0005),0);
+const queue=m.queueFill(1000,500,1200,.05,10000);
+assert.equal(queue.filled,500);assert.equal(queue.unfilled,500);
+assert.equal(m.queueFill(1000,1500,1200,.1,10000).filled,0);
+assert.equal(m.queueFill(1000,0,1000,0,10000).filled,0);
+const cashOnly=m.navExperiment(0,.5,.05,.001);
+close(cashOnly.ret,0);close(cashOnly.maxDD,0);close(cashOnly.fees,0);
+const fixed=m.navExperiment(1,1,.05,0);
+const moves=[.02,.03,-.06,-.035,.04,.01,-.07,.05,.035,-.02,.03,.015];
+close(fixed.ret,moves.reduce((s,r)=>s*(1+r),1)-1);
+for(const exposure of [0,.95,1])for(const reduce of [0,.5,1]){
+  const a=m.navExperiment(exposure,reduce,.05,.001);
+  let peak=1e6;
+  a.rows.forEach((r,i)=>{
+    close(r.nav,r.cash+r.stock,1e-6);
+    assert.ok(r.cash>=-1e-7&&r.stock>=-1e-7);
+    peak=Math.max(peak,r.nav);close(r.drawdown,r.nav/peak-1);
+    if(i){
+      const prev=a.rows[i-1];
+      close(r.cash,prev.cash-r.trade-r.fee,1e-6);
+      close(r.stock,(prev.stock+r.trade)*(1+moves[i-1]),1e-6);
+      close(r.target,prev.drawdown<-.05?exposure*reduce:exposure);
+    }
+  });
+}
+const at=m.attributionExample(100000,.01,.02,.03,100,100);
+[1000,1000,1000,-100,-100].forEach((v,i)=>close(at.parts[i],v));
+close(at.actual,2800);close(at.residual,0);
+for(const partial of [0,1])for(const confirmed of [0,1])for(const match of [0,1])for(const approved of [0,1]){
+  const f=m.faultDrill(partial,5,confirmed,match,approved);
+  const noRetry=m.faultDrill(partial,0,confirmed,match,approved);
+  assert.equal(f.cash,noRetry.cash);assert.equal(f.holding,noRetry.holding);
+  assert.equal(f.orderCount,1);assert.equal(f.events,partial);
+  assert.equal(f.cash,partial?901000:1000000);
+  assert.equal(f.reserved,confirmed?0:(partial?100000:200000));
+  assert.equal(f.free,f.cash-f.reserved);assert.equal(f.sellable,0);
+  assert.equal(f.frozen,!(confirmed&&match&&approved));
+}
+const executionRoutes={"advanced/volume-2/04_market_rules.md":["restrictions"],
+"advanced/volume-2/05_pit_data.md":["corporate"],
+"advanced/volume-2/13_backtest_execution.md":["attribution","fees","restrictions"],
+"advanced/volume-3/10_execution_replay.md":["queue"],
+"advanced/volume-3/11_dynamic_alloc.md":["nav"],
+"advanced/volume-3/12_live_system.md":["faults"],
+"教程/真实_09_成交与费用.md":["fees","restrictions"],"教程/真实_14_评价与风险.md":["nav"]};
+for(const [file,ids] of Object.entries(executionRoutes)){
+ const md=fs.readFileSync(file,"utf8");
+ assert.deepEqual([...md.matchAll(/data-lesson-lab="([^"]+)"/g)].map(a=>a[1]),ids);
+}
+console.log("PASS: seven execution labs, corporate actions, cash ledger and recovery");

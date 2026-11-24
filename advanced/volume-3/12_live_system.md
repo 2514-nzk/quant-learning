@@ -71,6 +71,10 @@ python examples/volume3_capstone_lab.py --json
 
 查看 paper.outcomes、snapshot.orders、events、cash、holdings、available、audit。示例的模拟券商快照是人为构造的对照，不是真实独立券商数据。重复成交不会改变现金和数量；对账差一分钱也禁止恢复。
 
+**动手注入故障：** 选择是否先部分成交、重启后重复提交次数、是否收到确认撤单、对账是否一致和是否获得人工批准。观察订单状态、持仓、现金及预留资金如何改变。同一订单和事件编号不得重复记账。假定数据会话有效，实际系统仍需要完整故障状态机与独立券商对账。
+
+<div data-lesson-lab="faults"></div>
+
 ## 5. 停机与恢复不是同一件事
 
 | 故障 | 行为 |

@@ -323,6 +323,127 @@
         (history.length>1?plot({series:[{name:"严格前向",color:colors.a,points:points("strictPrediction")},{name:"错误信号日期筛选",color:colors.warn,points:points("naivePrediction")}],xlabel:"信号时段",ylabel:"人工预测收益"}):"")+'<p>每期重新拟合带截距的一元回归，最多使用指定条数的历史记录。错误版本仅作反例，不是候选策略。预测差异不代表收益改善；持有期滑块仅改变人工标签可用时间，不重新模拟真实持有期收益。</p>';}}
   });
 
+
+  // A-share-inspired teaching fixtures. No exchange calendar, real tariff or broker connection.
+  function corporateAction(shares,ratio,dividend,move){
+    const before=10,ex=(before-dividend)/ratio,after=ex*(1+move);
+    const newShares=shares*ratio,cash=shares*dividend;
+    const factor=ex/before; // multiplicative price-continuity convention for this one event
+    return {before,ex,after,newShares,cash,oldValue:before*shares,newValue:newShares*after+cash,
+      raw:after/before-1,adjusted:after/ex-1,economic:(newShares*after+cash)/(before*shares)-1,
+      forward:[ex,after],backward:[before,after/factor]};
+  }
+  function restrictedOrder(side,request,old,newToday,cash,price,state,opposing){
+    // Artificial 100-share lot, no odd-lot exceptions; fees excluded in this one example.
+    const available=side==="BUY"?Math.floor(cash/price/100)*100:old;
+    const blocked=state===1||(state===2&&side==="BUY")||(state===3&&side==="SELL");
+    const fill=blocked?0:Math.floor(Math.min(request,available,opposing)/100)*100;
+    return {fill,unfilled:request-fill,available,holdings:old+newToday+(side==="BUY"?fill:-fill),
+      sellable:old-(side==="SELL"?fill:0),cash:cash+(side==="BUY"?-fill:fill)*price,
+      reason:blocked?"交易限制":fill===request?"全部成交":available<request&&available<=opposing?"资金或可卖数量不足":"对手盘不足"};
+  }
+  function tradeFee(value,side,commission,minFee,other,tax){
+    return value>0?Math.max(minFee,value*commission)+value*other+(side==="SELL"?value*tax:0):0;
+  }
+  function roundTrip(shares,gross,commission,minFee,tax,slip,other=.00001){
+    const buyRef=10,sellRef=10*(1+gross),buyPrice=buyRef*(1+slip),sellPrice=sellRef*(1-slip);
+    const buy=shares*buyPrice,sell=shares*sellPrice;
+    const buyFee=tradeFee(buy,"BUY",commission,minFee,other,tax),sellFee=tradeFee(sell,"SELL",commission,minFee,other,tax);
+    const grossPnl=shares*(sellRef-buyRef),slippage=shares*((buyPrice-buyRef)+(sellRef-sellPrice));
+    const pnl=sell-buy-buyFee-sellFee;
+    return {buy,sell,buyFee,sellFee,grossPnl,slippage,pnl,netReturn:pnl/(buy+buyFee),grossReturn:gross};
+  }
+  function queueFill(request,ahead,flow,participation,forecast){
+    // One fixed-price FIFO queue, no cancellations or new orders ahead.
+    const afterAhead=Math.max(0,flow-ahead),cap=Math.floor(forecast*participation/100)*100;
+    const filled=Math.min(request,Math.floor(afterAhead/100)*100,cap);
+    return {filled,unfilled:request-filled,afterAhead,cap,aheadRemaining:Math.max(0,ahead-flow)};
+  }
+  const priceMoves=[.02,.03,-.06,-.035,.04,.01,-.07,.05,.035,-.02,.03,.015];
+  function navExperiment(exposure,reduce,threshold,cost){
+    // One fractional risky basket plus cash. At previous close, choose exposure
+    // from known drawdown, trade using cash; current return is applied afterwards.
+    let cash=1e6,stock=0,peak=1e6;
+    const rows=[{day:0,nav:1e6,cash,stock,drawdown:0,trade:0,fee:0,target:0}];
+    for(let i=0;i<priceMoves.length;i++){
+      const before=cash+stock,dd=before/peak-1,target=dd< -threshold?exposure*reduce:exposure;
+      const desired=before*target-stock;
+      const trade=desired>=0?Math.min(desired,cash/(1+cost)):Math.max(desired,-stock);
+      const fee=Math.abs(trade)*cost;
+      cash-=trade+fee;stock+=trade;stock*=1+priceMoves[i];
+      const nav=cash+stock;peak=Math.max(peak,nav);
+      rows.push({day:i+1,nav,cash,stock,drawdown:nav/peak-1,trade,fee,target});
+    }
+    return {rows,ret:rows.at(-1).nav/rows[0].nav-1,maxDD:Math.min(...rows.map(r=>r.drawdown)),
+      fees:rows.reduce((a,r)=>a+r.fee,0)};
+  }
+  function attributionExample(value,market,industry,stock,fees,slippage){
+    const parts=[value*market,value*(industry-market),value*(stock-industry),-fees,-slippage];
+    const actual=value*stock-fees-slippage;
+    return {parts,actual,residual:actual-parts.reduce((a,b)=>a+b,0)};
+  }
+  function faultDrill(partial,retries,confirmed,match,approved){
+    // Integer cents; one artificial buy limit order; same stable intent and fill ID.
+    let cash=1000000,holding=0,filled=0,state="OPEN",frozen=false;
+    const quantity=200,limit=1000,price=990,seen=new Set(),log=[];
+    function fill(id,qty){
+      if(seen.has(id)){log.push("重复成交回报：忽略");return;}
+      if(qty<=0||qty>quantity-filled)throw Error("invalid fill");
+      seen.add(id);filled+=qty;holding+=qty;cash-=qty*price;
+      state=filled===quantity?"FILLED":"PARTIAL";
+      log.push("成交 "+qty+" 股，事件 "+id+" 已入账");
+    }
+    log.push("提交唯一订单 D1:S01:BUY:1，200 股");
+    if(partial)fill("F1",100);
+    state="UNKNOWN";frozen=true;log.push("超时：UNKNOWN，冻结新订单");
+    // Reconstruct the same serialized snapshot, not a new trading intent.
+    const snapshot=JSON.parse(JSON.stringify({cash,holding,filled,state,events:[...seen]}));
+    ({cash,holding,filled,state}=snapshot);
+    seen.clear();snapshot.events.forEach(id=>seen.add(id));
+    log.push("重启：恢复原订单与事件编号");
+    for(let i=0;i<retries;i++){
+      log.push("重复提交：返回原意图");
+      if(partial)fill("F1",100);
+    }
+    if(confirmed){state="CANCELLED";log.push("人工券商终态：剩余订单确认取消");}
+    else log.push("没有确认终态：继续保留预留资金");
+    if(!match)log.push("模拟对账差 1 分");
+    if(confirmed&&match&&approved){frozen=false;log.push("对账一致且获批准：解除冻结");}
+    else log.push("恢复条件不足：继续冻结");
+    const reserved=state==="UNKNOWN"?(quantity-filled)*limit:0;
+    return {cash,holding,filled,state,frozen,reserved,free:cash-reserved,sellable:0,log,orderCount:1,events:seen.size};
+  }
+  const yuan=v=>fmt(v,2)+" 元";
+  Object.assign(labs,{
+    corporate:{title:"复权：价格腰斩，账户真的亏一半吗？",intro:"昨天 10 元、100 股。调整每股现金分红、每旧股变为几股，以及除权后市场变动。假设分红即时到账，无税费。",
+      controls:[control("ratio","每旧股变为股数",1,3,1,2),control("dividend","每旧股现金分红（元）",0,2,.25,0),control("move","除权后市场涨跌（%）",-10,10,1,0)],
+      render:v=>{const r=corporateAction(100,v.ratio,v.dividend,v.move/100);return metrics([["不复权价格收益",pct(r.raw)],["复权价格收益",pct(r.adjusted)],["账户经济收益",pct(r.economic)],["事件后财富",yuan(r.newValue)]])+table(["口径","事件前","事件后"],[["不复权报价",yuan(r.before),yuan(r.after)],["前复权（以事件后尺度）",yuan(r.forward[0]),yuan(r.forward[1])],["后复权（以事件前尺度）",yuan(r.backward[0]),yuan(r.backward[1])],["股数",100,r.newShares],["现金分红",yuan(0),yuan(r.cash)],["账户财富",yuan(r.oldValue),yuan(r.newValue)]])+ '<p>本例用理论除权价构造单事件乘法连续价格。现金分红未再投资时，市场继续变化后价格连续收益与账户经济收益可以不同。真实研究需核对供应商复权算法、历史可得时点、登记和到账；实际成交必须用真实报价及股数。</p>';}},
+    restrictions:{title:"涨跌停、停牌和 T+1：想交易不等于能成交",intro:"开盘已有 300 股隔夜持仓，可用现金 5,000 元，报价 10 元。另有当日新买股票不可卖。假设人工 100 股整手，无手续费。",
+      controls:[control("side","方向（0 买入 / 1 卖出）",0,1,1,1),control("request","计划交易股数",100,1000,100,500),control("today","当日已买入股数",0,600,100,200),control("state","状态（0 正常 / 1 停牌 / 2 涨停无卖盘 / 3 跌停无买盘）",0,3,1,0),control("liquidity","可成交对手盘（股）",0,1000,100,500)],
+      render:v=>{const side=v.side?"SELL":"BUY",r=restrictedOrder(side,v.request,300,v.today,5000,10,v.state,v.liquidity);
+        return metrics([["成交股数",r.fill],["未成交股数",r.unfilled],["成交后持仓",r.holdings],["当日可卖股数",r.sellable],["成交后现金",yuan(r.cash)]])+table(["项目","结果"],[["计划方向",v.side?"卖出":"买入"],["计划股数",v.request],["成交前资金或可卖股数上限",r.available],["原因",r.reason]])+'<p>当日买入不增加当日可卖数量；未成交的卖单不释放现金。本例的封板状态明确无对应对手盘，不表示所有触及涨跌停价的订单都不能成交。真实制度按证券及历史日期确定。</p>';}},
+    fees:{title:"手续费与滑点：毛盈利怎样变成净亏损？",intro:"买入价参考 10 元，卖出参考价由毛涨幅决定；人工费率与最低佣金可调，双边均有不利滑点。",
+      controls:[control("shares","股数",100,2000,100,100),control("gross","参考价格毛涨幅（%）",-3,5,.1,1),control("commission","佣金（bps）",0,10,.5,3),control("min","单边最低佣金（元）",0,10,1,5),control("tax","卖出税费（bps）",0,10,.5,5),control("slip","单边不利滑点（bps）",0,50,1,0)],
+      render:v=>{const r=roundTrip(v.shares,v.gross/100,v.commission/10000,v.min,v.tax/10000,v.slip/10000);
+        return metrics([["毛盈亏",yuan(r.grossPnl)],["实际净盈亏",yuan(r.pnl)],["净投入收益率",pct(r.netReturn)],["双边滑点损失",yuan(r.slippage)]])+table(["明细","金额"],[["买入成交额",yuan(r.buy)],["买入费用",yuan(r.buyFee)],["卖出成交额",yuan(r.sell)],["卖出费用",yuan(r.sellFee)]])+'<p>另固定人工其他费用 0.1 bps 双边，按成交额计算，未模拟费用舍入。净收益分母为买入成交额加买入费用。真实费用须核对证券类别、历史日期、券商合同及是否已含代收费，不要重复收费。</p>';}},
+    queue:{title:"排队与容量：触价之后能成交多少股？",intro:"固定价位 FIFO 人工队列。先消耗前方队列，再分配给本订单，同时受事前估计成交量的参与率上限约束。",
+      controls:[control("request","订单股数",100,3000,100,1000),control("ahead","前方排队股数",0,4000,100,500),control("flow","此价位后续对手成交量（股）",0,5000,100,1200),control("rate","参与率上限（%）",0,20,1,5),control("forecast","事前流动性代理（股）",1000,50000,1000,10000)],
+      render:v=>{const r=queueFill(v.request,v.ahead,v.flow,v.rate/100,v.forecast);return metrics([["实际模拟成交",r.filled+" 股"],["未成交",r.unfilled+" 股"],["队列消耗后余量",r.afterAhead+" 股"],["参与率股数上限",r.cap+" 股"]])+plot({series:[{name:"前方队列剩余",color:colors.ink,points:[[0,v.ahead],[1,r.aheadRemaining]]}],dots:[{name:"本单成交",color:colors.a,points:[[1,r.filled]]}],xd:[0,1.2],xlabel:"0 初始 / 1 观察结束",ylabel:"股数"})+'<p>假定无撤单、无插队、无新价格，成交股数按人工整手向下取整。事前流动性代理与事后实际队列消耗分开，不能拿事后全日成交量冒充开盘可知容量。</p>';}},
+    nav:{title:"动态仓位、净值与最大回撤",intro:"固定 12 期人工收益路径。每期开始只看上一期净值与历史峰值，超过回撤阈值时缩减风险预算，对照固定仓位与动态仓位。",
+      controls:[control("exposure","正常股票目标仓位（%）",0,100,5,95),control("reduce","触发后保留正常预算（%）",0,100,5,50),control("threshold","回撤触发阈值（%）",1,15,1,5),control("cost","每次交易金额费用代理（bps）",0,100,5,10)],
+      render:v=>{const a=navExperiment(v.exposure/100,1,v.threshold/100,v.cost/10000),b=navExperiment(v.exposure/100,v.reduce/100,v.threshold/100,v.cost/10000);
+        return metrics([["动态期末净值",yuan(b.rows.at(-1).nav)],["动态累计收益",pct(b.ret)],["动态最大回撤",pct(b.maxDD)],["动态交易费用",yuan(b.fees)]])+plot({series:[{name:"固定仓位",color:colors.ink,points:a.rows.map(r=>[r.day,r.nav/1e6])},{name:"动态仓位",color:colors.a,points:b.rows.map(r=>[r.day,r.nav/1e6])}],xlabel:"人工观察期",ylabel:"单位净值"})+table(["方案","累计收益","最大回撤","费用"],[["固定",pct(a.ret),pct(a.maxDD),yuan(a.fees)],["动态",pct(b.ret),pct(b.maxDD),yuan(b.fees)]])+table(["期次","目标仓位","期末实际仓位","回撤"],b.rows.slice(1).map(r=>[r.day,pct(r.target),pct(r.stock/r.nav),pct(r.drawdown)]))+'<p>前一收盘根据信息调仓，费用按真实模拟交易金额收取，随后才应用本期收益；买入受现金限制。这里允许分数份额、无涨跌停，现金收益为零，不是第二卷完整订单引擎。回撤规则不保证更好表现，也不是实盘止损建议。</p>';}},
+    attribution:{title:"收益归因：赚的钱来自市场、行业还是选股？",intro:"单期持有人工股票 10 万元，分别改变市场、行业和股票收益，以及交易费用与滑点金额。",
+      controls:[control("market","市场收益（%）",-10,10,.5,1),control("industry","行业收益（%）",-10,10,.5,2),control("stock","股票收益（%）",-10,10,.5,3),control("fees","手续费（元）",0,1000,50,100),control("slip","滑点损失（元）",0,1000,50,100)],
+      render:v=>{const r=attributionExample(100000,v.market/100,v.industry/100,v.stock/100,v.fees,v.slip);
+        const names=["市场参考","行业相对市场","个股相对行业","手续费","滑点"];
+        return metrics([["账户实际盈亏",yuan(r.actual)],["对账残差",yuan(r.residual)]])+table(["贡献","金额"],r.parts.map((q,i)=>[names[i],yuan(q)]))+plot({series:[{name:"零贡献参考",color:colors.ink,points:[[1,0],[5,0]]}],dots:[{name:"各项金额贡献",color:colors.a,points:r.parts.map((q,i)=>[i+1,q])}],xd:[.5,5.5],xlabel:"1 市场 / 2 行业 / 3 个股 / 4 费用 / 5 滑点",ylabel:"贡献（元）"})+'<p>市场贡献 = 持仓金额 × 市场收益；行业和个股分别计算相对差，扣费后应与实际盈亏相等。这是参考篮子的金额分解，不是回归 Alpha/Beta 或因果解释。</p>';}},
+    faults:{title:"订单超时后重启：为什么不能再发一笔买单？",intro:"模拟纸面 10,000 元账户、200 股限价 10 元买单。按整数分记账，不连券商，不计费用。",
+      controls:[control("partial","超时前成交 100 股（0/1）",0,1,1,1),control("retries","重启后重复提交与回报次数",0,5,1,2),control("confirmed","券商确认余单取消（0/1）",0,1,1,0),control("match","模拟对账一致（0/1）",0,1,1,1),control("approved","人工恢复批准（0/1）",0,1,1,0)],
+      render:v=>{const r=faultDrill(v.partial,v.retries,v.confirmed,v.match,v.approved);
+        return metrics([["订单状态",r.state],["新委托",r.frozen?"冻结":"已解除冻结"],["现金余额",yuan(r.cash/100)],["预留资金",yuan(r.reserved/100)],["可用现金",yuan(r.free/100)],["持股 / 当日可卖",r.holding+" / "+r.sellable]])+table(["步骤","事件日志"],r.log.map((q,i)=>[i+1,q]))+'<p>同一个稳定订单键和同一个成交事件只记录一次。只有确认终态、对账一致和审批均通过才解除冻结；实验假定数据会话有效。这里是固定故障路径演练，不是完整券商状态机或生产系统。</p>';}}
+  });
+
   function mount(container){
     for(const target of container.querySelectorAll("[data-lesson-lab]")){
       const lab=labs[target.dataset.lessonLab];
@@ -340,7 +461,7 @@
       update();
     }
   }
-  const api={bayes,moments,correlation,ridge,gradient,confidence,fitTree,predict,treeExperiment,boosting,portfolio,averageRanks,rankIC,rankingExample,icSummary,icExample,quartiles,neutralExample,arSample,hac,blockBootstrap,holm,purgeRows,timeline,rollingAt,labs,mount};
+  const api={bayes,moments,correlation,ridge,gradient,confidence,fitTree,predict,treeExperiment,boosting,portfolio,averageRanks,rankIC,rankingExample,icSummary,icExample,quartiles,neutralExample,arSample,hac,blockBootstrap,holm,purgeRows,timeline,rollingAt,corporateAction,restrictedOrder,tradeFee,roundTrip,queueFill,navExperiment,attributionExample,faultDrill,labs,mount};
   root.QuantMathLab=api;
   if(typeof module!=="undefined"&&module.exports)module.exports=api;
 })(typeof self!=="undefined"?self:globalThis);
