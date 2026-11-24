@@ -13,6 +13,7 @@ import math
 from datetime import date, datetime
 from pathlib import Path
 from statistics import mean
+from collections import Counter
 
 FACTORS = ("REV5", "REV20", "MOM20")
 
@@ -82,7 +83,7 @@ def rank_ic(x, y):
     return sum((u-m)*(v-m) for u,v in zip(a,b))/math.sqrt(aa*bb) if aa and bb else None
 
 
-def evaluate(panel, days, signals, ks, label):
+def evaluate(panel, days, signals, ks, label, eligibility=None):
     if label not in ("intraday", "next_open_5"):
         raise ValueError("Unknown label")
     if not signals or len(set(signals)) != len(signals) or not ks or min(ks) < 1 or len(set(ks)) != len(ks):
@@ -93,6 +94,8 @@ def evaluate(panel, days, signals, ks, label):
         scores = []
         # Freeze the candidate set using only signal and past prices.
         for code, (_, close) in panel[signal].items():
+            if eligibility is not None and code not in eligibility[signal]:
+                continue
             p20 = panel[long].get(code, (None, None))[1]
             p5 = panel[short].get(code, (None, None))[1]
             if close is None or p20 is None or p5 is None:
@@ -156,6 +159,104 @@ def evaluate(panel, days, signals, ks, label):
                            "missing outcomes may bias paired RankIC and observed benchmark"]}
 
 
+def boolean(value):
+    """Normalize CSV/Parquet booleans; missing or unrecognized is unknown."""
+    if isinstance(value,bool):
+        return value
+    if value is None:
+        return None
+    v = str(value).strip().lower()
+    return {"true":True,"false":False,"1":True,"0":False}.get(v)
+
+
+def known_date(value):
+    try:
+        return day(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def membership_status(record, signal):
+    if record is None:
+        return "UNKNOWN_MEMBER"
+    listed = known_date(record.get("effective_list_date"))
+    known = known_date(record.get("name_available_date"))
+    if listed is None or known is None or known > signal:
+        return "UNKNOWN_IDENTITY_DATE"
+    if listed > signal:
+        return "NOT_YET_LISTED"
+    st = boolean(record.get("is_st"))
+    if st is True:
+        return "ST_EXCLUDED"
+    if st is None:
+        return "UNKNOWN_ST"
+    if boolean(record.get("has_daily_quote")) is not True:
+        return "UNKNOWN_QUOTE_STATUS"
+    trading = boolean(record.get("is_trading"))
+    if trading is None:
+        return "UNKNOWN_TRADING_STATUS"
+    if not trading:
+        return "NOT_TRADING"
+    return "ELIGIBLE_BY_SNAPSHOT"
+
+
+def load_keyed(path, columns, code_key, needed):
+    out = {d:{} for d in needed}
+    for row in rows(path, columns):
+        d = day(row["trade_date"])
+        if d not in out:
+            continue
+        code = str(row[code_key]).strip() if row[code_key] is not None else ""
+        if not code or code in out[d]:
+            raise ValueError("Missing or duplicate security key in auxiliary input")
+        out[d][code] = row
+    return out
+
+
+def paired_inputs(panel, days, signals, label, adjustments, members):
+    """Matched price support for raw/adjusted comparisons, signal-date gate only."""
+    raw, adjusted = {}, {}
+    for d, quotes in panel.items():
+        raw[d], adjusted[d] = {}, {}
+        for code, prices in quotes.items():
+            f = positive(adjustments.get(d,{}).get(code,{}).get("adj_factor"))
+            normalized = tuple(positive(p*f) if p is not None and f is not None else None
+                               for p in prices)
+            adjusted[d][code] = normalized
+            # Missing adjustment removes the corresponding endpoint in BOTH arms.
+            raw[d][code] = tuple(p if q is not None else None for p,q in zip(prices,normalized))
+    eligible, audits = {}, []
+    for signal in sorted(signals):
+        long, short, _, entry, exit_ = endpoints(days,signal,label)
+        reference = members.get(signal,{})
+        status_counts = Counter(membership_status(r,signal) for r in reference.values())
+        quote_status = Counter(membership_status(reference.get(code),signal)
+                               for code in panel[signal])
+        eligible[signal] = {code for code in panel[signal]
+                            if membership_status(reference.get(code),signal)=="ELIGIBLE_BY_SNAPSHOT"}
+        def valid_closes(data, code):
+            return all(data[d].get(code,(None,None))[1] is not None
+                       for d in (long,short,signal))
+        price_valid = {c for c in eligible[signal] if valid_closes(panel,c)}
+        factor_valid = {c for c in price_valid if valid_closes(adjusted,c)}
+        audits.append({"signal_date":signal,"reference_members":len(reference),
+                       "reference_status_counts":dict(status_counts),
+                       "signal_quotes":len(panel[signal]),"quote_status_counts":dict(quote_status),
+                       "eligible_by_snapshot":len(eligible[signal]),
+                       "valid_raw_price_endpoints":len(price_valid),
+                       "valid_adjusted_price_endpoints":len(factor_valid),
+                       "missing_adjustment_support":len(price_valid-factor_valid)})
+    return raw, adjusted, eligible, audits
+
+
+def file_sha(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as f:
+        for block in iter(lambda:f.read(1024*1024),b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--input",type=Path,required=True)
@@ -163,8 +264,12 @@ def main():
     p.add_argument("--k",nargs="+",type=int,default=[10,20,30,50,100,200])
     p.add_argument("--label",choices=["intraday","next_open_5"],default="next_open_5")
     p.add_argument("--output",type=Path,required=True)
+    p.add_argument("--adjustments",type=Path,help="separate daily adjustment factors")
+    p.add_argument("--membership",type=Path,help="separate daily membership and status snapshot")
     a = p.parse_args()
-    if a.output.resolve()==a.input.resolve() or a.output.exists():
+    if bool(a.adjustments) != bool(a.membership):
+        p.error('Supply both --adjustments and --membership, or neither')
+    if a.output.resolve() in {x.resolve() for x in (a.input,a.adjustments,a.membership) if x} or a.output.exists():
         p.error("Choose a new output file")
     signals = [day(d) for d in a.signal]
     days = sorted({day(r["trade_date"]) for r in rows(a.input,["trade_date"])})
@@ -178,12 +283,22 @@ def main():
         if not code or code in panel[d]:
             raise ValueError("Missing or duplicate security key on selected date")
         panel[d][code] = (positive(r["open"]),positive(r["close"]))
-    result = evaluate(panel,days,signals,a.k,a.label)
-    digest = hashlib.sha256()
-    with a.input.open("rb") as f:
-        for block in iter(lambda:f.read(1024*1024),b""):
-            digest.update(block)
-    result["input_sha256"] = digest.hexdigest()
+    if a.adjustments:
+        adjustment = load_keyed(a.adjustments,["trade_date","ts_code","adj_factor"],"ts_code",needed)
+        membership = load_keyed(a.membership,["trade_date","code","effective_list_date",
+                         "name_available_date","is_st","has_daily_quote","is_trading"],"code",set(signals))
+        raw, adjusted, eligible, audits = paired_inputs(panel,days,signals,a.label,adjustment,membership)
+        result = evaluate(adjusted,days,signals,a.k,a.label,eligible)
+        result["raw_matched_support_comparison"] = evaluate(raw,days,signals,a.k,a.label,eligible)
+        result["data_gate_audit"] = audits
+        result["price_mode"] = "RAW_TIMES_DAILY_ADJUSTMENT_FACTOR"
+        result["adjustment_sha256"] = file_sha(a.adjustments)
+        result["membership_sha256"] = file_sha(a.membership)
+        result["limitations"].append("date-level membership snapshot gates only; no verified publication/receipt times or execution eligibility")
+    else:
+        result = evaluate(panel,days,signals,a.k,a.label)
+        result["price_mode"] = "USER_SUPPLIED_PRICE_UNVERIFIED"
+    result["input_sha256"] = file_sha(a.input)
     a.output.parent.mkdir(parents=True,exist_ok=True)
     with a.output.open("x",encoding="utf-8") as handle:
         json.dump(result,handle,ensure_ascii=False,indent=2,allow_nan=False)

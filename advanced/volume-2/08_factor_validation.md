@@ -126,6 +126,16 @@ Parquet 模式需要自行安装 pyarrow；CSV 模式仅用 Python 标准库。�
 
 数据应留在获准使用的本地环境，公开教学与真实研究数据的再分发许可分别处理。
 
+#### 再进一步：同样本复权对照
+
+若有独立复权因子及历史股票池快照，可以同时提供两个辅助输入（均为使用者本地 CSV 或 Parquet）：
+
+~~~bash
+python examples/cross_section_daily_research.py --input /your/raw.parquet --adjustments /your/adj.parquet --membership /your/members.parquet --signal 2019-12-27 --label intraday --output /your/report.json
+~~~
+
+复权表字段：trade_date、ts_code、adj_factor；历史快照字段：trade_date、code、effective_list_date、name_available_date、is_st、has_daily_quote、is_trading。必须保证证券身份映射、价格乘因子的定义和版本经使用者核实。缺或无效复权端点在原始与调整两组中同时屏蔽；信号日身份未知、ST 或交易状态不足不参与打分。未来价格、复权因子缺失不会改变已形成的候选或补选股票。输出 data_gate_audit、raw_matched_support_comparison、复权组结果和三份文件哈希。若所有证券状态未知，应报告零合格而非自动退回未经核验的样本。这仍然只是日期级诊断，不是严格 PIT 或可成交回测。
+
 ## 3. 显著性：先处理时间依赖，再谈“有证据”
 
 仅用普通均值标准误 s/sqrt(T)，隐含了较强的独立假设。金融逐期 IC 常见自相关、波动聚集与状态变化。我们用两种不同方法讲清楚其风险：

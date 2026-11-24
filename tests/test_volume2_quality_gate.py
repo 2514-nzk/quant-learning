@@ -181,6 +181,50 @@ class VolumeTwoQualityGate(unittest.TestCase):
         self.assertEqual(row["valid_scores"],changed["valid_scores"])
 
 
+    def test_local_adjustment_and_membership_gate(self):
+        from examples.cross_section_daily_research import paired_inputs, evaluate, membership_status
+        from datetime import date, timedelta
+        days = [(date(2020,1,1)+timedelta(days=i)).isoformat() for i in range(27)]
+        t = days[20]
+        panel = {
+            days[0]: {"A":(10,10),"B":(10,10),"C":(10,10),"D":(10,10)},
+            days[15]: {"A":(10,10),"B":(10,10),"C":(10,10),"D":(10,10)},
+            t: {"A":(8,8),"B":(9,9),"C":(6,6),"D":(7,7)},
+            days[21]: {"A":(8,8.8),"B":(9,9.18),"C":(6,6),"D":(7,7)},
+            days[26]: {"A":(9,9),"B":(10,10),"C":(6,6),"D":(7,7)},
+        }
+        valid = {"effective_list_date":days[0],"name_available_date":days[0],
+                 "is_st":"false","has_daily_quote":True,"is_trading":True}
+        members = {t:{"A":valid,"B":valid,"C":dict(valid,is_trading=None),"D":valid}}
+        adjustment = {d:{c:{"adj_factor":1.0} for c in quotes} for d,quotes in panel.items()}
+        for d in (t,days[21],days[26]):
+            adjustment[d]["A"]["adj_factor"] = 1.25
+        del adjustment[days[0]]["D"]
+        raw, adj, eligible, audit = paired_inputs(panel,days,[t],"intraday",adjustment,members)
+        self.assertEqual(eligible[t],{"A","B","D"})
+        self.assertEqual(audit[0]["missing_adjustment_support"],1)
+        self.assertEqual(audit[0]["reference_status_counts"]["UNKNOWN_TRADING_STATUS"],1)
+        r = evaluate(raw,days,[t],[1],"intraday",eligible)["rounds"][0]
+        a = evaluate(adj,days,[t],[1],"intraday",eligible)["rounds"][0]
+        self.assertEqual((r["valid_scores"],a["valid_scores"]),(2,2))
+        self.assertAlmostEqual(r["factors"]["REV20"]["top"][0]["gross"],.1)
+        self.assertAlmostEqual(a["factors"]["REV20"]["top"][0]["gross"],.02)
+        self.assertEqual(membership_status(dict(valid,name_available_date=days[21]),t),"UNKNOWN_IDENTITY_DATE")
+        self.assertEqual(membership_status(dict(valid,is_st=None),t),"UNKNOWN_ST")
+        self.assertEqual(membership_status(dict(valid,has_daily_quote=False),t),"UNKNOWN_QUOTE_STATUS")
+        # The future adjustment gap removes only the outcome, never the score or ranking.
+        del adjustment[days[21]]["B"]
+        raw, adj, eligible, audit = paired_inputs(panel,days,[t],"intraday",adjustment,members)
+        a = evaluate(adj,days,[t],[1],"intraday",eligible)["rounds"][0]
+        self.assertEqual(a["valid_scores"],2)
+        self.assertEqual(a["valid_labels"],1)
+        self.assertIsNone(a["factors"]["REV20"]["top"][0]["gross"])
+        members = {t:{c:dict(valid,is_trading=None) for c in panel[t]}}
+        raw, adj, eligible, audit = paired_inputs(panel,days,[t],"intraday",adjustment,members)
+        a = evaluate(adj,days,[t],[1],"intraday",eligible)["rounds"][0]
+        self.assertEqual(a["valid_scores"],0)
+
+
     def test_real_four_stock_editorial_examples(self):
         import json
         from statistics import mean, stdev
