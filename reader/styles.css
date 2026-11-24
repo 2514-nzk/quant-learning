@@ -460,6 +460,27 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .volume-progress-note { display: block; margin-top: 7px; color: var(--green); font-size: 9px; }
 .preview-note { margin-top: 12px; color: var(--ink-soft); font-size: 10px; line-height: 1.8; }
 .preview-note a { color: var(--green); text-underline-offset: 3px; }
-.math-block { display: block; max-width: 100%; margin: 1.2em 0; overflow-x: auto; overflow-y: hidden; text-align: center; }
-.math-inline { display: inline; }
-.katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; }
+/* Math is reading content, not source code. A single scroll area protects narrow screens. */
+.math-block {
+  display: block;
+  max-width: 100%;
+  margin: 1.25em 0;
+  padding: .9em .85em;
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--green);
+  border-radius: 6px;
+  color: var(--ink);
+  text-align: center;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.math-inline { display: inline; color: var(--ink); }
+.math-block .katex-display { margin: 0; min-width: max-content; overflow: visible; white-space: normal; }
+.math-block .katex { font-size: 1.13em; }
+@media (max-width: 600px) {
+  .math-block { padding: .75em .6em; }
+  .math-block .katex { font-size: 1.05em; }
+}

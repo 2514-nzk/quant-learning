@@ -52,6 +52,21 @@ class VolumeTwoQualityGate(unittest.TestCase):
                           if line.startswith("~~~")]
                 self.assertEqual(len(fences) % 2, 0)
 
+    def test_introductory_math_is_typeset_and_explained(self):
+        intro = self.read("01_research_protocol")
+        self.assertNotIn("IC_t = Spearman", intro)
+        for token in (r"\operatorname{Spearman}", r"H_0:\quad E[IC_t]=0",
+                      r"H_1:\quad E[IC_t]>0", "因子名次", "收益名次",
+                      "样本平均", "完整的单侧原假设"):
+            self.assertIn(token, intro)
+        chapter = self.read("02_math_statistics")
+        self.assertLess(chapter.index("阅读准备｜先认识这些数学符号"),
+                        chapter.index("## 1. 概率论"))
+        self.assertIn("70 ÷ 250 = 28%", chapter)
+        self.assertIn("0.20 ÷ 10 = 0.02", chapter)
+        self.assertAlmostEqual(1 - 6 * (0 + 1 + 1 + 0) / (4 * (4**2 - 1)), .8)
+        self.assertAlmostEqual((.12 - .04 + .06 + .02 + .09) / 5, .05)
+
     def test_local_markdown_code_and_data_links_exist(self):
         source_files = [VOL / (c + ".md") for c in CHAPTERS] + [
             VOL / "README.md", VOL / "REVIEW_BACKLOG.md",
