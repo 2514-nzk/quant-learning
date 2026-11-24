@@ -59,6 +59,12 @@ def endpoints(days, signal, label):
     return days[i-20], days[i-5], signal, days[i+1], days[i+exit_offset]
 
 
+def mom60_date(days, signal):
+    i = days.index(signal)
+    if i < 60:
+        raise ValueError("Insufficient observed dates for MOM60: " + signal)
+    return days[i-60]
+
 def average_ranks(values):
     order = sorted(range(len(values)), key=lambda i: values[i])
     ranks = [0.] * len(values)
@@ -83,14 +89,16 @@ def rank_ic(x, y):
     return sum((u-m)*(v-m) for u,v in zip(a,b))/math.sqrt(aa*bb) if aa and bb else None
 
 
-def evaluate(panel, days, signals, ks, label, eligibility=None):
+def evaluate(panel, days, signals, ks, label, eligibility=None, include_mom60=False):
     if label not in ("intraday", "next_open_5"):
         raise ValueError("Unknown label")
     if not signals or len(set(signals)) != len(signals) or not ks or min(ks) < 1 or len(set(ks)) != len(ks):
         raise ValueError("Require unique signals and positive unique K")
+    factors = FACTORS + ("MOM60",) if include_mom60 else FACTORS
     rounds = []
     for signal in sorted(signals):
         long, short, _, entry, exit_ = endpoints(days, signal, label)
+        base60 = mom60_date(days, signal) if include_mom60 else None
         scores = []
         # Freeze the candidate set using only signal and past prices.
         for code, (_, close) in panel[signal].items():
@@ -103,7 +111,16 @@ def evaluate(panel, days, signals, ks, label, eligibility=None):
             m5, m20 = close/p5-1, close/p20-1
             if not math.isfinite(m5) or not math.isfinite(m20):
                 continue
-            scores.append((code, {"REV5":-m5, "REV20":-m20, "MOM20":m20}))
+            values = {"REV5":-m5, "REV20":-m20, "MOM20":m20}
+            if include_mom60:
+                p60 = panel[base60].get(code,(None,None))[1]
+                if p60 is None:
+                    continue
+                m60 = close/p60-1
+                if not math.isfinite(m60):
+                    continue
+                values["MOM60"] = m60
+            scores.append((code, values))
         # Future prices are joined only after candidate scores have been frozen.
         ys = {}
         for code, _ in scores:
@@ -119,7 +136,9 @@ def evaluate(panel, days, signals, ks, label, eligibility=None):
                "base20_date":long,"base5_date":short,
                "valid_scores":len(scores),"valid_labels":len(ys),
                "benchmark_observed_gross":benchmark,"factors":{}}
-        for factor in FACTORS:
+        if include_mom60:
+            row["base60_date"] = base60
+        for factor in factors:
             order = sorted(scores, key=lambda r:(-r[1][factor],r[0]))
             top = []
             for k in ks:
@@ -134,16 +153,30 @@ def evaluate(panel, days, signals, ks, label, eligibility=None):
         rounds.append(row)
 
     def complete(r, j):
-        return all(r["factors"][f]["top"][j]["gross"] is not None for f in FACTORS)
+        return all(r["factors"][f]["top"][j]["gross"] is not None for f in factors)
 
     def summarize(j, subset):
         return {f:mean(r["factors"][f]["top"][j]["excess"] for r in subset)
-                if subset else None for f in FACTORS}
+                if subset else None for f in factors}
 
     common_all = [r for r in rounds if all(complete(r,j) for j in range(len(ks)))]
-    return {"label":label,"rounds":rounds,
+    years = sorted({r["signal_date"][:4] for r in rounds})
+    by_year = []
+    for year in years:
+        subset = [r for r in rounds if r["signal_date"][:4] == year]
+        common = [r for r in common_all if r["signal_date"][:4] == year]
+        by_year.append({"year":year,"signal_count":len(subset),
+                        "valid_scores":sum(r["valid_scores"] for r in subset),
+                        "valid_labels":sum(r["valid_labels"] for r in subset),
+                        "mean_rank_ic":{f:mean(v) if (v := [r["factors"][f]["rank_ic"] for r in subset
+                                            if r["factors"][f]["rank_ic"] is not None]) else None
+                                        for f in factors},
+                        "common_all_k_dates":[r["signal_date"] for r in common],
+                        "mean_excess_by_k":[{"k":k,"mean_excess":summarize(j,common)}
+                                            for j,k in enumerate(ks)]})
+    return {"label":label,"rounds":rounds,"factor_names":list(factors),"by_year":by_year,
             "mean_rank_ic":{f:mean(vals) if (vals := [r["factors"][f]["rank_ic"] for r in rounds
-                            if r["factors"][f]["rank_ic"] is not None]) else None for f in FACTORS},
+                            if r["factors"][f]["rank_ic"] is not None]) else None for f in factors},
             "common_by_k":[{"k":k,"dates":[r["signal_date"] for r in subset],
                             "mean_excess":summarize(j,subset)}
                            for j,k in enumerate(ks)
@@ -213,7 +246,7 @@ def load_keyed(path, columns, code_key, needed):
     return out
 
 
-def paired_inputs(panel, days, signals, label, adjustments, members):
+def paired_inputs(panel, days, signals, label, adjustments, members, include_mom60=False):
     """Matched price support for raw/adjusted comparisons, signal-date gate only."""
     raw, adjusted = {}, {}
     for d, quotes in panel.items():
@@ -228,6 +261,9 @@ def paired_inputs(panel, days, signals, label, adjustments, members):
     eligible, audits = {}, []
     for signal in sorted(signals):
         long, short, _, entry, exit_ = endpoints(days,signal,label)
+        history = (long, short, signal)
+        if include_mom60:
+            history += (mom60_date(days,signal),)
         reference = members.get(signal,{})
         status_counts = Counter(membership_status(r,signal) for r in reference.values())
         quote_status = Counter(membership_status(reference.get(code),signal)
@@ -236,7 +272,7 @@ def paired_inputs(panel, days, signals, label, adjustments, members):
                             if membership_status(reference.get(code),signal)=="ELIGIBLE_BY_SNAPSHOT"}
         def valid_closes(data, code):
             return all(data[d].get(code,(None,None))[1] is not None
-                       for d in (long,short,signal))
+                       for d in history)
         price_valid = {c for c in eligible[signal] if valid_closes(panel,c)}
         factor_valid = {c for c in price_valid if valid_closes(adjusted,c)}
         audits.append({"signal_date":signal,"reference_members":len(reference),
@@ -264,6 +300,7 @@ def main():
     p.add_argument("--k",nargs="+",type=int,default=[10,20,30,50,100,200])
     p.add_argument("--label",choices=["intraday","next_open_5"],default="next_open_5")
     p.add_argument("--output",type=Path,required=True)
+    p.add_argument("--mom60",action="store_true",help="require a common 60-day endpoint and include MOM60")
     p.add_argument("--adjustments",type=Path,help="separate daily adjustment factors")
     p.add_argument("--membership",type=Path,help="separate daily membership and status snapshot")
     a = p.parse_args()
@@ -274,6 +311,8 @@ def main():
     signals = [day(d) for d in a.signal]
     days = sorted({day(r["trade_date"]) for r in rows(a.input,["trade_date"])})
     needed = {d for signal in signals for d in endpoints(days,signal,a.label)}
+    if a.mom60:
+        needed.update(mom60_date(days,signal) for signal in signals)
     panel = {d:{} for d in needed}
     for r in rows(a.input,["trade_date","ts_code","open","close"]):
         d = day(r["trade_date"])
@@ -287,16 +326,16 @@ def main():
         adjustment = load_keyed(a.adjustments,["trade_date","ts_code","adj_factor"],"ts_code",needed)
         membership = load_keyed(a.membership,["trade_date","code","effective_list_date",
                          "name_available_date","is_st","has_daily_quote","is_trading"],"code",set(signals))
-        raw, adjusted, eligible, audits = paired_inputs(panel,days,signals,a.label,adjustment,membership)
-        result = evaluate(adjusted,days,signals,a.k,a.label,eligible)
-        result["raw_matched_support_comparison"] = evaluate(raw,days,signals,a.k,a.label,eligible)
+        raw, adjusted, eligible, audits = paired_inputs(panel,days,signals,a.label,adjustment,membership,a.mom60)
+        result = evaluate(adjusted,days,signals,a.k,a.label,eligible,a.mom60)
+        result["raw_matched_support_comparison"] = evaluate(raw,days,signals,a.k,a.label,eligible,a.mom60)
         result["data_gate_audit"] = audits
         result["price_mode"] = "RAW_TIMES_DAILY_ADJUSTMENT_FACTOR"
         result["adjustment_sha256"] = file_sha(a.adjustments)
         result["membership_sha256"] = file_sha(a.membership)
         result["limitations"].append("date-level membership snapshot gates only; no verified publication/receipt times or execution eligibility")
     else:
-        result = evaluate(panel,days,signals,a.k,a.label)
+        result = evaluate(panel,days,signals,a.k,a.label,include_mom60=a.mom60)
         result["price_mode"] = "USER_SUPPLIED_PRICE_UNVERIFIED"
     result["input_sha256"] = file_sha(a.input)
     a.output.parent.mkdir(parents=True,exist_ok=True)

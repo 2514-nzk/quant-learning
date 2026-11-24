@@ -44,6 +44,14 @@ F^{mom}_{i,t}=
 
 真实研究必须定义观察窗口、交易日历、停牌期间的处理、公司行为与复权版本。这里的 `price_reference_reversal` 和 `price_reference_momentum` 是教材直接生成的人工端点，**没有**随仓库提供真实连续行情，不能称为已证实的可交易特征。
 
+### 同样的下跌，为什么可以同时产生反转和动量信号？
+
+用一个人工价格路径来理解：60 个交易日前股价为 70，20 日前为 100，5 日前为 95，今天为 90。REV5 = 1−90/95 ≈ +5.26%，REV20 = 1−90/100 = +10%，MOM60 = 90/70−1 ≈ +28.57%。这只股票近期下跌、过去较长时期仍然上涨。短期反转与较长周期动量不必互相排斥。
+
+如果改用相同的 20 日期限，MOM20 = −10% 正好等于 −REV20。在相同有效股票和标签上，二者的 Spearman 相关必然互为相反数（若相关有定义），不是两个独立发现。只有窗口、信息来源或机制不同，才可能带来新信息。
+
+把三个问题分开研究：最近跌幅是否与随后回升有关；中期趋势是否对短期跌幅具有条件作用；买入这些证券之后，净收益能否超过相同母体的可投资基准。第三个问题还要处理集中度、冲击与退出限制。
+
 ### 1.1 模型输入、收益标签与成交时点分开
 
 本卷价格字段是历史观察输入，following-period return 是**退出之后才可用于评价的人工标签**。训练/验证必须确保 label_available_at 早于当前训练信号；评分计算本身不能引用未来价格。
@@ -127,6 +135,10 @@ python -m unittest discover -s tests -p "test_volume3_strategy_lab.py" -v
 查看 reversal_diagnostic：它给出 artificial strong_industry_mean_rankic、weak_industry_mean_rankic、all_stocks_mean_rankic 及有效期数。任何数字前都必须保留 **SYNTHETIC_ONLY** 标签。
 
 代码的主要函数包括 `score_reversal`、`score_momentum`、`asof_members`、`ranked_industries`、`spearman` 和 `reversal_diagnostic`。测试覆盖：人工价格端点的手算、完全反序排名的 Spearman、恒定评分时返回未定义、成员信息晚到不能混入当期截面，以及改变未来收益不改变当期评分、行业强弱与市场门禁。
+
+### 6.0 用自己的日线进行价格观察
+
+第二卷的[通用日线研究示例](../../examples/cross_section_daily_research.py) 可用于合法取得的本地行情。加入 `--mom60 --label next_open_5 --k 10 20 30 50` 后，比较 REV5、REV20、MOM20 与 MOM60 的逐期排序和同日期毛收益差。默认不用私人数据；该例也不假定供应商复权口径、历史母体或成交约束已经核验。按年份报告只能帮助提出市场条件假设，不能自动证明因子随市场状态变化，更不能直接从最好年份推导仓位规则。
 
 ### 6.1 真实研究需要怎样的严格复核？
 

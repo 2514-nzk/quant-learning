@@ -225,6 +225,34 @@ class VolumeTwoQualityGate(unittest.TestCase):
         self.assertEqual(a["valid_scores"],0)
 
 
+    def test_mom60_common_support_and_yearly_report(self):
+        from examples.cross_section_daily_research import evaluate, mom60_date
+        from datetime import date, timedelta
+        days = [(date(2020,10,1)+timedelta(days=i)).isoformat() for i in range(120)]
+        t = days[60]
+        panel = {
+            days[0]: {"A":(70,70),"B":(120,120)},
+            days[40]: {"A":(100,100),"B":(100,100),"C":(100,100)},
+            days[55]: {"A":(95,95),"B":(100,100),"C":(100,100)},
+            t: {"A":(90,90),"B":(110,110),"C":(80,80)},
+            days[61]: {"A":(90,90),"B":(110,110),"C":(80,80)},
+            days[66]: {"A":(99,99),"B":(99,99),"C":(88,88)},
+        }
+        base = evaluate(panel,days,[t],[1,2],"next_open_5")
+        report = evaluate(panel,days,[t],[1,2],"next_open_5",include_mom60=True)
+        row = report["rounds"][0]
+        self.assertEqual(base["rounds"][0]["valid_scores"],3)
+        self.assertEqual(row["valid_scores"],2)
+        self.assertEqual(row["base60_date"],days[0])
+        self.assertAlmostEqual(row["factors"]["MOM60"]["top"][0]["gross"],.1)
+        self.assertEqual(report["common_all_k"]["dates"],[t])
+        self.assertEqual(report["by_year"][0]["valid_scores"],2)
+        self.assertEqual(report["by_year"][0]["common_all_k_dates"],[t])
+        self.assertAlmostEqual(row["factors"]["REV20"]["rank_ic"],-row["factors"]["MOM20"]["rank_ic"])
+        with self.assertRaises(ValueError):
+            mom60_date(days,days[59])
+
+
     def test_real_four_stock_editorial_examples(self):
         import json
         from statistics import mean, stdev
