@@ -149,6 +149,38 @@ class VolumeTwoQualityGate(unittest.TestCase):
         self.assertEqual(sorted(points,key=lambda code:(-points[code],code))[:2],["688256","002594"])
 
 
+    def test_local_cross_section_observation_contract(self):
+        from examples.cross_section_daily_research import evaluate, average_ranks
+        from datetime import date, timedelta
+        days = [(date(2020,1,1)+timedelta(days=i)).isoformat() for i in range(27)]
+        signal = days[20]
+        panel = {
+            days[0]: {"A":(10,10),"B":(10,10),"C":(10,10)},
+            days[15]: {"A":(10,10),"B":(10,10),"C":(10,10)},
+            signal: {"A":(8,8),"B":(9,9),"C":(12,12)},
+            days[21]: {"B":(9,10),"C":(12,13)},
+            days[26]: {"B":(10,10),"C":(11,11)},
+        }
+        self.assertEqual(average_ranks([4,1,1]),[2,0.5,0.5])
+        r = evaluate(panel,days,[signal],[1,2],"intraday")
+        row = r["rounds"][0]
+        self.assertEqual((row["valid_scores"],row["valid_labels"]),(3,2))
+        self.assertEqual(row["factors"]["REV20"]["top"][0]["valid_labels"],0)
+        self.assertIsNone(row["factors"]["REV20"]["top"][0]["gross"])
+        self.assertEqual(row["factors"]["MOM20"]["top"][0]["valid_labels"],1)
+        self.assertAlmostEqual(row["factors"]["MOM20"]["top"][0]["gross"],1/12)
+        self.assertEqual(r["common_by_k"][0]["dates"],[])
+        self.assertAlmostEqual(row["factors"]["REV20"]["rank_ic"],-row["factors"]["MOM20"]["rank_ic"])
+        five = evaluate(panel,days,[signal],[1],"next_open_5")["rounds"][0]
+        self.assertEqual(five["exit_date"],days[26])
+        self.assertAlmostEqual(five["factors"]["MOM20"]["top"][0]["gross"],-1/12)
+        # Restoring the future label must not change the frozen top score.
+        panel[days[21]]["A"]=(8,100)
+        changed=evaluate(panel,days,[signal],[1],"intraday")["rounds"][0]
+        self.assertAlmostEqual(changed["factors"]["REV20"]["top"][0]["gross"],11.5)
+        self.assertEqual(row["valid_scores"],changed["valid_scores"])
+
+
     def test_real_four_stock_editorial_examples(self):
         import json
         from statistics import mean, stdev
