@@ -23,39 +23,69 @@
     return [...rows].sort((a, b) => b.mom5 - a.mom5 || a.symbol.localeCompare(b.symbol));
   }
 
+  function averageRanks(values) {
+    const indices = values.map((_,i)=>i).sort((a,b)=>values[b]-values[a]);
+    const ranks = Array(values.length);
+    for(let lo=0;lo<indices.length;){
+      let hi=lo+1;
+      while(hi<indices.length && values[indices[hi]]===values[indices[lo]])hi++;
+      for(let j=lo;j<hi;j++)ranks[indices[j]]=(lo+hi+1)/2;
+      lo=hi;
+    }
+    return ranks;
+  }
+
   function rankIc(rows) {
-    if (!Array.isArray(rows) || rows.length !== 4) {
+    if (!Array.isArray(rows) || rows.length !== 4 || new Set(rows.map(r=>r.symbol)).size!==4 ||
+        !rows.every(r=>Number.isFinite(r.mom5)&&Number.isFinite(r.forward_return))) {
       throw new Error("这一练习需要同一期四只股票的完整数据。");
     }
-    const predicted = sortMomentum(rows);
-    const realized = [...rows].sort((a, b) =>
-      b.forward_return - a.forward_return || a.symbol.localeCompare(b.symbol));
-    if (new Set(rows.map((r) => r.forward_return)).size !== 4 ||
-        new Set(rows.map((r) => r.mom5)).size !== 4) {
-      throw new Error("当前数据出现并列名次，需要改用平均名次计算。");
+    const x=averageRanks(rows.map(r=>r.mom5)),y=averageRanks(rows.map(r=>r.forward_return));
+    const mx=x.reduce((a,b)=>a+b,0)/4,my=y.reduce((a,b)=>a+b,0)/4;
+    const xx=x.reduce((a,b)=>a+(b-mx)**2,0),yy=y.reduce((a,b)=>a+(b-my)**2,0);
+    if(!xx||!yy)return null;
+    return x.reduce((sum,v,i)=>sum+(v-mx)*(y[i]-my),0)/Math.sqrt(xx*yy);
+  }
+
+  function sensitivity(sample, direction, count, bps) {
+    assertValid(sample);
+    if(!["momentum","reversal"].includes(direction)||!Number.isInteger(count)||count<1||count>4||
+       !Number.isFinite(bps)||bps<0||bps>100)throw new Error("实验参数超出课堂范围");
+    const sign=direction==="momentum"?1:-1,cost=bps/10000;
+    const rows=sample.rounds.map(round=>{
+      const sorted=[...round.rows].sort((a,b)=>sign*(b.mom5-a.mom5)||a.symbol.localeCompare(b.symbol));
+      const selected=sorted.slice(0,count);
+      const gross=selected.reduce((a,b)=>a+b.forward_return,0)/count;
+      const benchmark=sorted.reduce((a,b)=>a+b.forward_return,0)/4;
+      const ic=rankIc(round.rows);
+      return {signal:round.signal_date,selected:selected.map(r=>r.name),gross,benchmark,ic:ic===null?null:sign*ic};
+    });
+    function stats(values,name){
+      const ics=values.map(v=>v.ic).filter(Number.isFinite);
+      const compound=fn=>values.reduce((a,v)=>a*(1+fn(v)),1)-1;
+      return {name,periods:values.length,definedIc:ics.length,
+        meanIc:ics.length?ics.reduce((a,b)=>a+b,0)/ics.length:null,
+        gross:compound(v=>v.gross),netProxy:compound(v=>v.gross-cost),
+        benchmarkProxy:compound(v=>v.benchmark-cost)};
     }
-    const rank = new Map(realized.map((r, i) => [r.symbol, i + 1]));
-    const squared = predicted.reduce((sum, r, i) => {
-      const diff = (i + 1) - rank.get(r.symbol);
-      return sum + diff * diff;
-    }, 0);
-    return 1 - 6 * squared / 60;
+    return {...stats(rows,"全部"),rows,blocks:[stats(rows.slice(0,10),"前10期"),stats(rows.slice(10,14),"中4期"),stats(rows.slice(14),"后4期（已公开）")]};
   }
 
   function summarize(rounds) {
     if (!Array.isArray(rounds) || rounds.length === 0) {
       throw new Error("没有可计算的历史观察期。");
     }
-    let strategy = 1, baseline = 1, sumIc = 0;
+    let strategy = 1, baseline = 1, sumIc = 0, definedIc = 0;
     for (const round of rounds) {
       const returns = sortMomentum(round.rows).map((x) => x.forward_return);
       strategy *= 1 + (returns[0] + returns[1]) / 2;
       baseline *= 1 + returns.reduce((a, b) => a + b, 0) / 4;
-      sumIc += rankIc(round.rows);
+      const ic = rankIc(round.rows);
+      if(ic!==null){sumIc+=ic;definedIc++;}
     }
     return {
       periods: rounds.length,
-      meanIc: sumIc / rounds.length,
+      meanIc: definedIc ? sumIc / definedIc : null,
       strategyPct: (strategy - 1) * 100,
       baselinePct: (baseline - 1) * 100,
     };
@@ -117,7 +147,7 @@
     ]) {
       if (!values.length) continue;
       const s = summarize(values);
-      lines.push(name + "：" + s.periods + "期｜平均RankIC " + signed(s.meanIc, 3) +
+      lines.push(name + "：" + s.periods + "期｜平均RankIC " + (s.meanIc===null?"未定义":signed(s.meanIc, 3)) +
         "｜选股复利 " + signed(s.strategyPct) + "%｜四股等权 " +
         signed(s.baselinePct) + "%");
     }
@@ -129,7 +159,7 @@
     return lines.join("\n");
   }
 
-  const api = { run, rankIc, summarize };
+  const api = { run, rankIc, summarize, sensitivity };
   root.QuantRealCase = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;
 })(typeof self !== "undefined" ? self : globalThis);

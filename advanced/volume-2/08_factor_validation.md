@@ -170,6 +170,10 @@ python -m unittest discover -s tests -p "test_advanced_factor_research_lab.py" -
 
 **代码不是市场绩效回测**：它没有真实股票池、历史行业、财务版本、订单或费用，也没有进行真正的模型选择与独立 OOS。因此报告中所有数字必须带 `SYNTHETIC_ONLY` 标签，不得用于买卖判断。
 
+### 真实四股参数敏感性：不是重新寻找最优策略
+
+本章末尾增加第一卷同一真实价格快照的交互计算，不与 40 只人工股票混在一起。可以比较 MOM5 的正反方向、选股数和固定每期费用代理；三段仍按 10/4/4 期列出，均是已公开的回顾性观察。RankIC 使用平均名次处理并列，若一列名次恒定则未定义，不填成零。先观察同一批样本内选择和成本如何影响结果，再讨论真正的样本外证据。
+
 ### 5.1 真实四股 18 期 RankIC 的证据等级
 
 [审计报告](REAL_DATA_EVIDENCE_REVIEW.md) · [复算脚本](../../examples/advanced_real_evidence_audit.py) · [负例测试](../../tests/test_advanced_real_evidence_audit.py)。

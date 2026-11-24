@@ -48,6 +48,13 @@ class RealStockCourseTests(unittest.TestCase):
         self.assertAlmostEqual(intro["lot_end"], 954882)
         self.assertAlmostEqual(rank_ic(intro["rows"]), -1.0)
 
+    def test_average_ties_and_constant_ranks(self):
+        import math
+        rows=[dict(symbol=str(i),mom5=v,forward_return=i+1)
+              for i,v in enumerate([1,1,3,4])]
+        self.assertAlmostEqual(rank_ic(rows),math.sqrt(.9))
+        self.assertIsNone(rank_ic([dict(x,mom5=1) for x in rows]))
+
     def test_time_split_and_real_mean_rank_ic(self):
         rounds = self.saved["rounds"]
         self.assertEqual(len(rounds[:10]), 10)

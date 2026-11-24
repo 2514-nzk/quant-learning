@@ -58,6 +58,7 @@
   let labs = {};
   let pyWorker = null;
   let labRequestId = 0;
+  let labBusy = false;
   const labPending = new Map();
   const textCache = new Map();
 
@@ -275,14 +276,14 @@
       textCache.set(relative, fetch(new URL(relative, document.baseURI)).then((response) => {
         if (!response.ok) throw new Error(`无法读取 ${relative}（${response.status}）`);
         return response.text();
-      }));
+      }).catch(error => { textCache.delete(relative); throw error; }));
     }
     return textCache.get(relative);
   }
 
   function getPyWorker() {
     if (pyWorker) return pyWorker;
-    pyWorker = new Worker(new URL("pyodide-worker.js?v=9", document.baseURI));
+    pyWorker = new Worker(new URL("pyodide-worker.js?v=10", document.baseURI));
     pyWorker.onmessage = (event) => {
       const { id, status, ok, output } = event.data || {};
       const pending = labPending.get(id);
@@ -308,6 +309,7 @@
   }
 
   function runInBrowser({ code, filename, files, argv, onStatus }) {
+    if (labPending.size) return Promise.reject(new Error("已有 Python 实验运行，请完成后再试。"));
     const worker = getPyWorker();
     const id = ++labRequestId;
     return new Promise((resolve, reject) => {
@@ -341,7 +343,10 @@
   }
 
   async function runLabScript(lab, config, output, status, button) {
-    button.disabled = true;
+    if (labBusy) { setLabStatus(status, "已有实验正在运行，请完成后再试。"); return; }
+    labBusy = true;
+    const buttons = [...(button.closest(".lab-panel")?.querySelectorAll("button") || [button])];
+    buttons.forEach(b => { b.disabled = true; });
     output.textContent = "";
     setLabStatus(status, "正在准备…");
     try {
@@ -376,12 +381,16 @@
       if (output.isConnected) output.textContent = error.message || String(error);
       setLabStatus(status, "运行失败");
     } finally {
-      button.disabled = false;
+      labBusy = false;
+      buttons.forEach(b => { b.disabled = false; });
     }
   }
 
   async function runLabEditor(lab, editor, output, status, button) {
-    button.disabled = true;
+    if (labBusy) { setLabStatus(status, "已有实验正在运行，请完成后再试。"); return; }
+    labBusy = true;
+    const buttons = [...(button.closest(".lab-panel")?.querySelectorAll("button") || [button])];
+    buttons.forEach(b => { b.disabled = true; });
     output.textContent = "";
     setLabStatus(status, "正在准备…");
     try {
@@ -401,7 +410,8 @@
       if (output.isConnected) output.textContent = error.message || String(error);
       setLabStatus(status, "运行失败");
     } finally {
-      button.disabled = false;
+      labBusy = false;
+      buttons.forEach(b => { b.disabled = false; });
     }
   }
 
@@ -479,17 +489,36 @@
 
   // Keep TeX delimiters intact through Markdown parsing, without converting code fences.
   function prepareMath(markdown) {
-    const parts = markdown.split(/(~{3}[\s\S]*?~{3}|\x60{3}[\s\S]*?\x60{3})/g);
-    return parts.map((part, index) => {
-      if (index % 2) return part;
-      return part
-        .replace(/\\\[([\s\S]*?)\\\]/g, (_, tex) =>
-          '<div class="math-block" data-math="' + encodeURIComponent(tex) +
-          '">' + escapeHTML('\\[' + tex + '\\]') + '</div>')
-        .replace(/\\\(([\s\S]*?)\\\)/g, (_, tex) =>
-          '<span class="math-inline" data-math="' + encodeURIComponent(tex) +
-          '">' + escapeHTML('\\(' + tex + '\\)') + '</span>');
-    }).join("");
+    // Line-anchored fences (including longer ones) and inline code are literal.
+    // Do not rewrite TeX that is being taught as source code.
+    const lines = markdown.match(/[^\n]*\n|[^\n]+$/g) || [];
+    let fence = null, plain = "", result = "";
+    function renderText(part) {
+      return part.replace(/(\x60+)([^\n]*?)\1(?!\x60)|\\\[([\s\S]*?)\\\]|\\\(([\s\S]*?)\\\)/g,
+        (whole, ticks, code, display, inline) => {
+          if (ticks) return whole;
+          const tex = display === undefined ? inline : display;
+          const block = display !== undefined;
+          const tag = block ? "div" : "span";
+          const literal = (block ? "\\[" : "\\(") + tex + (block ? "\\]" : "\\)");
+          // Escape pipes in fallback HTML, too, so GFM tables do not split a formula.
+          return '<' + tag + ' class="math-' + (block ? "block" : "inline") +
+            '" data-math="' + encodeURIComponent(tex) + '">' +
+            escapeHTML(literal).replace(/\|/g, "&#124;") + '</' + tag + '>';
+        });
+    }
+    function flush() { result += renderText(plain); plain = ""; }
+    for (const line of lines) {
+      const marker = line.match(/^ {0,3}(~{3,}|\x60{3,})([^\n]*)/);
+      if (fence) {
+        result += line;
+        if (marker && marker[1][0] === fence[0] && marker[1].length >= fence.length && !marker[2].trim()) fence = null;
+      } else if (marker) {
+        flush(); fence = marker[1]; result += line;
+      } else plain += line;
+    }
+    flush();
+    return result;
   }
 
   function typesetMath(container) {
@@ -556,6 +585,32 @@
     }).catch(()=>{if(panel.isConnected)body.textContent="图表数据加载失败。仍可使用本章 Python 实验重新计算。";});
   }
 
+  function renderRealSensitivity(doc) {
+    if (!["教程/真实_08_单因子评价.md","教程/真实_16_综合练习.md",
+           "advanced/volume-2/08_factor_validation.md"].includes(doc.path)) return;
+    const panel = document.createElement("section");
+    panel.className = "risk-dashboard real-sensitivity";
+    panel.innerHTML = '<h2>动手试：动量还是反转？买几只股票？</h2><p>使用第一卷原有四只真实股票的 18 期价格观察。可以改变排序方向、选股数量和每期费用代理。所有结果仅为已公开历史的描述性教学，不是独立样本外或真实成交净值。</p><div class="sensitivity-body" aria-live="polite">正在读取课堂数据…</div>';
+    els.article.append(panel);
+    const body = panel.querySelector(".sensitivity-body");
+    fetchText("data/real_a_share/teaching_case.json").then(JSON.parse).then(sample => {
+      if (!panel.isConnected) return;
+      body.innerHTML = '<div class="sensitivity-controls"><label>排序方向 <select name="direction"><option value="momentum">动量（过去涨得多）</option><option value="reversal">反转（过去跌得多）</option></select></label><label>每期选股数量 <select name="count"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label><label>每期固定费用代理 <select name="bps"><option>0</option><option>10</option><option>30</option><option>50</option><option>100</option></select> bps</label></div><div class="sensitivity-results"></div>';
+      const result = body.querySelector(".sensitivity-results");
+      function update() {
+        const r = window.QuantRealCase.sensitivity(sample,body.querySelector('[name="direction"]').value,
+          Number(body.querySelector('[name="count"]').value),Number(body.querySelector('[name="bps"]').value));
+        const pct = n => (n*100).toFixed(2)+"%";
+        const f = n => n===null?"未定义":n.toFixed(3);
+        const tr = r.blocks.map(b=>'<tr><td>'+escapeHTML(b.name)+'</td><td>'+b.periods+'</td><td>'+f(b.meanIc)+'</td><td>'+pct(b.gross)+'</td><td>'+pct(b.netProxy)+'</td><td>'+pct(b.benchmarkProxy)+'</td></tr>').join("");
+        const selected = r.rows[r.rows.length-1];
+        result.innerHTML='<div class="risk-metrics"><div><small>18期毛观察复利</small><strong>'+pct(r.gross)+'</strong></div><div><small>费用情景复利</small><strong>'+pct(r.netProxy)+'</strong></div><div><small>平均 RankIC</small><strong>'+f(r.meanIc)+'</strong></div><div><small>四股等权费用情景</small><strong>'+pct(r.benchmarkProxy)+'</strong></div></div><p>最后一期按已知分数选择：'+escapeHTML(selected.selected.join("、"))+'；该期毛收益 '+pct(selected.gross)+'。</p><div class="risk-capacity"><table><thead><tr><th>历史分段</th><th>期数</th><th>平均IC</th><th>毛复利</th><th>扣费代理</th><th>等权扣费代理</th></tr></thead><tbody>'+tr+'</tbody></table></div><p>费用代理 = 每期收益减去固定基点（1 bps = 0.01 个百分点）；两种组合都按相同假设扣费。没有实际整手、分红、成交及换手账本。改变选股数不改变排序 IC；切换方向则反转排序符号。不要从已公开历史中挑表现最好的一组再称为独立检验。</p>';
+      }
+      body.querySelectorAll("select").forEach(select=>select.addEventListener("change",update));
+      update();
+    }).catch(error=>{if(panel.isConnected)body.textContent="课堂数据加载失败："+error.message;});
+  }
+
   function renderArticle(doc) {
     if (!window.marked || !window.DOMPurify) {
       els.article.innerHTML = `<p class="reader-error">正文解析组件没有加载成功。请刷新页面，或检查当前网络是否可以访问 jsDelivr。</p><pre>${escapeHTML(doc.content)}</pre>`;
@@ -608,6 +663,7 @@
       if (headingBySlug.has(fragment)) anchor.setAttribute("href", `#${headingBySlug.get(fragment)}`);
     });
     els.article.replaceChildren(...wrapper.childNodes);
+    renderRealSensitivity(doc);
     renderRiskDashboard(doc);
     renderLabFor(doc);
     if (sections.length) {

@@ -284,8 +284,9 @@ def report():
     allocation=allocation_report(panel)
     paper=paper_report()
     o=paper["outcomes"]
-    gates=dict(ledger_reconciled=all(abs(a["totals"]["residual"])<1e-6
-                                    for a in allocation["attribution"].values()),
+    gates=dict(ledger_reconciled=all(abs(d["residual"])<1e-6
+                                    for a in allocation["attribution"].values()
+                                    for d in a["daily"]),
                fault_drill=(o["retry_after_restart"]=="DUPLICATE" and
                             o["duplicate_fill"]=="DUPLICATE" and
                             not o["mismatch_resume"] and o["confirmed_resume"] and

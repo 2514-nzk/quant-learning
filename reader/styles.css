@@ -513,3 +513,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid 
 .risk-metrics strong, .risk-metrics small { display: block; }
 .risk-metrics strong { font-size: 1.1em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .risk-capacity { overflow-x: auto; }
+
+.sensitivity-controls { display:flex; flex-wrap:wrap; gap:1em; margin:1em 0; }
+.sensitivity-controls label { display:flex; flex-direction:column; gap:.3em; font-size:.9em; }
+.sensitivity-controls select { color:var(--ink); background:var(--paper-raised); border:1px solid var(--line); border-radius:5px; padding:.35em; font:inherit; }

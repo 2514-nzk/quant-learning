@@ -9,18 +9,31 @@ ROOT = Path(__file__).resolve().parents[1]
 CASE = ROOT / "data" / "real_a_share" / "teaching_case.json"
 
 
-def rank_ic(rows: list[dict]) -> float:
-    """Spearman rank correlation for four observations without ties.
-
-    Predictive scores sort descending (1 is highest), actual returns sort descending.
-    """
-    ids = [x["symbol"] for x in rows]
-    pred = {row["symbol"]:i + 1 for i,row in enumerate(sorted(rows,key=lambda r:(-r["mom5"],r["symbol"])))}
-    actual = {row["symbol"]:i + 1 for i,row in enumerate(sorted(rows,key=lambda r:(-r["forward_return"],r["symbol"])))}
-    # 4-stock Spearman formula applies when both orderings are unique.
-    if len({x["forward_return"] for x in rows}) != len(rows):
-        raise ValueError("Return ties require average ranks, not this simplified formula")
-    return 1 - 6*sum((pred[x]-actual[x])**2 for x in ids)/(4*(4**2-1))
+def rank_ic(rows: list[dict]) -> float | None:
+    """Spearman correlation with average ties; constant ranks are undefined."""
+    import math
+    if len(rows)!=4 or len({x["symbol"] for x in rows})!=4:
+        raise ValueError("Four distinct securities required")
+    def ranks(key):
+        values=[x[key] for x in rows]
+        if not all(math.isfinite(v) for v in values):
+            raise ValueError("Nonfinite data")
+        order=sorted(range(4),key=lambda i:-values[i])
+        result=[0.]*4
+        lo=0
+        while lo<4:
+            hi=lo+1
+            while hi<4 and values[order[hi]]==values[order[lo]]:
+                hi+=1
+            for j in range(lo,hi):
+                result[order[j]]=(lo+hi+1)/2
+            lo=hi
+        return result
+    x,y=ranks("mom5"),ranks("forward_return")
+    xx,yy=sum((v-2.5)**2 for v in x),sum((v-2.5)**2 for v in y)
+    if not xx or not yy:
+        return None
+    return sum((a-2.5)*(b-2.5) for a,b in zip(x,y))/math.sqrt(xx*yy)
 
 
 def summarize(rounds: list[dict]) -> dict:
@@ -30,10 +43,12 @@ def summarize(rounds: list[dict]) -> dict:
     for item in rounds:
         growth *= 1 + item["top2_gross"]
         baseline *= 1 + item["all4_gross"]
-        ics.append(rank_ic(item["rows"]))
+        ic=rank_ic(item["rows"])
+        if ic is not None:
+            ics.append(ic)
     return {
         "periods":len(rounds),
-        "mean_ic":sum(ics)/len(ics),
+        "mean_ic":sum(ics)/len(ics) if ics else None,
         "selected_total_pct":(growth-1)*100,
         "baseline_total_pct":(baseline-1)*100,
     }
@@ -57,7 +72,8 @@ def run(period: int | None = None) -> None:
     print("\n18个非重叠教学期（不代表完整历史股票池）：")
     for name,sl in (("前10期（学习）",rows[:10]),("中4期（比较）",rows[10:14]),("后4期（演示留出）",rows[14:])):
         s=summarize(sl)
-        print(f"{name}: {s['periods']}期，平均RankIC {s['mean_ic']:+.3f}，"
+        ic_text=f"{s['mean_ic']:+.3f}" if s["mean_ic"] is not None else "未定义"
+        print(f"{name}: {s['periods']}期，平均RankIC {ic_text}，"
               f"理论选股复利 {s['selected_total_pct']:+.2f}%，四股等权 {s['baseline_total_pct']:+.2f}%")
     print("只有4只知名股票、18期。样本太小，不可将这张成绩单当成实盘策略有效性证据。")
 

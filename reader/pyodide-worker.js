@@ -4,7 +4,8 @@ const PYODIDE_BASE = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/
 
 let bootPromise = null;
 let pyodide = null;
-let mounted = new Set();
+let mounted = new Map();
+let running = false;
 
 async function boot() {
   if (bootPromise) return bootPromise;
@@ -21,17 +22,20 @@ async function boot() {
 async function mountFiles(files) {
   const py = await boot();
   for (const file of files || []) {
-    if (mounted.has(file.path)) continue;
+    if (mounted.get(file.path) === file.content) continue;
     const directory = file.path.split("/").slice(0, -1).join("/");
     if (directory) py.FS.mkdirTree(directory);
     py.FS.writeFile(file.path, new TextEncoder().encode(file.content));
-    mounted.add(file.path);
+    mounted.set(file.path, file.content);
   }
 }
 
 self.onmessage = async (event) => {
   const { id, code, files, filename, argv } = event.data || {};
+  if (running) { self.postMessage({id, ok:false, output:"已有 Python 实验正在运行。"}); return; }
+  running = true;
   let output = "";
+  let globals = null;
   try {
     self.postMessage({ id, status: "booting" });
     const py = await boot();
@@ -42,7 +46,7 @@ self.onmessage = async (event) => {
     py.setStderr({ batched: (text) => { output += text + "\n"; } });
     await py.runPythonAsync(`import os, sys\nos.chdir('/project')\nsys.argv = ${JSON.stringify(argv || [])}`);
 
-    const globals = py.toPy({
+    globals = py.toPy({
       __name__: "__main__",
       __file__: filename || "/project/examples/script.py",
     });
@@ -54,5 +58,8 @@ self.onmessage = async (event) => {
       ok: false,
       output: `${output}\n${error?.message || String(error)}`.trim(),
     });
+  } finally {
+    globals?.destroy();
+    running = false;
   }
 };
