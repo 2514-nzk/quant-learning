@@ -4,7 +4,7 @@
 
 2026-11-11 固定的主课程样本包含 **2024-01-02 至 2024-06-28** 的历史日线，每只 117 行：贵州茅台（600519）、寒武纪（688256）、宁德时代（300750）、比亚迪（002594）。另外保存了平安银行（000001）的独立历史日线；它不属于本书四股教学组合。
 
-接口优先级：`stock_zh_a_hist`（东方财富）→ `stock_zh_a_daily`（新浪，备用）。本次东方财富接口返回异常，**四只均通过 AKShare 新浪历史行情接口采集**。每只数据实际使用的接口在 [manifest.json](manifest.json) 中有单独记录；再次采集时不保证源会自动保持相同。
+接口优先级：`stock_zh_a_hist_em`（东方财富）→ `stock_zh_a_hist_sina`（新浪，备用）。本次东方财富接口返回异常，**四只均通过 AKShare 新浪历史行情接口采集**。每只数据实际使用的接口在 [manifest.json](manifest.json) 中有单独记录；再次采集时不保证源会自动保持相同。
 
 ## 字段
 
@@ -24,7 +24,7 @@
 在项目根目录运行：
 
 ~~~powershell
-python -m pip install akshare
+python -m pip install --upgrade akshare
 python scripts/collect_real_a_share.py
 python -m unittest discover -s tests -p "test_real_a_share.py" -v
 python examples/real_kline_lab.py --symbol 000001
@@ -39,5 +39,9 @@ python examples/real_kline_lab.py --symbol 000001
 
 
 ## 扩展真实日线（本地可选，不覆盖上述快照）
+
+批量脚本使用当前 AKShare 命名：stock_zh_a_hist_em（东方财富）和 stock_zh_a_hist_sina（新浪备用）。AKShare 在 1.20.41–1.20.54 期间统一接口命名，旧 stock_zh_a_hist 已改名为 stock_zh_a_hist_em；不要照搬旧教程里的旧接口名。参见 [AKShare 当前接口说明](https://github.com/akfamily/akshare#使用)。
+
+批量包保存 raw/ 与 qfq/ 两份独立原始响应。qfq 是本次抓取时点的前复权快照，历史值可能随后续公司行为而重述，不等于 PIT；原始数据保留供应商字段，不强行拼成统一列。脚本会记录源接口、成交量/换手率单位、失败和哈希。默认只保存到本地，不自动把数百只股票行情提交到公开仓库；是否可再分发需另行核查。
 
 使用 [批量日线采集脚本](../../scripts/collect_research_daily.py)，详见[数据附录](../../advanced/volume-2/HISTORICAL_UNIVERSE_SOURCE_AUDIT.md)。采集文件保留来源、范围、失败与 SHA-256；下载成功不代表动态 PIT 股票池成立。

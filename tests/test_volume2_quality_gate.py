@@ -167,6 +167,32 @@ class VolumeTwoQualityGate(unittest.TestCase):
         self.assertLess(rounds[-1]["signal_date"],"2024-06-25")
         self.assertGreater(rounds[-1]["exit_date"],"2024-06-25")
 
+
+    def test_real_factor_cross_section_and_dividend_example(self):
+        import csv
+        files = {code: ROOT / "data" / "real_a_share" / (code + ".csv")
+                 for code in ("300750", "600519", "688256", "002594")}
+        returns = {}
+        closes = {}
+        for code, path in files.items():
+            with path.open(encoding="utf-8") as handle:
+                rows = list(csv.DictReader(handle))
+            by_date = {row["trade_date"]: row for row in rows}
+            ix = next(i for i, row in enumerate(rows)
+                      if row["trade_date"] == "2024-06-21")
+            returns[code] = {
+                n: float(rows[ix]["close"]) / float(rows[ix-n]["close"]) - 1
+                for n in (5, 20, 60)
+            }
+            closes[code] = by_date
+        self.assertAlmostEqual(returns["600519"][5], -.0540192926, places=8)
+        self.assertAlmostEqual(returns["688256"][20], .1719651606, places=8)
+        self.assertAlmostEqual(returns["002594"][60], .1448732587, places=8)
+        raw = float(closes["600519"]["2024-06-21"]["close"]) / float(closes["600519"]["2024-06-14"]["close"]) - 1
+        dividend_total = (float(closes["600519"]["2024-06-21"]["close"]) + 30.876) / float(closes["600519"]["2024-06-14"]["close"]) - 1
+        self.assertAlmostEqual(raw, -.0540192926, places=8)
+        self.assertAlmostEqual(dividend_total, -.0341633441, places=8)
+
     def test_worked_example_math(self):
         self.assertAlmostEqual(.7 * .1 / (.7 * .1 + .2 * .9), .28)
         self.assertAlmostEqual((4 / 3) / (2 / 3 + 1), .8)

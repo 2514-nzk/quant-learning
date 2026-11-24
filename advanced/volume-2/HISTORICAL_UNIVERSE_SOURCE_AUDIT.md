@@ -55,12 +55,12 @@ python examples/advanced_real_evidence_audit.py --json
 以 2016—2025 年为首批完整年度，优先选择有历史来源的明确证券清单（CSV 列 `symbol`，可有 `name`）。也可显式选择当前沪深300成分作为回顾性固定名单练习，不是历史沪深300。两种模式均不自动构建 PIT 母体。
 
 ~~~bash
-python -m pip install akshare
+python -m pip install --upgrade akshare
 python scripts/collect_research_daily.py --symbols-file /your/list.csv --out /your/daily-v1
 python scripts/collect_research_daily.py --current-csi300 --out /your/daily-csi300-v1
 ~~~
 
-程序优先调用 AKShare `stock_zh_a_hist`，失败后尝试 `stock_zh_a_daily`（新浪）。逐证券分别保存不复权与后复权原始字段、名单快照、请求范围、取数时刻、版本和哈希。原始列不强行合并，清单逐文件标明成交量单位；不同来源的 raw/hfq 配对单独标记，研究时必须先核对一致性。目录必须为空或不存在，防止覆盖原始证据。缺失或异常证券记入清单，返回非零退出码，不补造数据。未验证的历史缺失不等于停牌。后复权序列也不自动满足 PIT 或总回报定义；真实执行须用不复权报价及公司行为账本。
+程序优先调用当前 AKShare 的 stock_zh_a_hist_em（东方财富），失败后调用 stock_zh_a_hist_sina（新浪）。逐证券分别保存不复权与前复权原始字段、名单快照、请求范围、取数时刻、版本和哈希。原始列不强行合并，清单逐文件标明成交量单位；不同来源的 raw/qfq 配对单独标记，研究时必须先核对一致性。目录必须为空或不存在，防止覆盖原始证据。缺失或异常证券记入清单，返回非零退出码，不补造数据。未验证的历史缺失不等于停牌。后复权序列也不自动满足 PIT 或总回报定义；真实执行须用不复权报价及公司行为账本。
 
 文档：[AKShare 股票接口](https://akshare-hh.readthedocs.io/en/latest/data/stock/stock.html)、[指数接口](https://akshare-hh.readthedocs.io/en/latest/data/index/index.html)。批量数据保留在本地，未经许可审核不自动提交或发布。这里提供采集工具，不宣称已经取得 300 股实际日线。
 
