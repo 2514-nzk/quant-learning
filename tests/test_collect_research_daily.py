@@ -86,7 +86,17 @@ class BatchTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate(frame, "20200101", "20200103", "akshare.stock_zh_a_hist_em", "raw")
 
+    def test_beijing_a_share_code_uses_eastmoney_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            report = collect(
+                FakeEM(), {"830799": "Beijing"}, {"type": "TEST"},
+                "20200101", "20200103", Path(tmp) / "data", pause=0, attempts=1,
+            )
+            self.assertTrue(report["all_requests_succeeded"])
+            self.assertTrue(all(row["source"] == "akshare.stock_zh_a_hist_em" for row in report["items"]))
+
     def test_invalid_dates_rows_and_codes(self):
+        self.assertEqual(list(symbols([{"symbol": "830799"}])), ["830799"])
         with self.assertRaises(ValueError):
             symbols([{"symbol": "1"}])
         with self.assertRaises(ValueError):

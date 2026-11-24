@@ -53,7 +53,7 @@ def number(raw, field: str, allow_empty: bool = False) -> float | None:
 
 def standardized_rows(df, symbol: str, name: str, source: str) -> list[dict]:
     """Normalize dataframe rows with explicit source-dependent volume units."""
-    chinese = source == "akshare.stock_zh_a_hist"
+    chinese = source.endswith("_em")
     fields = {
         "date": "日期" if chinese else "date",
         "open": "开盘" if chinese else "open",
@@ -108,13 +108,13 @@ def standardized_rows(df, symbol: str, name: str, source: str) -> list[dict]:
 
 def collect_one(ak, symbol: str, name: str) -> tuple[list[dict], str]:
     providers = [
-        ("akshare.stock_zh_a_hist", lambda: ak.stock_zh_a_hist(
+        ("akshare.stock_zh_a_hist_em", lambda: ak.stock_zh_a_hist_em(
             symbol=symbol, period="daily", start_date=START, end_date=END,
-            adjust="", timeout=20,
+            adjust="",
         )),
-        ("akshare.stock_zh_a_daily", lambda: ak.stock_zh_a_daily(
+        ("akshare.stock_zh_a_hist_sina", lambda: ak.stock_zh_a_hist_sina(
             symbol=("sh" if symbol.startswith("6") else "sz") + symbol,
-            start_date="2024-01-02", end_date="2024-06-28", adjust="",
+            period="daily", start_date="2024-01-02", end_date="2024-06-28", adjust="",
         )),
     ]
     errors = []

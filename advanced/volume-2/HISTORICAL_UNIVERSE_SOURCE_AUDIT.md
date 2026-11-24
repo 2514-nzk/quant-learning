@@ -60,7 +60,7 @@ python scripts/collect_research_daily.py --symbols-file /your/list.csv --out /yo
 python scripts/collect_research_daily.py --current-csi300 --out /your/daily-csi300-v1
 ~~~
 
-程序优先调用当前 AKShare 的 stock_zh_a_hist_em（东方财富），失败后调用 stock_zh_a_hist_sina（新浪）。逐证券分别保存不复权与前复权原始字段、名单快照、请求范围、取数时刻、版本和哈希。原始列不强行合并，清单逐文件标明成交量单位；不同来源的 raw/qfq 配对单独标记，研究时必须先核对一致性。目录必须为空或不存在，防止覆盖原始证据。缺失或异常证券记入清单，返回非零退出码，不补造数据。未验证的历史缺失不等于停牌。后复权序列也不自动满足 PIT 或总回报定义；真实执行须用不复权报价及公司行为账本。
+程序优先调用当前 AKShare 的 stock_zh_a_hist_em（东方财富），失败后调用 stock_zh_a_hist_sina（新浪）。逐证券分别保存不复权与前复权原始字段、名单快照、请求范围、取数时刻、版本和哈希。原始列不强行合并，清单逐文件标明成交量单位；不同来源的 raw/qfq 配对单独标记，研究时必须先核对一致性。目录必须为空或不存在，防止覆盖原始证据。缺失或异常证券记入清单，返回非零退出码，不补造数据。未验证的历史缺失不等于停牌。前复权快照也不自动满足 PIT 或总回报定义；真实执行须用不复权报价及公司行为账本。
 
 文档：[AKShare 股票接口](https://akshare-hh.readthedocs.io/en/latest/data/stock/stock.html)、[指数接口](https://akshare-hh.readthedocs.io/en/latest/data/index/index.html)。批量数据保留在本地，未经许可审核不自动提交或发布。这里提供采集工具，不宣称已经取得 300 股实际日线。
 

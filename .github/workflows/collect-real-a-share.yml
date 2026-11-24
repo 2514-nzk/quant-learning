@@ -27,7 +27,7 @@ jobs:
           cache: pip
           cache-dependency-path: requirements.txt
       - name: Install AKShare
-        run: python -m pip install --disable-pip-version-check 'akshare>=1.16'
+        run: python -m pip install --disable-pip-version-check 'akshare>=1.20.54'
       - name: Capture actual historical daily bars
         run: python scripts/collect_real_a_share.py
       - name: Build fact-checked four-stock examples from actual OHLC

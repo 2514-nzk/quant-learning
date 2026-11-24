@@ -24,8 +24,8 @@ def symbols(rows):
     out = {}
     for row in rows:
         code = str(row["symbol"]).strip()
-        if not re.fullmatch(r"[036]\d{5}", code):
-            raise ValueError(f"Expected six-digit Shanghai/Shenzhen A-share code: {code}")
+        if not re.fullmatch(r"[03468]\d{5}", code):
+            raise ValueError(f"Expected six-digit Shanghai/Shenzhen/Beijing A-share code: {code}")
         if code in out:
             raise ValueError(f"Duplicate code: {code}")
         out[code] = str(row.get("name", ""))
@@ -110,7 +110,11 @@ def collect(ak, universe, universe_source, start, end, out, pause=0.5, attempts=
                     "lots",
                     "percent",
                 ),
-                (
+            ]
+            # Sina's historical endpoint is used only for Shanghai/Shenzhen;
+            # Beijing A-share symbols stay on the Eastmoney provider.
+            if code.startswith(("0", "3", "6")):
+                providers.append((
                     "akshare.stock_zh_a_hist_sina",
                     lambda: ak.stock_zh_a_hist_sina(
                         symbol=("sh" if code.startswith("6") else "sz") + code,
@@ -118,8 +122,7 @@ def collect(ak, universe, universe_source, start, end, out, pause=0.5, attempts=
                     ),
                     "shares",
                     "fraction",
-                ),
-            ]
+                ))
             success = False
             for provider, fetch, volume_unit, turnover_unit in providers:
                 for attempt in range(attempts):
@@ -196,7 +199,7 @@ def main():
             raise RuntimeError("AKShare lacks index_stock_cons_csindex; inspect ak.interface_info/search.")
         frame = getter(symbol="000300")
         universe = symbols([
-            {"symbol": str(row["成分券代码"]).zfill(6), "name": row.get("成分券名称", "")}
+            {"symbol": str(row["成分券代码"]).split(".")[0].zfill(6), "name": row.get("成分券名称", "")}
             for row in frame.to_dict("records")
         ])
         if len(universe) != 300:

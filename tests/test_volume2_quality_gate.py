@@ -170,6 +170,7 @@ class VolumeTwoQualityGate(unittest.TestCase):
 
     def test_real_factor_cross_section_and_dividend_example(self):
         import csv
+        import json
         files = {code: ROOT / "data" / "real_a_share" / (code + ".csv")
                  for code in ("300750", "600519", "688256", "002594")}
         returns = {}

@@ -49,15 +49,15 @@ def fake_rows(provider="em"):
 
 class AkShareKlineTests(unittest.TestCase):
     def test_roundtrip_prices_and_normalized_volume(self):
-        em = standardized_rows(FakeFrame(fake_rows()), "000001", "平安银行", "akshare.stock_zh_a_hist")
-        sina = standardized_rows(FakeFrame(fake_rows("sina")), "000001", "平安银行", "akshare.stock_zh_a_daily")
+        em = standardized_rows(FakeFrame(fake_rows()), "000001", "平安银行", "akshare.stock_zh_a_hist_em")
+        sina = standardized_rows(FakeFrame(fake_rows("sina")), "000001", "平安银行", "akshare.stock_zh_a_hist_sina")
         self.assertEqual(len(em), 55)
         self.assertEqual(em[0]["trade_date"], "2024-01-02")
         self.assertEqual(em[0]["volume_lots"], "100.00")
         self.assertEqual(sina[0]["volume_lots"], "100.00")
         turnover_rows = fake_rows("sina")
         turnover_rows[0]["turnover"] = .006
-        converted = standardized_rows(FakeFrame(turnover_rows), "000001", "平安银行", "akshare.stock_zh_a_daily")
+        converted = standardized_rows(FakeFrame(turnover_rows), "000001", "平安银行", "akshare.stock_zh_a_hist_sina")
         self.assertEqual(converted[0]["turnover_pct"], "0.6000")
         self.assertEqual(em[-1]["turnover_pct"], "")
 
@@ -65,19 +65,19 @@ class AkShareKlineTests(unittest.TestCase):
         rows = fake_rows()
         rows[0]["最高"] = rows[0]["开盘"] - 1
         with self.assertRaises(ValueError):
-            standardized_rows(FakeFrame(rows), "000001", "平安银行", "akshare.stock_zh_a_hist")
+            standardized_rows(FakeFrame(rows), "000001", "平安银行", "akshare.stock_zh_a_hist_em")
         duplicate = fake_rows()
         duplicate[1]["日期"] = duplicate[0]["日期"]
         with self.assertRaisesRegex(ValueError, "duplicated"):
-            standardized_rows(FakeFrame(duplicate), "000001", "平安银行", "akshare.stock_zh_a_hist")
+            standardized_rows(FakeFrame(duplicate), "000001", "平安银行", "akshare.stock_zh_a_hist_em")
 
     def test_ma_is_backward_only(self):
         data = [10., 11., 12., 13., 14., 15.]
         self.assertEqual(moving_average(data, 3), [None, None, 11., 12., 13., 14.])
 
     def test_svg_is_static_and_metadata_has_checksum(self):
-        rows = standardized_rows(FakeFrame(fake_rows()), "000001", "平安银行", "akshare.stock_zh_a_hist")
-        svg = render_svg(rows, "000001", "平安银行", "akshare.stock_zh_a_hist")
+        rows = standardized_rows(FakeFrame(fake_rows()), "000001", "平安银行", "akshare.stock_zh_a_hist_em")
+        svg = render_svg(rows, "000001", "平安银行", "akshare.stock_zh_a_hist_em")
         self.assertTrue(svg.startswith('<svg xmlns="http://www.w3.org/2000/svg"'))
         self.assertIn("不复权", svg)
         self.assertIn("MA5", svg)
@@ -87,7 +87,7 @@ class AkShareKlineTests(unittest.TestCase):
             base = Path(directory)
             report = write_snapshot(
                 base / "data", base / "charts",
-                [("000001", "平安银行", "akshare.stock_zh_a_hist", rows)],
+                [("000001", "平安银行", "akshare.stock_zh_a_hist_em", rows)],
                 "test-version",
             )
             record = report["items"][0]
